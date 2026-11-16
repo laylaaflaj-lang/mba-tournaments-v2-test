@@ -151,6 +151,19 @@ details>summary{cursor:pointer;color:#244e83;font-weight:700;padding:9px}
 .venue-location .venue-qr canvas,.venue-location .venue-qr img{width:102px!important;height:102px!important}
 @media(max-width:680px){.venue-strip{justify-content:stretch}.venue-location{width:100%;justify-content:space-between}.venue-location .venue-qr{min-width:112px}}
 @media print{.venue-strip{display:none!important}}
+
+/* Universal tournament switcher — available inside every dashboard */
+.global-tournament-switcher{position:sticky;top:8px;z-index:90;background:#fff;border:1px solid #bccfe7;border-radius:14px;padding:11px 14px;box-shadow:0 7px 26px #14274222;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.global-tournament-switcher .switch-copy{flex:0 0 auto;min-width:170px}
+.global-tournament-switcher .switch-copy strong{font-size:13px;display:block;color:#153860}
+.global-tournament-switcher .switch-copy small{color:#62738b;font-size:11px}
+.global-tournament-switcher select{flex:1;min-width:190px;border:1px solid #aac0df;color:#152b48;background:#f5f9ff;border-radius:9px;padding:11px;font-size:15px;font-weight:750;max-width:100%}
+.global-tournament-switcher .scope-label{background:#e9f0fa;border-radius:25px;padding:6px 10px;font-size:11px;color:#284974;font-weight:800}
+.visibility-grid{display:grid;gap:8px}.visibility-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f8fafd;border:1px solid #dbe5f1;border-radius:10px;padding:12px;flex-wrap:wrap}
+.visibility-row .btn{min-width:120px}.scope-grid{display:grid;gap:7px}.scope-line{display:grid;grid-template-columns:minmax(0,1fr) 95px 95px;gap:7px;align-items:center;border-bottom:1px solid #e0e8f1;padding:8px 3px}
+.scope-line .choice{margin:0}.scope-help{color:#5b6d85;font-size:12px}
+@media(max-width:680px){.global-tournament-switcher{top:0;padding:10px}.global-tournament-switcher .switch-copy{min-width:auto}.global-tournament-switcher select{width:100%;flex-basis:100%}.scope-line{grid-template-columns:minmax(0,1fr) 60px 60px}.scope-line .choice{font-size:11px}}
+@media print{.global-tournament-switcher,.visibility-panel{display:none!important}}
 </style><style id="print-rule"></style></head>
 <body><header><div class="container header-top"><div><h1>🏸 MBA Tournaments <span style="opacity:.75">V2</span></h1><p>Tournament Manager · Secure Roles & Finance</p></div><span class="tag">V2 TEST • ROLE CONTROL</span></div></header>
 <main class="container">
@@ -161,7 +174,8 @@ details>summary{cursor:pointer;color:#244e83;font-weight:700;padding:9px}
  <form id="link-form" hidden class="sub-form"><p class="helper">Use a separate app password, not your Gmail password. At least 12 characters.</p><label class="field">New app password<input id="new-password" type="password" minlength="12" autocomplete="new-password" required></label><label class="field">Confirm password<input id="confirm-password" type="password" minlength="12" autocomplete="new-password" required></label><button class="btn primary" type="submit">Link Password to Existing Account</button></form></div>
  <div id="auth-message" class="helper" role="status"></div></section>
 <div class="banner"><strong>V2 TEST with Roles & Finance:</strong> This uses a NEW v3 data area in your separate V2 TEST Firebase. Your existing <code>v2/state</code> and the ORIGINAL 2026 Firebase stay untouched. Super Admin starts a one-time copy of the already imported V2 test tournaments after publishing the new security rules. Finance is private.</div>
-<div class="toolbar noprint"><span class="helper" style="margin:0">Signed-in viewers can see tournaments. Score, team, finance and admin changes use separate Firebase permissions.</span><button id="print-page" class="btn">🖨 Print A4</button></div>
+<section id="global-tour-control" class="global-tournament-switcher noprint" hidden aria-label="Active tournament switcher"></section>
+<div class="toolbar noprint"><span class="helper" style="margin:0">Only Super Admin-published tournaments appear to viewers. The Super Admin assigns separate View / Edit access per tournament. Finance remains private.</span><button id="print-page" class="btn">🖨 Print A4</button></div>
 <nav class="noprint" aria-label="Tournament management"><button data-page="tournaments" class="selected">🏆 Tournaments</button><button data-page="teams">👥 Teams</button><button data-page="categories">🗂 Categories</button><button data-page="groups">🧩 Groups</button><button data-page="fixtures">🔀 Fixtures</button><button data-page="results">✅ Results</button><button data-page="standings">📊 Standings</button><button data-page="settings">⚙ Settings</button><button data-page="finance">💰 Finance</button><button data-page="access">🛡 User Roles</button><button data-page="print">🖨 Print Center</button></nav>
 <div id="venue-public" class="venue-strip noprint"></div><div id="notice"></div><div id="view"></div></main><div id="profile-layer"></div><footer>MBA Tournaments V2 TEST • Firebase v3 roles & finance • Original 2026 database untouched</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -177,7 +191,7 @@ const firebaseConfig={
  messagingSenderId:'872128319294',appId:'1:872128319294:web:768133f86c435054a0666f'
 };
 const fapp=initializeApp(firebaseConfig),auth=getAuth(fapp),db=getDatabase(fapp);
-const VERSION='2.1.0-finance-roles-test';
+const VERSION='2.2.0-tournament-visibility-scopes-test';
 const deep=x=>JSON.parse(JSON.stringify(x));
 const clean=s=>String(s??'').trim();
 const need=(v,msg)=>{if(!v)throw Error(msg)};
@@ -602,7 +616,9 @@ const h=(strings,...vars)=>strings.reduce((s,x,i)=>s+x+(vars[i]??''),'');
 let store={tournaments:[],selected:null,playerLibrary:[]},page='tournaments',editor=null,mode='score',notice='',profile=null,printReport='fixtures',printCategory='all',printGroup='all',tournamentPanel='details';
 function active(){return store.tournaments.find(x=>x.id===store.selected)||store.tournaments[0]}
 function libraryNames(){return reusablePlayerNames(store.tournaments,store.playerLibrary||[])}
-function remember(){} // UI selections do not overwrite shared online tournament data.
+function remember(){
+ try{if(authUser&&store.selected)localStorage.setItem('mba-v3-selected-'+authUser.uid,store.selected)}catch{}
+} // Only the selected tournament ID is saved locally, never financial data.
 /* V3 uses normalized Firebase paths. Viewer data and private financial records never share a readable ancestor. */
 const permissionsList=[
  ['scoresWrite','Enter / correct match scores'],
@@ -631,13 +647,19 @@ const rolePresets={
 let authUser=null,legacySuper=false,accessRecord=null,accessList={},accessRequests={},remoteReady=false,readError='',writePending=false;
 let stopListeners=[],finListeners=[],financeFor='',finance={config:null,payments:{},overrides:{},expenses:{},transfers:{}};
 const isSuper=()=>legacySuper||!!(accessRecord?.active&&accessRecord?.role==='super');
-const can=key=>!!(authUser&&remoteReady&&!readError&&(isSuper()||(accessRecord?.active===true&&accessRecord.permissions?.[key]===true&&(!['paymentsRead','paymentsWrite','financeRead','financeWrite','feesWrite','financeDashboardRead'].includes(key)||accessRecord.role!=='viewer'))));
+/* Read permission and editing permission are independent per tournament.
+   A global role never grants access to unassigned private tournaments. */
+let publicTournaments={},userTournamentScopes={},superTournamentListener=null,personalTournamentListeners=new Map(),stopCatalog=[],lastTournamentSource='';
+let unsavedFormChanges=false;
+const viewScope=id=>isSuper()||Boolean(publicTournaments[id]||userTournamentScopes[id]?.view===true||userTournamentScopes[id]?.edit===true);
+const editScope=id=>isSuper()||userTournamentScopes[id]?.edit===true;
+const can=key=>!!(authUser&&remoteReady&&!readError&&(isSuper()||(accessRecord?.active===true&&accessRecord.role!=='viewer'&&accessRecord.permissions?.[key]===true&&(key.endsWith('Read')?viewScope(active()?.id):editScope(active()?.id))&&key!=='usersWrite'&&key!=='tournamentWrite'&&(!['paymentsRead','paymentsWrite','financeRead','financeWrite','feesWrite','financeDashboardRead'].includes(key)||accessRecord.role!=='viewer'))));
 const canSeePayments=()=>isSuper()||can('paymentsRead')||can('financeDashboardRead');
 const canSeeExpenses=()=>isSuper()||can('financeRead')||can('financeDashboardRead');
 const canFullFinance=()=>isSuper()||can('financeDashboardRead');
 const canViewFinance=()=>canSeePayments()||canSeeExpenses()||can('paymentsWrite')||can('financeWrite')||can('feesWrite');
 /* A Viewer account must never receive finance values, statuses, reports, or navigation. */
-const allowedToEdit=()=>!!(authUser&&remoteReady&&!readError&&(isSuper()||permissionsList.some(([k])=>!k.endsWith('Read')&&accessRecord?.active&&accessRecord.permissions?.[k])));
+const allowedToEdit=()=>!!(authUser&&remoteReady&&!readError&&(isSuper()||permissionsList.some(([k])=>!k.endsWith('Read')&&can(k))));
 function authorized(action){
  const mapping={
   'edit-tournament':'settingsWrite','new-tournament':'tournamentWrite','delete-tournament':'tournamentWrite',
@@ -665,7 +687,9 @@ function dbToTournament(rec,id){
 }
 function cloudToStore(raw){
  const list=Object.entries(dataObj(raw)).map(([id,rec])=>dbToTournament(rec,id));
- return {tournaments:list,selected:list.some(x=>x.id===store.selected)?store.selected:list[0]?.id||null,playerLibrary:store.playerLibrary||[]};
+ let saved=null;try{saved=localStorage.getItem('mba-v3-selected-'+authUser.uid)}catch{}
+ const selected=list.some(x=>x.id===store.selected)?store.selected:list.some(x=>x.id===saved)?saved:list[0]?.id||null;
+ return {tournaments:list,selected,playerLibrary:store.playerLibrary||[]};
 }
 let rawTournamentData={};
 function setCloud(raw){rawTournamentData=dataObj(raw);store=cloudToStore(rawTournamentData);remoteReady=true;writePending=false;watchFinance();render()}
@@ -686,28 +710,86 @@ function watchFinance(){
 let authGeneration=0;
 function authState(){
  const status=document.getElementById('auth-status');document.getElementById('auth-login').hidden=!!authUser;document.getElementById('auth-account').hidden=!authUser;
- if(!authUser){status.textContent='Please sign in. Google accounts can start as read-only viewers.';return}
+ if(!authUser){status.textContent='Please sign in. Only tournaments approved by Super Admin are visible.';return}
  const roles=isSuper()?'🛡 Super Admin':accessRecord?.active?(accessRecord.role||'Custom Admin'):'👁 Viewer';
  status.textContent=(authUser.email||'Signed in')+' • '+roles+(remoteReady?' • Cloud connected':' • Loading cloud…');
  document.getElementById('password-setup').hidden=authUser.providerData?.some(p=>p.providerId==='password');
 }
+function clearTournamentListeners(){
+ if(superTournamentListener){superTournamentListener();superTournamentListener=null}
+ for(const off of personalTournamentListeners.values())off();
+ personalTournamentListeners.clear();
+}
+/* Super Admin can read all tournaments. Everyone else subscribes only to
+   approved/public IDs, because Firebase rules deny reading the entire collection. */
+function syncTournamentListeners(){
+ if(!authUser)return;
+ const gen=authGeneration;
+ if(isSuper()){
+  if(lastTournamentSource!=='super'){
+   clearTournamentListeners();lastTournamentSource='super';rawTournamentData={};remoteReady=false;
+   superTournamentListener=onValue(ref(db,'v3/tournaments'),s=>{
+    if(gen!==authGeneration||!isSuper())return;
+    if(!writePending)setCloud(s.val());
+   },e=>{if(gen!==authGeneration)return;readError=errText(e);render()});
+  }
+  return;
+ }
+ if(lastTournamentSource==='super'){
+  clearTournamentListeners();rawTournamentData={};store.playerLibrary=[];remoteReady=false;
+  clearListeners(finListeners);financeFor='';finance={config:null,payments:{},overrides:{},expenses:{},transfers:{}};
+ }
+ lastTournamentSource='scoped';
+ const desired=new Set([...Object.keys(publicTournaments),...Object.entries(userTournamentScopes).filter(([,v])=>v?.view===true||v?.edit===true).map(([id])=>id)]);
+ for(const [id,off] of personalTournamentListeners){if(!desired.has(id)){
+  off();personalTournamentListeners.delete(id);delete rawTournamentData[id];
+ }}
+ for(const id of desired){if(personalTournamentListeners.has(id))continue;
+  // Placeholder prevents duplicate listener registration while an initial snapshot arrives.
+  const off=onValue(ref(db,'v3/tournaments/'+id),snap=>{
+    if(gen!==authGeneration||isSuper())return;
+    if(snap.exists())rawTournamentData[id]=snap.val();else delete rawTournamentData[id];
+    if(!writePending)setCloud(rawTournamentData);
+  },e=>{
+    if(gen!==authGeneration)return;
+    delete rawTournamentData[id];personalTournamentListeners.delete(id);
+    // Do not expose a hidden tournament after its access is revoked.
+    setCloud(rawTournamentData);
+  });
+  personalTournamentListeners.set(id,off);
+ }
+ if(!writePending)setCloud(rawTournamentData);
+}
+function watchCatalog(gen){
+ stopCatalog.push(onValue(ref(db,'v3/publicTournaments'),s=>{
+  if(gen!==authGeneration)return;publicTournaments=dataObj(s.val());syncTournamentListeners();render();
+ },e=>{if(gen===authGeneration){readError=errText(e);render()}}));
+ stopCatalog.push(onValue(ref(db,'v3/tournamentAccess/'+authUser.uid),s=>{
+  if(gen!==authGeneration)return;userTournamentScopes=dataObj(s.val());syncTournamentListeners();render();
+ },e=>{if(gen===authGeneration){readError=errText(e);render()}}));
+}
 function beginSession(user){
- const gen=++authGeneration;clearListeners(stopListeners);clearListeners(finListeners);financeFor='';
+ const gen=++authGeneration;
+ clearListeners(stopListeners);clearListeners(stopCatalog);clearTournamentListeners();clearListeners(finListeners);
+ financeFor='';lastTournamentSource='';publicTournaments={};userTournamentScopes={};unsavedFormChanges=false;
  authUser=user;legacySuper=false;accessRecord=null;accessList={};accessRequests={};readError='';remoteReady=false;
  rawTournamentData={};store={tournaments:[],selected:null,playerLibrary:[]};page='tournaments';editor=null;profile=null;notice='';
  authState();render();if(!user)return;
  const on=(path,cb)=>{stopListeners.push(onValue(ref(db,path),s=>{if(gen===authGeneration)cb(s.val())},e=>{if(gen!==authGeneration)return;readError=errText(e);render();document.getElementById('auth-message').textContent='Database error: '+readError}))};
- on('admins/'+user.uid,v=>{legacySuper=v?.active===true&&v?.role==='super';authState();financeFor='';watchFinance();render();if(legacySuper)watchAccess()});
- on('v3/access/'+user.uid,v=>{accessRecord=v||null;authState();financeFor='';watchFinance();render();if(isSuper())watchAccess()});
- on('v3/tournaments',v=>{if(!writePending)setCloud(v)});
- on('v3/playerLibrary',v=>{store.playerLibrary=Array.isArray(v)?v:[];if(remoteReady)render()});
+ on('admins/'+user.uid,v=>{legacySuper=v?.active===true&&v?.role==='super';authState();syncTournamentListeners();watchFinance();render();if(isSuper())watchAccess();else clearAccess()});
+ on('v3/access/'+user.uid,v=>{accessRecord=v||null;authState();syncTournamentListeners();financeFor='';watchFinance();render();if(isSuper())watchAccess();else clearAccess()});
+ watchCatalog(gen);
+ // The shared player library includes names from PRIVATE tournaments: Super Admin only.
+ // Other users derive names from their visible tournament rosters.
+ // Player library deliberately not subscribed for non-Super users.
 }
-let stopAccess=[];
+let stopAccess=[];let accessScopesByUid={};
 function watchAccess(){if(!isSuper()||stopAccess.length)return;
  stopAccess.push(onValue(ref(db,'v3/access'),s=>{accessList=s.val()||{};if(page==='access')render()},()=>{}));
  stopAccess.push(onValue(ref(db,'v3/accessRequests'),s=>{accessRequests=s.val()||{};if(page==='access')render()},()=>{}));
+ stopAccess.push(onValue(ref(db,'v3/tournamentAccess'),s=>{accessScopesByUid=s.val()||{};if(page==='access')render()},()=>{}));
 }
-function clearAccess(){clearListeners(stopAccess)}
+function clearAccess(){clearListeners(stopAccess);accessScopesByUid={}}
 const roleLabel=()=>isSuper()?'Super Admin':accessRecord?.active?accessRecord.role:'Viewer';
 async function migrateFromV2(){
  if(!isSuper())throw Error('Only Super Admin can migrate test tournaments');
@@ -748,7 +830,7 @@ function patchesForMutation(before,after){
  return patches;
 }
 async function op(fn){
- if(!allowedToEdit()){alert('Read-only Viewer account. Ask Super Admin for editing permissions.');return}
+ if(!allowedToEdit()){alert('No editing access for this tournament. Ask Super Admin for permission.');return}
  if(writePending){alert('Previous save still pending.');return}
  const previous=deep(store);
  try{fn();if(can('teamsWrite'))store.playerLibrary=libraryNames();const patches=patchesForMutation(previous,store);
@@ -760,7 +842,16 @@ async function op(fn){
     const tx=await runTransaction(ref(db,key),current=>eq(current??null,orig)?changed[0][1]:undefined,{applyLocally:false});
     if(!tx.committed)throw Error('Another device updated the same match. Latest result loaded; please review then retry.');
   }else await update(ref(db),patches);
-  notice='Saved online to V3 TEST Firebase.';
+  if(isSuper()){
+    const existingIds=new Set(store.tournaments.map(t=>t.id));
+    const catalogPatch={};for(const id of Object.keys(publicTournaments)){
+     const current=store.tournaments.find(t=>t.id===id);
+     if(!current)catalogPatch['v3/publicTournaments/'+id]=null;
+     else if(publicTournaments[id].name!==current.name||publicTournaments[id].date!==(current.date||''))catalogPatch['v3/publicTournaments/'+id]={name:current.name,date:current.date||'',visible:true};
+    }
+    if(Object.keys(catalogPatch).length)await update(ref(db),catalogPatch);
+   }
+   notice='Saved online to V3 TEST Firebase.';
  }catch(e){store=previous;notice='Not saved: '+errText(e);alert(notice)}finally{
   writePending=false;
   try{const updated=await get(ref(db,'v3/tournaments'));setCloud(updated.val())}catch{render()}
@@ -868,21 +959,23 @@ function financeView(t){
  return `${full?`<section class="card"><h2>💰 Full Finance Dashboard · ${esc(t.name)}</h2><p class="helper">Super Admin has specifically granted the full finance view. Projected surplus is not cash already available.</p>${cards}</section>`:`<section class="card"><h2>💰 Finance · Limited Access</h2><p class="helper">You can access only the specific payment or expense functions granted by the Super Admin. Full income, expenditure, profit, collector balances and aggregate dashboard are private.</p></section>`}${config}${playerTable}${canPay?card('Record Payment',receiptForm(t)):''}${receiptsTable}${canFin?card('Record Expense',expenseForm()):''}${expenseTable}${categoryTotals}${collector}${transfer}${transferRegister}`;
 }
 function accessView(){if(!isSuper())return card('User Roles','<p>Only Super Admin can manage user permissions. Use “Request an Editing Role” above.</p>');
- const list=Object.entries(accessList).sort((a,b)=>String(a[1].email||'').localeCompare(String(b[1].email||''))).map(([id,x])=>`<tr><td>${esc(x.email||id)}<small>${esc(id)}</small></td><td>${esc(x.role||'viewer')}</td><td>${x.active?'Active':'Disabled'}</td><td>${Object.entries(x.permissions||{}).filter(([,v])=>v).map(([k])=>esc(k)).join(', ')||'View only'}</td><td><button class="btn" type="button" data-action="manage-user" data-id="${esc(id)}">Edit</button></td></tr>`).join('');
+ const list=Object.entries(accessList).sort((a,b)=>String(a[1].email||'').localeCompare(String(b[1].email||''))).map(([id,x])=>`<tr><td>${esc(x.email||id)}<small>${esc(id)}</small></td><td>${esc(x.role||'viewer')}</td><td>${x.active?'Active':'Disabled'}</td><td>${Object.entries(x.permissions||{}).filter(([,v])=>v).map(([k])=>esc(k)).join(', ')||'View only'}<small>Assigned tournaments: ${Object.values(accessScopesByUid[id]||{}).filter(v=>v.view||v.edit).length}</small></td><td><button class="btn" type="button" data-action="manage-user" data-id="${esc(id)}">Edit</button></td></tr>`).join('');
  const req=Object.entries(accessRequests).map(([id,x])=>`<tr><td>${esc(x.email||id)}<small>${esc(x.name||'')} · ${esc(x.note||'')}</small></td><td><button class="btn" data-action="manage-user" data-id="${esc(id)}" type="button">Set Rights</button></td></tr>`).join('');
- const selected=editor?.kind==='access'?editor.id:'';const existing=accessList[selected]||{};
+ const selected=editor?.kind==='access'?editor.id:'';const existing=accessList[selected]||{};const selectedScopes=selected?(accessScopesByUid[selected]||{}):{};
  const form=`<form data-form="access" class="sub-form access-panel"><h3>Assign or Revoke User Permissions</h3>
  ${field('Firebase User UID (from their Copy UID button)','userUid',selected,'text','required maxlength="128"')}
  ${field('User email (label)','userEmail',existing.email||accessRequests[selected]?.email||'','email','maxlength="160"')}
  <label class="field"><span>Role Preset (then customize individual rights below)</span><select name="role" id="role-preset">${Object.keys(rolePresets).map(role=>`<option value="${esc(role)}" ${existing.role===role?'selected':''}>${esc(role)}</option>`).join('')}</select></label>
  <label class="choice"><input name="active" type="checkbox" ${existing.active===false?'':'checked'}> Account role active</label>
  <div class="checklist">${permissionsList.map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div>
- <div class="actions"><button type="button" data-action="apply-role-preset" class="btn">Fill Permissions from Role</button><button class="btn primary" type="submit">Save User Permissions</button></div>
+ <section class="full"><h4>🏆 Per-Tournament View / Edit Access</h4><p class="scope-help">Super Admin chooses exactly which tournaments this account can see, and which it can change. A role alone cannot edit any tournament unless Edit is granted here. Published tournaments are visible to all signed-in viewers regardless of private assignment.</p>
+ <div class="scope-grid">${store.tournaments.map(t=>{const scope=selectedScopes[t.id]||{};return `<div class="scope-line"><b>${esc(t.name)}</b><label class="choice"><input type="checkbox" name="scopeView" value="${esc(t.id)}" ${scope.view||scope.edit?'checked':''}> View</label><label class="choice"><input type="checkbox" name="scopeEdit" value="${esc(t.id)}" ${scope.edit?'checked':''}> Edit</label></div>`}).join('')||'<p>No tournaments yet</p>'}</div></section>
+ <div class="actions"><button type="button" data-action="apply-role-preset" class="btn">Fill Permissions from Role</button><button class="btn primary" type="submit">Save User Permissions & Tournament Access</button></div>
  <p class="helper">Original Super Admin access under admins/&lt;uid&gt; is preserved. Grant Super Admin rights only to trusted committee owners.</p></form>`;
  return card('Super Admin · User & Roles Dashboard',`<h3>Pending Access Requests</h3><div class="scroll"><table><tbody>${req||'<tr><td>No pending requests</td></tr>'}</tbody></table></div>${form}<h3>Users with Explicit Permissions</h3><div class="scroll"><table><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Permissions</th><th>Actions</th></tr></thead><tbody>${list||'<tr><td colspan="5">No managed users yet</td></tr>'}</tbody></table></div>`);
 }
 async function createFinanceEvent(kind,payload,forcedId=null){
- if(!authUser||!active())throw Error('Login and choose a tournament first');
+ if(!authUser||!active()||!editScope(active().id))throw Error('You need tournament-specific Edit access to save payments.');
  const p=`v3/finance/${active().id}`;
  const branch=kind==='receipt'?'payments':kind==='expense'?'expenses':'transfers';
  const right=kind==='receipt'?'paymentsWrite':'financeWrite';if(!can(right))throw Error('You do not have '+right+' permission');
@@ -893,11 +986,11 @@ async function createFinanceEvent(kind,payload,forcedId=null){
 async function financeSubmit(kind,data){
  const t=active(),get=x=>String(data.get(x)||'').trim();if(!t)throw Error('No tournament selected');
  if(kind==='fin-fee'){
-  if(!can('feesWrite'))throw Error('Ground fee settings permission required');const fee=safeAmount(data.get('fee'),true);
+  if(!can('feesWrite'))throw Error('Ground fee settings and tournament Edit permission required');const fee=safeAmount(data.get('fee'),true);
   await update(ref(db,`v3/finance/${t.id}/config`),{feePerPlayer:fee,updatedBy:authUser.uid,updatedAt:Date.now()});return;
  }
  if(kind==='fin-override'){
-  if(!can('feesWrite'))throw Error('Ground fee settings permission required');const id=get('playerId');if(!playersOf(t).some(p=>p.id===id))throw Error('Player not found');
+  if(!can('feesWrite'))throw Error('Ground fee settings and tournament Edit permission required');const id=get('playerId');if(!playersOf(t).some(p=>p.id===id))throw Error('Player not found');
   await set(ref(db,`v3/finance/${t.id}/overrides/${id}`),{fee:safeAmount(data.get('fee'),true),reason:get('reason'),updatedBy:authUser.uid,updatedAt:Date.now()});return;
  }
  if(kind==='fin-receipt'){
@@ -931,7 +1024,14 @@ async function accessSubmit(data){
  if(permitted.has('paymentsRead')&&permitted.has('financeRead')&&!permitted.has('financeDashboardRead'))throw Error('Full accounts would be reconstructable from both ledgers. Grant the explicit Full Finance Dashboard permission or choose one ledger only.');
  const permissions=Object.fromEntries(permissionsList.map(([key])=>[key,permitted.has(key)]));
  if(role==='super'&&!confirm('Give this person FULL Super Admin control, including finance and user permissions?'))return;
- await update(ref(db),{['v3/access/'+uidString]:{role,active:data.has('active'),permissions,email:String(data.get('userEmail')||'').trim(),updatedBy:authUser.uid,updatedAt:Date.now()},['v3/accessRequests/'+uidString]:null});
+ const views=new Set(data.getAll('scopeView').map(String)),edits=new Set(data.getAll('scopeEdit').map(String));
+ if(role==='viewer'&&(edits.size||permitted.size))throw Error('Viewer Only must have no editing or finance permissions. Select a different role first.');
+ const userScopes=Object.fromEntries(store.tournaments.filter(t=>views.has(t.id)||edits.has(t.id)).map(t=>[t.id,{view:true,edit:edits.has(t.id)}]));
+ const updates={['v3/access/'+uidString]:{role,active:data.has('active'),permissions,email:String(data.get('userEmail')||'').trim(),updatedBy:authUser.uid,updatedAt:Date.now()},['v3/accessRequests/'+uidString]:null};
+ // A single multi-path update makes the assigned role and its tournament scopes consistent.
+ const oldScopes=dataObj(accessScopesByUid[uidString]);
+ for(const id of new Set([...Object.keys(oldScopes),...Object.keys(userScopes)]))updates['v3/tournamentAccess/'+uidString+'/'+id]=userScopes[id]||null;
+ await update(ref(db),updates);
  editor=null;notice='User permissions saved to V3 Firebase.';render();
 }
 
@@ -984,10 +1084,35 @@ function button(label,action,data='',kind=''){return `<button class="btn ${kind}
 function field(label,name,value='',type='text',other=''){return `<label class="field"><span>${label}</span><input name="${name}" type="${type}" value="${esc(value)}" ${other}></label>`}
 function selectField(label,name,values,selected){return `<label class="field"><span>${label}</span><select name="${name}">${values.map(([value,text])=>`<option value="${esc(value)}" ${value===selected?'selected':''}>${esc(text)}</option>`).join('')}</select></label>`}
 function card(title,body,tools=''){return `<section class="card"><div class="section-head"><h2>${esc(title)}</h2><div class="actions noprint">${tools}</div></div>${body}</section>`}
+function tournamentVisibilityPanel(){
+ if(!isSuper())return '';
+ return `<section class="card visibility-panel"><div class="section-head"><h2>🔒 Super Admin · Tournament Visibility</h2></div>
+ <p class="helper">PRIVATE is the default. Publish an individual tournament to show it to signed-in viewers. Unpublishing hides its roster, results, fixtures and standings from viewers; authorized private users can still see it. Only Super Admin can change publication.</p>
+ <div class="visibility-grid">${store.tournaments.map(t=>`<div class="visibility-row"><div><b>${esc(t.name)}</b><small style="display:block;color:#62738b">${esc(dateShow(t.date))} · ${publicTournaments[t.id]?'Published to viewers':'Private / Not published'}</small></div>
+ <button type="button" class="btn ${publicTournaments[t.id]?'danger-outline':'primary'}" data-action="toggle-tournament-public" data-id="${esc(t.id)}">${publicTournaments[t.id]?'Hide from Viewers':'Show to Viewers'}</button></div>`).join('')}</div>
+ <p class="helper">To choose WHICH PERSON may edit WHICH tournament, open 🛡 User Roles → Select user → Per-Tournament View / Edit Access.</p></section>`;
+}
+function renderTournamentSwitcher(){
+ const root=document.getElementById('global-tour-control');
+ if(!authUser||!remoteReady||!store.tournaments.length){root.hidden=true;root.innerHTML='';return}
+ root.hidden=false;
+ const t=active();
+ root.innerHTML=`<div class="switch-copy"><strong>🏆 ACTIVE TOURNAMENT</strong><small>Switch anywhere — current tab stays open</small></div>
+ <select id="tournament-switcher" aria-label="Choose active tournament">${store.tournaments.map(x=>`<option value="${esc(x.id)}" ${x.id===t?.id?'selected':''}>${esc(x.name)} · ${esc(dateShow(x.date))}</option>`).join('')}</select>
+ <span class="scope-label">${isSuper()?'SUPER ADMIN':editScope(t?.id)?'EDIT ACCESS':'VIEW ONLY'}</span>`;
+}
+function switchTournament(id){
+ if(!store.tournaments.some(t=>t.id===id)||id===store.selected)return;
+ if(writePending){alert('Finish saving the current change before switching tournaments.');render();return}
+ if(unsavedFormChanges&&!confirm('You have unsaved form entries. Switch tournament and discard those unsaved entries?')){render();return}
+ unsavedFormChanges=false;store.selected=id;remember();editor=null;profile=null;printCategory='all';printGroup='all';
+ financeFor='';watchFinance();render();
+}
 const viewerActions=new Set(['open-tournament','tournament-section','close-profile','view-player','view-team','view-category','print-now','export','cancel','migrate-v3','manage-user','apply-role-preset']);
 function render(){
  authState();
  const nav=document.querySelector('nav[aria-label="Tournament management"]'),content=document.getElementById('view');
+ renderTournamentSwitcher();
  document.querySelectorAll('[data-page]').forEach(el=>el.classList.toggle('selected',el.dataset.page===page));
  document.getElementById('notice').innerHTML=notice?`<div class="notice">${esc(notice)}</div>`:'';
  document.querySelector('[data-page="access"]').hidden=!isSuper();
@@ -1001,11 +1126,11 @@ function render(){
  nav.hidden=false;
  const t=active();if(!t&&page!=='access'){
    content.innerHTML=editor?.kind==='create'?tournamentView(null):isSuper()?`<section class="card"><h2>V3 Test database is empty</h2><p>Your 4 imported V2 tournaments are still safe in /v2/state. Click below to COPY them into the separate V3 data structure.</p>${button('Copy Existing V2 Test Tournaments (One Time)','migrate-v3','','primary')} ${button('Create New Tournament','new-tournament')}</section>`:
-   '<section class="card"><h2>No V3 tournaments yet</h2><p>Ask the Super Admin to copy the V2 test tournaments first.</p></section>';
+   '<section class="card"><h2>No tournaments available to this account</h2><p>Super Admin must publish a tournament or grant you private View access. Hidden tournaments cannot be opened directly.</p></section>';
    document.getElementById('profile-layer').innerHTML='';return;
  }
  const views={tournaments:tournamentView,teams:teamView,categories:categoryView,groups:groupView,fixtures:fixtureView,results:resultView,standings:standingsView,settings:settingsView,finance:financeView,access:accessView,print:printView};
- content.innerHTML=page==='access'?accessView():views[page]?.(t)||'';
+ content.innerHTML=page==='access'?accessView():((page==='tournaments'&&isSuper()?tournamentVisibilityPanel():'')+(views[page]?.(t)||''));
  document.getElementById('profile-layer').innerHTML=t?detailModal(t):'';
  if(t)document.getElementById('print-rule').textContent=`@page{size:A4 ${t.settings?.printOrientation==='portrait'?'portrait':'landscape'};margin:0}@media print{.print-sheet{font-size:${t.settings?.printFontSize||17}px}}`;
  document.querySelectorAll('[data-action]').forEach(el=>{if(!authorized(el.dataset.action))el.hidden=true});
@@ -1266,13 +1391,25 @@ document.addEventListener('click',async ev=>{
  if(b.classList.contains('profile-overlay')&&ev.target!==b)return;
  const t=active(),id=b.dataset.id,catId=b.dataset.cat,action=b.dataset.action;
  const safe=(fn)=>op(fn);
+ if(action==='toggle-tournament-public'){
+  if(!isSuper())return;
+  const target=store.tournaments.find(x=>x.id===id);if(!target)return;
+  const currently=!!publicTournaments[id];
+  if(!confirm(currently?`Hide "${target.name}" from ordinary viewers? Previously granted private View access is not affected.`:`Publish "${target.name}" to ALL signed-in Viewer accounts? Its teams, fixtures, scores and standings will be readable.`))return;
+  try{
+   const path=ref(db,'v3/publicTournaments/'+id);
+   if(currently)await set(path,null);else await set(path,{name:target.name,date:target.date||'',visible:true});
+   notice=currently?'Tournament made private.':'Tournament published to signed-in viewers.';render();
+  }catch(e){alert('Visibility not changed: '+errText(e))}
+  return;
+ }
  if(action==='migrate-v3'){try{await migrateFromV2()}catch(e){alert(errText(e))}return}
  if(action==='manage-user'){if(!isSuper())return;editor={kind:'access',id};page='access';render();return}
  if(action==='apply-role-preset'){if(!isSuper())return;const form=b.closest('form'),role=form?.querySelector('[name=role]')?.value||'viewer',preset=rolePresets[role]||{};form?.querySelectorAll('[name=perm]').forEach(el=>el.checked=!!preset[el.value]);return}
  if(!authorized(action)){alert('Your role does not allow this action.');return}
  if(writePending&&!viewerActions.has(action)){alert('Previous change is still saving.');return}
  if(action==='use-provided-venue'){const input=document.querySelector('form[data-form="tournament"] [name="venueUrl"]');if(input){input.value=PROVIDED_VENUE_URL;input.focus()}return}
- if(action==='open-tournament'){if(store.tournaments.some(x=>x.id===id)){store.selected=id;tournamentPanel='details';editor=null;profile=null;printCategory='all';printGroup='all';remember();watchFinance();render()}return}
+ if(action==='open-tournament'){if(store.tournaments.some(x=>x.id===id)){switchTournament(id);tournamentPanel='details';render()}return}
  if(action==='tournament-section'){if(['details','history'].includes(b.dataset.section)){tournamentPanel=b.dataset.section;render()}return}
  if(action==='close-profile'){if(b.closest('.profile-dialog')||b.classList.contains('profile-overlay')){profile=null;render()}return}
  if(['view-player','view-team','view-category'].includes(action)){profile={kind:action.slice(5),id};render();return}
@@ -1301,7 +1438,11 @@ document.addEventListener('click',async ev=>{
   const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='MBA-V3-TEST-Tournaments.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return;
  }
 });
+document.addEventListener('input',e=>{if(e.target.closest('#view form[data-form]'))unsavedFormChanges=true});
 document.addEventListener('change',async e=>{
+ if(e.target.id==='tournament-switcher'){switchTournament(e.target.value);return}
+ if(e.target.name==='scopeEdit'&&e.target.checked){const form=e.target.closest('form');const linked=[...form.querySelectorAll('[name=scopeView]')].find(x=>x.value===e.target.value);if(linked)linked.checked=true}
+
  if(e.target.id==='legacy-json-import'){
   if(!isSuper()){alert('Only Super Admin can import.');return}
   if(!confirm('Import legacy JSON into V3 TEST? The original Firebase remains untouched.'))return;
@@ -1335,10 +1476,10 @@ document.addEventListener('change',async e=>{
  if(e.target.name==='teamId'&&e.target.closest('form[data-form="entry"]')){entryPlayerForm();return}
  if(e.target.name==='mode'&&e.target.closest('form[data-form="result"]')){mode=e.target.value;render();return}
 });
-document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>{if(el.dataset.page==='finance'&&!canViewFinance())return;if(el.dataset.page==='access'&&!isSuper())return;page=el.dataset.page;editor=null;render()}));
+document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>{if(unsavedFormChanges&&!confirm('Discard unsaved changes to switch tabs?'))return;unsavedFormChanges=false;if(el.dataset.page==='finance'&&!canViewFinance())return;if(el.dataset.page==='access'&&!isSuper())return;page=el.dataset.page;editor=null;render()}));
 document.addEventListener('submit',async ev=>{
  const form=ev.target.closest('form[data-form]');if(!form)return;ev.preventDefault();
- const data=new FormData(form),kind=form.dataset.form,t=active();
+ const data=new FormData(form),kind=form.dataset.form,t=active();unsavedFormChanges=false;
  if(kind.startsWith('fin-')||kind==='access'){
   const btn=form.querySelector('button[type="submit"]');if(btn)btn.disabled=true;
   try{if(kind==='access')await accessSubmit(data);else await financeSubmit(kind,data);notice='Saved online to V3 TEST Firebase.';render()}
