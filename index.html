@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101f3a"><title>MBA Tournaments — V2 Live Test</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101f3a"><title>MBA Tournaments — V2 Finance, Roles & Venue Test</title>
 <style>
 :root{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#17253d;background:#f2f5fa;color-scheme:light}
 *{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}
@@ -138,63 +138,46 @@ details>summary{cursor:pointer;color:#244e83;font-weight:700;padding:9px}
 .tour-file-import input{max-width:100%;font-size:13px}
 @media(max-width:760px){.tournament-grid{grid-template-columns:1fr}.tour-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.tournament-pane{padding:12px}}
 @media print{.tournament-grid{display:block}.tournament-column,.tour-pane-tabs,.tour-file-import{display:none!important}}
-[hidden]{display:none!important}
-#v2-auth-panel .field{display:block;margin:8px 0;max-width:390px}
-#v2-auth-panel .field input{width:100%;min-height:38px;padding:8px}
-#v2-auth-panel .btn{margin:3px}
+
+.finance-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.finance-stat{border:1px solid #d7e3f2;border-radius:12px;padding:13px;background:#f6f9ff}.finance-stat strong{display:block;font-size:23px;color:#173c75}.finance-stat small{color:#5d708d}.payment-paid{color:#0b8050;font-weight:800}.payment-unpaid{color:#b1263e;font-weight:800}.payment-partial{color:#ad6b0b;font-weight:800}.payment-unknown{color:#66758e;font-weight:750}.fin-table td{word-break:break-word}.fin-actions{display:flex;gap:8px;flex-wrap:wrap}.hide-only-viewer{display:none}
+@media(max-width:680px){.finance-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media print{#v2-auth-panel,.finance-edit,.finance-private,.access-panel{display:none!important}}
+
+/* Venue Location QR: responsive, viewable by every signed-in tournament viewer */
+.venue-strip{display:flex;align-items:center;justify-content:flex-end;margin:0 0 12px}
+.venue-location{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#fff;border:1px solid #d1deee;border-radius:14px;padding:12px 16px;box-shadow:0 4px 14px #182c5009;color:#17253d;max-width:520px}
+.venue-location strong{display:block;font-size:15px}.venue-location small{display:block;color:#5c6e87;margin:3px 0 8px;line-height:1.35}
+.venue-location a{color:#16569b;font-weight:800;text-decoration:underline}.venue-location .venue-qr{width:112px;min-height:112px;display:flex;justify-content:center;align-items:center;background:#fff;border:1px solid #e2e9f1;padding:4px}
+.venue-location .venue-qr canvas,.venue-location .venue-qr img{width:102px!important;height:102px!important}
+@media(max-width:680px){.venue-strip{justify-content:stretch}.venue-location{width:100%;justify-content:space-between}.venue-location .venue-qr{min-width:112px}}
+@media print{.venue-strip{display:none!important}}
 </style><style id="print-rule"></style></head>
-<body><header><div class="container header-top"><div><h1>🏸 MBA Tournaments <span style="opacity:.75">V2</span></h1><p>Custom Tournament Engine · Firebase Live Test</p></div><span class="tag">PRIVATE TEST • FIREBASE</span></div></header>
+<body><header><div class="container header-top"><div><h1>🏸 MBA Tournaments <span style="opacity:.75">V2</span></h1><p>Tournament Manager · Secure Roles & Finance</p></div><span class="tag">V2 TEST • ROLE CONTROL</span></div></header>
 <main class="container">
-<section class="card noprint" id="v2-auth-panel" style="margin:0 0 16px;padding:15px">
-  <h2 style="margin:0 0 10px">🔐 V2 Test Account</h2>
-  <div id="v2-login-state" role="status" aria-live="polite">Checking login…</div>
-  <div id="v2-login-actions" style="display:none;margin-top:10px">
-    <button type="button" class="btn primary" id="v2-google-login">Continue with Google</button>
-    <button type="button" class="btn" id="v2-toggle-email">Email / Password</button>
-    <form id="v2-email-form" style="display:none;max-width:360px;margin-top:10px">
-      <label class="field"><span>Email</span><input type="email" id="v2-email" autocomplete="email" required></label>
-      <label class="field"><span>Password</span><input type="password" id="v2-email-password" autocomplete="current-password" required></label>
-      <button type="submit" class="btn primary">Sign in</button>
-      <button type="button" class="btn" id="v2-reset-password">Forgot password?</button>
-    </form>
-  </div>
-  <div id="v2-account-actions" style="display:none;margin-top:10px">
-    <button class="btn" type="button" id="v2-copy-uid">Copy my User UID</button>
-    <button class="btn" type="button" id="v2-password-setup">Set app password</button>
-    <button class="btn danger-outline" type="button" id="v2-logout">Logout</button>
-    <form id="v2-link-form" style="display:none;max-width:380px;margin-top:12px">
-      <p class="helper">Create a separate password for this existing Google account; do not use your Gmail password.</p>
-      <label class="field"><span>New app password</span><input type="password" id="v2-new-password" autocomplete="new-password" minlength="12" required></label>
-      <label class="field"><span>Confirm app password</span><input type="password" id="v2-confirm-password" autocomplete="new-password" minlength="12" required></label>
-      <button class="btn primary" type="submit">Link to current account</button>
-    </form>
-  </div>
-  <p id="v2-auth-message" class="helper" role="status" aria-live="polite" style="margin:8px 0 0"></p>
-</section>
-<div class="banner"><strong>Private V2 Firebase Test:</strong> Sign in to see test tournaments shared across devices. Only authorized test admins can change results or settings. Nothing here connects to the original 2026 Firebase project. Existing offline demo data is <strong>not</strong> uploaded automatically.</div>
-<div class="toolbar noprint"><span class="helper" style="margin:0">Signed-in viewers see online tournament details; test admins can edit and save to Firebase.</span><button id="print-page" class="btn">🖨 Print A4</button></div>
-<nav class="noprint" aria-label="Tournament management"><button data-page="tournaments" class="selected">🏆 Tournaments</button><button data-page="teams">👥 Teams</button><button data-page="categories">🗂 Categories</button><button data-page="groups">🧩 Groups</button><button data-page="fixtures">🔀 Fixtures</button><button data-page="results">✅ Results</button><button data-page="standings">📊 Standings</button><button data-page="settings">⚙ Settings</button><button data-page="print">🖨 Print Center</button></nav>
-<div id="notice"></div><div id="view"></div></main><div id="profile-layer"></div><footer>MBA Tournaments V2 • Live Test Firebase ONLY • Original 2026 database untouched</footer>
+<section class="card noprint" id="v2-auth-panel" style="margin:0 0 14px"><h2>🔐 MBA Tournaments Account</h2><div id="auth-status" class="helper">Checking login…</div>
+ <div id="auth-login" hidden><button id="google-login" class="btn primary">Continue with Google</button><button class="btn" id="toggle-email">Email / Password</button>
+ <form id="email-form" hidden class="sub-form"><label class="field">Email<input id="email" type="email" autocomplete="email" required></label><label class="field">Password<input id="password" type="password" autocomplete="current-password" required minlength="6"></label><div class="actions"><button class="btn primary" type="submit">Sign In</button><button id="signup" class="btn" type="button">Create Viewer Account</button><button id="reset-password" class="btn" type="button">Reset Password</button></div></form></div>
+ <div id="auth-account" hidden><button class="btn" id="copy-uid">Copy my User UID</button><button class="btn" id="request-access">Request an Editing Role</button><button class="btn" id="password-setup">Set app password</button><button class="btn danger-outline" id="logout">Logout</button>
+ <form id="link-form" hidden class="sub-form"><p class="helper">Use a separate app password, not your Gmail password. At least 12 characters.</p><label class="field">New app password<input id="new-password" type="password" minlength="12" autocomplete="new-password" required></label><label class="field">Confirm password<input id="confirm-password" type="password" minlength="12" autocomplete="new-password" required></label><button class="btn primary" type="submit">Link Password to Existing Account</button></form></div>
+ <div id="auth-message" class="helper" role="status"></div></section>
+<div class="banner"><strong>V2 TEST with Roles & Finance:</strong> This uses a NEW v3 data area in your separate V2 TEST Firebase. Your existing <code>v2/state</code> and the ORIGINAL 2026 Firebase stay untouched. Super Admin starts a one-time copy of the already imported V2 test tournaments after publishing the new security rules. Finance is private.</div>
+<div class="toolbar noprint"><span class="helper" style="margin:0">Signed-in viewers can see tournaments. Score, team, finance and admin changes use separate Firebase permissions.</span><button id="print-page" class="btn">🖨 Print A4</button></div>
+<nav class="noprint" aria-label="Tournament management"><button data-page="tournaments" class="selected">🏆 Tournaments</button><button data-page="teams">👥 Teams</button><button data-page="categories">🗂 Categories</button><button data-page="groups">🧩 Groups</button><button data-page="fixtures">🔀 Fixtures</button><button data-page="results">✅ Results</button><button data-page="standings">📊 Standings</button><button data-page="settings">⚙ Settings</button><button data-page="finance">💰 Finance</button><button data-page="access">🛡 User Roles</button><button data-page="print">🖨 Print Center</button></nav>
+<div id="venue-public" class="venue-strip noprint"></div><div id="notice"></div><div id="view"></div></main><div id="profile-layer"></div><footer>MBA Tournaments V2 TEST • Firebase v3 roles & finance • Original 2026 database untouched</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, linkWithCredential, EmailAuthProvider, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
-import { getDatabase, ref, onValue, get, runTransaction } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
-const firebaseConfig = {
-  "apiKey": "AIzaSyCMbC8Gx6IjPVW-MHbgTyx9MnrG8QNbJnw",
-  "authDomain": "mba-tournaments-v2-test.firebaseapp.com",
-  "databaseURL": "https://mba-tournaments-v2-test-default-rtdb.asia-southeast1.firebasedatabase.app",
-  "projectId": "mba-tournaments-v2-test",
-  "storageBucket": "mba-tournaments-v2-test.firebasestorage.app",
-  "messagingSenderId": "872128319294",
-  "appId": "1:872128319294:web:768133f86c435054a0666f"
+import { getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,linkWithCredential,EmailAuthProvider,sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { getDatabase,ref,onValue,get,update,runTransaction,set } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
+const firebaseConfig={
+ apiKey:'AIzaSyCMbC8Gx6IjPVW-MHbgTyx9MnrG8QNbJnw',
+ authDomain:'mba-tournaments-v2-test.firebaseapp.com',
+ databaseURL:'https://mba-tournaments-v2-test-default-rtdb.asia-southeast1.firebasedatabase.app',
+ projectId:'mba-tournaments-v2-test',storageBucket:'mba-tournaments-v2-test.firebasestorage.app',
+ messagingSenderId:'872128319294',appId:'1:872128319294:web:768133f86c435054a0666f'
 };
-const firebaseApp = initializeApp(firebaseConfig);
-const firebaseAuth = getAuth(firebaseApp);
-const firebaseDB = getDatabase(firebaseApp);
-const liveStateRef = ref(firebaseDB,'v2/state');
-
-/* MBA Tournaments V2 tournament engine. Data comes from the separate V2 TEST Firebase only. */
-const VERSION='2.0.0-beta.6-live-test';
+const fapp=initializeApp(firebaseConfig),auth=getAuth(fapp),db=getDatabase(fapp);
+const VERSION='2.1.0-finance-roles-test';
 const deep=x=>JSON.parse(JSON.stringify(x));
 const clean=s=>String(s??'').trim();
 const need=(v,msg)=>{if(!v)throw Error(msg)};
@@ -616,123 +599,349 @@ function sampleTournament(){
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const h=(strings,...vars)=>strings.reduce((s,x,i)=>s+x+(vars[i]??''),'');
-// No localStorage: the old offline demo cannot silently become shared online data.
-const blankStore=()=>({tournaments:[],selected:null,playerLibrary:[]});
-let store=blankStore(),page='tournaments',editor=null,mode='score',notice='',profile=null,printReport='fixtures',printCategory='all',printGroup='all',tournamentPanel='details';
-let authUser=null,adminActive=false,remoteReady=false,remoteRevision=0,remoteValue=null,writePending=false;
-let stopState=null,stopAdmin=null,subscriptionGeneration=0,readError='';
+let store={tournaments:[],selected:null,playerLibrary:[]},page='tournaments',editor=null,mode='score',notice='',profile=null,printReport='fixtures',printCategory='all',printGroup='all',tournamentPanel='details';
 function active(){return store.tournaments.find(x=>x.id===store.selected)||store.tournaments[0]}
 function libraryNames(){return reusablePlayerNames(store.tournaments,store.playerLibrary||[])}
-// Selection and print preview are local UI controls; never write for just opening a screen.
-function remember(){}
-const allowedToEdit=()=>Boolean(authUser&&adminActive&&remoteReady&&!readError);
-function parseCloudState(raw){
-  const result=blankStore();
-  if(raw&&typeof raw==='object'&&Array.isArray(raw.tournaments)){
-    result.tournaments=raw.tournaments.map(t=>({
-      ...t,teams:Array.isArray(t.teams)?t.teams.map(team=>({...team,players:Array.isArray(team.players)?team.players:[]})):[],
-      categories:Array.isArray(t.categories)?t.categories.map(cat=>({...cat,groups:Array.isArray(cat.groups)?cat.groups:[],entrants:Array.isArray(cat.entrants)?cat.entrants:[]})):[],
-      fixtures:Array.isArray(t.fixtures)?t.fixtures:[],results:t.results||{},
-      settings:t.settings||{printOrientation:'landscape',printFontSize:17,minRestSlots:1}
-    }));
-    result.playerLibrary=Array.isArray(raw.playerLibrary)?raw.playerLibrary:[];
+function remember(){} // UI selections do not overwrite shared online tournament data.
+/* V3 uses normalized Firebase paths. Viewer data and private financial records never share a readable ancestor. */
+const permissionsList=[
+ ['scoresWrite','Enter / correct match scores'],
+ ['teamsWrite','Add / edit teams and players'],
+ ['categoriesWrite','Manage categories, entries and groups'],
+ ['fixturesWrite','Generate and edit league / knockout fixtures'],
+ ['settingsWrite','Edit tournament rules and settings'],
+ ['tournamentWrite','Create / delete tournaments'],
+ ['paymentsRead','See player payments and payment status'],
+ ['paymentsWrite','Record payments, refunds and collectors'],
+ ['financeRead','See expense entries only (no income or full dashboard)'],
+ ['financeWrite','Record expenses and transfers (no full dashboard)'],
+ ['feesWrite','Set ground fee and individual waivers'],
+ ['financeDashboardRead','View FULL tournament income, expenses, profit & collector dashboard (Super Admin grants only)'],
+ ['usersWrite','Manage users / permissions']
+];
+const rolePresets={
+ viewer:{},
+ scorer:{scoresWrite:true},
+ team_admin:{teamsWrite:true,categoriesWrite:true},
+ payment_manager:{paymentsRead:true,paymentsWrite:true},
+ finance_manager:{financeRead:true,financeWrite:true},
+ admin:{scoresWrite:true,teamsWrite:true,categoriesWrite:true,fixturesWrite:true,settingsWrite:true},
+ super:Object.fromEntries(permissionsList.map(([k])=>[k,true]))
+};
+let authUser=null,legacySuper=false,accessRecord=null,accessList={},accessRequests={},remoteReady=false,readError='',writePending=false;
+let stopListeners=[],finListeners=[],financeFor='',finance={config:null,payments:{},overrides:{},expenses:{},transfers:{}};
+const isSuper=()=>legacySuper||!!(accessRecord?.active&&accessRecord?.role==='super');
+const can=key=>!!(authUser&&remoteReady&&!readError&&(isSuper()||(accessRecord?.active===true&&accessRecord.permissions?.[key]===true&&(!['paymentsRead','paymentsWrite','financeRead','financeWrite','feesWrite','financeDashboardRead'].includes(key)||accessRecord.role!=='viewer'))));
+const canSeePayments=()=>isSuper()||can('paymentsRead')||can('financeDashboardRead');
+const canSeeExpenses=()=>isSuper()||can('financeRead')||can('financeDashboardRead');
+const canFullFinance=()=>isSuper()||can('financeDashboardRead');
+const canViewFinance=()=>canSeePayments()||canSeeExpenses()||can('paymentsWrite')||can('financeWrite')||can('feesWrite');
+/* A Viewer account must never receive finance values, statuses, reports, or navigation. */
+const allowedToEdit=()=>!!(authUser&&remoteReady&&!readError&&(isSuper()||permissionsList.some(([k])=>!k.endsWith('Read')&&accessRecord?.active&&accessRecord.permissions?.[k])));
+function authorized(action){
+ const mapping={
+  'edit-tournament':'settingsWrite','new-tournament':'tournamentWrite','delete-tournament':'tournamentWrite',
+  'new-team':'teamsWrite','edit-team':'teamsWrite','remove-team':'teamsWrite',
+  'new-category':'categoriesWrite','edit-category':'categoriesWrite','remove-category':'categoriesWrite',
+  'new-group':'categoriesWrite','rename-group':'categoriesWrite','remove-group':'categoriesWrite',
+  'add-entry':'categoriesWrite','remove-entry':'categoriesWrite',
+  'shuffle':'fixturesWrite','clear-knockout':'fixturesWrite','knockout':'fixturesWrite',
+  'edit-result':'scoresWrite','clear-result':'scoresWrite'
+ };
+ return !mapping[action]||can(mapping[action]);
+}
+const dataObj=x=>x&&typeof x==='object'?x:{};
+const makeMap=items=>Object.fromEntries((items||[]).map(x=>[x.id,x]));
+function tournamentToDb(t){
+ const {teams,categories,fixtures,results,...meta}=t;
+ return {meta,teams:makeMap(teams),categories:makeMap(categories),fixtures:makeMap(fixtures),results:results||{}};
+}
+function dbToTournament(rec,id){
+ const x=dataObj(rec),meta=dataObj(x.meta);
+ const arrays=o=>Object.values(dataObj(o));
+ const t={...meta,id,teams:arrays(x.teams).map(team=>({...team,players:team.players||[]})),categories:arrays(x.categories).map(c=>({...c,groups:c.groups||[],entrants:c.entrants||[]})),fixtures:arrays(x.fixtures).sort((a,b)=>(a.slot||0)-(b.slot||0)||a.court-b.court),results:dataObj(x.results),settings:meta.settings||{printOrientation:'landscape',printFontSize:17,minRestSlots:1}};
+ for(const c of t.categories)if(t.fixtures.some(m=>m.stage==='knockout'&&m.categoryId===c.id))try{advanceKnockout(t,c.id)}catch(e){console.warn('Knockout advancement needs admin review:',e.message)}
+ return t;
+}
+function cloudToStore(raw){
+ const list=Object.entries(dataObj(raw)).map(([id,rec])=>dbToTournament(rec,id));
+ return {tournaments:list,selected:list.some(x=>x.id===store.selected)?store.selected:list[0]?.id||null,playerLibrary:store.playerLibrary||[]};
+}
+let rawTournamentData={};
+function setCloud(raw){rawTournamentData=dataObj(raw);store=cloudToStore(rawTournamentData);remoteReady=true;writePending=false;watchFinance();render()}
+function errText(e){return e?.code||e?.message||String(e)}
+function clearListeners(items){while(items.length){try{items.pop()()}catch{}}}
+function watchFinance(){
+ const t=active();if(financeFor===t?.id)return;
+ clearListeners(finListeners);financeFor=t?.id||'';
+ finance={config:null,payments:{},overrides:{},expenses:{},transfers:{}};
+ if(!t||!authUser)return;
+ const p=`v3/finance/${t.id}`;
+ function watch(part){const off=onValue(ref(db,p+'/'+part),snap=>{finance[part]=snap.val()|| (part==='config'?null:{});if(page==='finance'||page==='teams'||page==='tournaments'||page==='print')render()},e=>{document.getElementById('auth-message').textContent='Finance read: '+errText(e)});finListeners.push(off)}
+ if(canSeePayments()||can('feesWrite')){watch('config');watch('overrides')}
+ if(canSeePayments())watch('payments');
+ if(canSeeExpenses())watch('expenses');
+ if(canFullFinance())watch('transfers');
+}
+let authGeneration=0;
+function authState(){
+ const status=document.getElementById('auth-status');document.getElementById('auth-login').hidden=!!authUser;document.getElementById('auth-account').hidden=!authUser;
+ if(!authUser){status.textContent='Please sign in. Google accounts can start as read-only viewers.';return}
+ const roles=isSuper()?'🛡 Super Admin':accessRecord?.active?(accessRecord.role||'Custom Admin'):'👁 Viewer';
+ status.textContent=(authUser.email||'Signed in')+' • '+roles+(remoteReady?' • Cloud connected':' • Loading cloud…');
+ document.getElementById('password-setup').hidden=authUser.providerData?.some(p=>p.providerId==='password');
+}
+function beginSession(user){
+ const gen=++authGeneration;clearListeners(stopListeners);clearListeners(finListeners);financeFor='';
+ authUser=user;legacySuper=false;accessRecord=null;accessList={};accessRequests={};readError='';remoteReady=false;
+ rawTournamentData={};store={tournaments:[],selected:null,playerLibrary:[]};page='tournaments';editor=null;profile=null;notice='';
+ authState();render();if(!user)return;
+ const on=(path,cb)=>{stopListeners.push(onValue(ref(db,path),s=>{if(gen===authGeneration)cb(s.val())},e=>{if(gen!==authGeneration)return;readError=errText(e);render();document.getElementById('auth-message').textContent='Database error: '+readError}))};
+ on('admins/'+user.uid,v=>{legacySuper=v?.active===true&&v?.role==='super';authState();financeFor='';watchFinance();render();if(legacySuper)watchAccess()});
+ on('v3/access/'+user.uid,v=>{accessRecord=v||null;authState();financeFor='';watchFinance();render();if(isSuper())watchAccess()});
+ on('v3/tournaments',v=>{if(!writePending)setCloud(v)});
+ on('v3/playerLibrary',v=>{store.playerLibrary=Array.isArray(v)?v:[];if(remoteReady)render()});
+}
+let stopAccess=[];
+function watchAccess(){if(!isSuper()||stopAccess.length)return;
+ stopAccess.push(onValue(ref(db,'v3/access'),s=>{accessList=s.val()||{};if(page==='access')render()},()=>{}));
+ stopAccess.push(onValue(ref(db,'v3/accessRequests'),s=>{accessRequests=s.val()||{};if(page==='access')render()},()=>{}));
+}
+function clearAccess(){clearListeners(stopAccess)}
+const roleLabel=()=>isSuper()?'Super Admin':accessRecord?.active?accessRecord.role:'Viewer';
+async function migrateFromV2(){
+ if(!isSuper())throw Error('Only Super Admin can migrate test tournaments');
+ const old=(await get(ref(db,'v2/state'))).val();
+ if(!old||!Array.isArray(old.tournaments)||!old.tournaments.length)throw Error('V2 state has no tournaments. Nothing imported.');
+ if(Object.keys(rawTournamentData).length)throw Error('V3 already has tournaments. Import blocked to prevent overwrite.');
+ if(!confirm(`COPY ${old.tournaments.length} tournaments into a new V3 test data area? Old V2 state and original Firebase will remain unchanged. Take the V2 JSON backup first.`))return;
+ const migrated=Object.fromEntries(old.tournaments.map(t=>[t.id,tournamentToDb(t)]));
+ const result=await runTransaction(ref(db,'v3/tournaments'),current=>current&&Object.keys(current).length?undefined:migrated,{applyLocally:false});
+ if(!result.committed)throw Error('Migration cancelled: V3 tournaments already exist.');
+ const initial={};if(Array.isArray(old.playerLibrary))initial['v3/playerLibrary']=old.playerLibrary;
+ initial['v3/migrations/v2ImportedAt']=Date.now();initial['v3/migrations/copiedTournaments']=old.tournaments.length;
+ await update(ref(db),initial);
+ alert(`${old.tournaments.length} tournaments copied to V3 TEST. Verify the 2026 18 matches and 14 recorded results.`);
+}
+function eq(a,b){return JSON.stringify(a)===JSON.stringify(b)}
+function patchesForMutation(before,after){
+ const patches={},prev=Object.fromEntries(before.tournaments.map(t=>[t.id,t])),next=Object.fromEntries(after.tournaments.map(t=>[t.id,t]));
+ for(const id of new Set([...Object.keys(prev),...Object.keys(next)])){
+  const a=prev[id],b=next[id],p=`v3/tournaments/${id}`;
+  if(!a||!b){if(!can('tournamentWrite'))throw Error('Tournament creation/deletion requires Super Admin permission.');patches[p]=b?tournamentToDb(b):null;continue}
+  const x=tournamentToDb(a),y=tournamentToDb(b);
+  if(!eq(x.meta,y.meta)){if(!can('settingsWrite'))throw Error('Settings permission required.');patches[p+'/meta']=y.meta}
+  for(const [type,permission] of [['teams','teamsWrite'],['categories','categoriesWrite'],['fixtures','fixturesWrite'],['results','scoresWrite']]){
+   const o=dataObj(x[type]),n=dataObj(y[type]);
+   for(const key of new Set([...Object.keys(o),...Object.keys(n)])){
+    if(eq(o[key],n[key]))continue;
+    if(type==='fixtures'&&!can('fixturesWrite')&&can('scoresWrite')){
+      const old=o[key],modified=n[key];
+      if(old?.stage==='knockout'&&modified?.stage==='knockout'&&eq({...old,a:null,b:null},{...modified,a:null,b:null}))continue;
+    }
+    if(!can(permission))throw Error(permission+' permission required for this edit.');
+    patches[p+'/'+type+'/'+key]=n[key]??null;
+   }
   }
-  result.selected=result.tournaments.some(t=>t.id===store.selected)?store.selected:result.tournaments[0]?.id||null;
-  return result;
+ }
+ if(!eq(before.playerLibrary,after.playerLibrary)){if(can('teamsWrite')||isSuper())patches['v3/playerLibrary']=after.playerLibrary;else throw Error('Player library write permission required')}
+ return patches;
 }
-function cloudPayload(state,revision){return {schemaVersion:2,revision,updatedAt:Date.now(),tournaments:state.tournaments,playerLibrary:state.playerLibrary||[]}}
-function setCloudData(raw){
-  remoteValue=raw;
-  remoteRevision=Number(raw?.revision)||0;
-  store=parseCloudState(raw);
-  remoteReady=true;
-  if(!store.tournaments.length&&editor?.kind!=='create'){page='tournaments';editor=null;profile=null}
-  render();
-}
-function adminMessage(e){return e?.code||e?.message||'Unknown error'}
-function authErrorText(e){
-  if(e?.code==='auth/popup-blocked')return 'Popup was blocked. Open the V2 site in Chrome, not an in-app browser, and try again.';
-  if(e?.code==='auth/unauthorized-domain')return 'This website domain is not authorized in Firebase Authentication.';
-  if(e?.code==='auth/requires-recent-login')return 'Log out, sign in again using Google, then set your app password.';
-  if(e?.code==='auth/email-already-in-use'||e?.code==='auth/credential-already-in-use')return 'This email already has another password account. Do not create a new account.';
-  return adminMessage(e);
-}
-function renderAuth(){
-  const state=document.getElementById('v2-login-state'),actions=document.getElementById('v2-login-actions'),account=document.getElementById('v2-account-actions');
-  if(!authUser){state.textContent='Please sign in. Online test data is private.';actions.style.display='block';account.style.display='none';return}
-  const permission=adminActive?'🛡 Test Admin':'👁 View only';
-  state.textContent=(authUser.email||'Signed in')+' • '+permission+(remoteReady?' • Cloud connected':' • Loading cloud…');
-  actions.style.display='none';account.style.display='block';
-  document.getElementById('v2-password-setup').style.display=authUser.providerData.some(p=>p.providerId==='password')?'none':'inline-flex';
-}
-function updateUserSession(user){
-  subscriptionGeneration++; const generation=subscriptionGeneration;
-  if(stopState){stopState();stopState=null}if(stopAdmin){stopAdmin();stopAdmin=null}
-  authUser=user;adminActive=false;remoteReady=false;remoteValue=null;remoteRevision=0;readError='';writePending=false;
-  store=blankStore();editor=null;profile=null;page='tournaments';notice='';
-  renderAuth();render();
-  if(!user)return;
-  stopAdmin=onValue(ref(firebaseDB,'admins/'+user.uid),snapshot=>{
-    if(generation!==subscriptionGeneration)return;
-    adminActive=snapshot.val()?.active===true;
-    renderAuth();render();
-  },e=>{if(generation!==subscriptionGeneration)return;adminActive=false;renderAuth();render()});
-  stopState=onValue(liveStateRef,snapshot=>{
-    if(generation!==subscriptionGeneration)return;
-    if(writePending)return; // Avoid replacing an edit currently awaiting server acknowledgement.
-    setCloudData(snapshot.val());renderAuth();
-  },e=>{
-    if(generation!==subscriptionGeneration)return;
-    readError=adminMessage(e);remoteReady=false;renderAuth();render();
-  });
+async function op(fn){
+ if(!allowedToEdit()){alert('Read-only Viewer account. Ask Super Admin for editing permissions.');return}
+ if(writePending){alert('Previous save still pending.');return}
+ const previous=deep(store);
+ try{fn();if(can('teamsWrite'))store.playerLibrary=libraryNames();const patches=patchesForMutation(previous,store);
+  if(!Object.keys(patches).length){render();return}
+  writePending=true;notice='Saving to V3 TEST Firebase…';render();
+  const changed=Object.entries(patches);
+  if(changed.length===1&&/v3\/tournaments\/[^/]+\/results\/[^/]+$/.test(changed[0][0])){
+    const key=changed[0][0],parts=key.split('/'),orig=previous.tournaments.find(t=>t.id===parts[2])?.results?.[parts[4]]??null;
+    const tx=await runTransaction(ref(db,key),current=>eq(current??null,orig)?changed[0][1]:undefined,{applyLocally:false});
+    if(!tx.committed)throw Error('Another device updated the same match. Latest result loaded; please review then retry.');
+  }else await update(ref(db),patches);
+  notice='Saved online to V3 TEST Firebase.';
+ }catch(e){store=previous;notice='Not saved: '+errText(e);alert(notice)}finally{
+  writePending=false;
+  try{const updated=await get(ref(db,'v3/tournaments'));setCloud(updated.val())}catch{render()}
+ }
+ render();
 }
 function wireAuth(){
-  onAuthStateChanged(firebaseAuth,updateUserSession);
-  const msg=document.getElementById('v2-auth-message');
-  document.getElementById('v2-google-login').addEventListener('click',async()=>{
-    msg.textContent='Opening Google Login…';
-    try{await signInWithPopup(firebaseAuth,new GoogleAuthProvider());msg.textContent=''}catch(e){msg.textContent=authErrorText(e)}
-  });
-  document.getElementById('v2-toggle-email').addEventListener('click',()=>{const f=document.getElementById('v2-email-form');f.style.display=f.style.display==='none'?'block':'none'});
-  document.getElementById('v2-email-form').addEventListener('submit',async e=>{
-    e.preventDefault();msg.textContent='Signing in…';
-    const email=document.getElementById('v2-email').value.trim(),pwd=document.getElementById('v2-email-password').value;
-    try{await signInWithEmailAndPassword(firebaseAuth,email,pwd);msg.textContent=''}catch(err){msg.textContent=authErrorText(err)}
-    document.getElementById('v2-email-password').value='';
-  });
-  document.getElementById('v2-reset-password').addEventListener('click',async()=>{
-    const email=document.getElementById('v2-email').value.trim();
-    if(!email){msg.textContent='Enter your email address first.';return}
-    try{await sendPasswordResetEmail(firebaseAuth,email);msg.textContent='If this email has password login, please check your inbox for reset instructions.'}
-    catch(e){msg.textContent=authErrorText(e)}
-  });
-  document.getElementById('v2-copy-uid').addEventListener('click',async()=>{
-    if(!authUser)return;
-    try{await navigator.clipboard.writeText(authUser.uid);msg.textContent='User UID copied. Add this UID under admins in your TEST Firebase Console.'}
-    catch{msg.textContent='Your test Firebase User UID: '+authUser.uid}
-  });
-  document.getElementById('v2-password-setup').addEventListener('click',()=>{const f=document.getElementById('v2-link-form');f.style.display=f.style.display==='none'?'block':'none'});
-  document.getElementById('v2-link-form').addEventListener('submit',async e=>{
-    e.preventDefault();if(!authUser?.email)return;
-    const p=document.getElementById('v2-new-password').value,q=document.getElementById('v2-confirm-password').value;
-    if(p!==q||p.length<12){msg.textContent='Use a matching app password with at least 12 characters.';return}
-    try{
-      const before=authUser.uid;
-      const result=await linkWithCredential(authUser,EmailAuthProvider.credential(authUser.email,p));
-      if(result.user.uid!==before)throw Error('UID unexpectedly changed');
-      msg.textContent='App password linked to the SAME account. UID preserved.';
-      document.getElementById('v2-new-password').value='';document.getElementById('v2-confirm-password').value='';renderAuth();
-    }catch(e){msg.textContent=authErrorText(e)}
-  });
-  document.getElementById('v2-logout').addEventListener('click',async()=>{try{await signOut(firebaseAuth)}catch(e){msg.textContent=authErrorText(e)}});
+ onAuthStateChanged(auth,u=>{clearAccess();beginSession(u)});
+ const msg=document.getElementById('auth-message');
+ document.getElementById('google-login').onclick=async()=>{try{msg.textContent='Opening Google login…';await signInWithPopup(auth,new GoogleAuthProvider());msg.textContent=''}catch(e){msg.textContent=errText(e)}};
+ document.getElementById('toggle-email').onclick=()=>{const f=document.getElementById('email-form');f.hidden=!f.hidden};
+ document.getElementById('email-form').onsubmit=async e=>{e.preventDefault();try{await signInWithEmailAndPassword(auth,document.getElementById('email').value.trim(),document.getElementById('password').value);msg.textContent=''}catch(e){msg.textContent=errText(e)}document.getElementById('password').value=''};
+ document.getElementById('signup').onclick=async()=>{if(!confirm('Create a new, read-only Viewer account with this email and password?'))return;try{await createUserWithEmailAndPassword(auth,document.getElementById('email').value.trim(),document.getElementById('password').value);msg.textContent='Viewer account created.'}catch(e){msg.textContent=errText(e)}};
+ document.getElementById('reset-password').onclick=async()=>{const email=document.getElementById('email').value.trim();if(!email){msg.textContent='Enter email first';return}try{await sendPasswordResetEmail(auth,email);msg.textContent='If this email has a password account, check your inbox.'}catch(e){msg.textContent=errText(e)}};
+ document.getElementById('logout').onclick=async()=>{try{await signOut(auth)}catch(e){msg.textContent=errText(e)}};
+ document.getElementById('copy-uid').onclick=async()=>{if(!authUser)return;try{await navigator.clipboard.writeText(authUser.uid);msg.textContent='User UID copied.'}catch{msg.textContent='Your UID: '+authUser.uid}};
+ document.getElementById('request-access').onclick=async()=>{if(!authUser)return;const note=prompt('Which editing access do you need? (Super Admin will approve.)','Score / Teams / Payments / Finance');if(note===null)return;
+  try{await set(ref(db,`v3/accessRequests/${authUser.uid}`),{email:authUser.email||'',name:authUser.displayName||'',note:String(note).slice(0,160),requestedAt:Date.now()});msg.textContent='Request sent to Super Admin.'}catch(e){msg.textContent=errText(e)}
+ };
+ document.getElementById('password-setup').onclick=()=>{const f=document.getElementById('link-form');f.hidden=!f.hidden};
+ document.getElementById('link-form').onsubmit=async e=>{e.preventDefault();const p=document.getElementById('new-password').value,q=document.getElementById('confirm-password').value;
+  if(p!==q||p.length<12){msg.textContent='Passwords must match and be 12+ characters';return}
+  try{const oldUid=authUser.uid;const x=await linkWithCredential(authUser,EmailAuthProvider.credential(authUser.email,p));if(x.user.uid!==oldUid)throw Error('UID changed unexpectedly');msg.textContent='Password linked; original UID preserved.';document.getElementById('link-form').hidden=true;authState()}catch(e){msg.textContent=errText(e)}
+ };
 }
+
+/* Financial data: separate from public tournament data, append-only receipts and expenses. */
+const expenseCategories=['Court Fee','Shuttlecock','Trophy / Medals','Food','Drinking Water','Transport','Printing / Banner','Equipment','Other / Custom'];
+const payModes=['Cash','UPI / GPay','PhonePe','Paytm','Bank Transfer','Card','Other'];
+const money=n=>{const v=Math.round((+n||0)*100)/100;return(v<0?'-₹':'₹')+Math.abs(v).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})};
+const today=()=>{const d=new Date(),z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${z(d.getMonth()+1)}-${z(d.getDate())}`};
+const safeAmount=(n,allowZero=false)=>{const x=Number(n);if(!Number.isFinite(x)||x<0||(!allowZero&&x===0)||x>100000000||Math.round(x*100)!==x*100)throw Error('Enter a valid INR amount with up to 2 decimals.');return x};
+const playersOf=t=>t.teams.flatMap(team=>team.players.map(p=>({id:p.id,name:p.name,team:team.name})));
+const financesReady=()=>!!finance.config&&finance.config.feePerPlayer!==undefined;
+const playerFee=p=>!financesReady()?null:Number(finance.overrides?.[p]?.fee??finance.config.feePerPlayer);
+const receipts=()=>Object.entries(dataObj(finance.payments)).map(([id,x])=>({...x,id}));
+const expenseEvents=()=>Object.entries(dataObj(finance.expenses)).map(([id,x])=>({...x,id}));
+const transfers=()=>Object.entries(dataObj(finance.transfers)).map(([id,x])=>({...x,id}));
+function paidForPlayer(pid){return receipts().filter(x=>x.playerId===pid).reduce((sum,x)=>sum+Number(x.amount||0)*(x.kind==='refund'?-1:1),0)}
+function paymentStatus(pid){
+ const fee=playerFee(pid);if(fee===null)return {text:'NOT RECORDED',cls:'payment-unknown',fee:null,paid:paidForPlayer(pid),due:null};
+ const paid=paidForPlayer(pid),due=Math.max(0,fee-paid);
+ return {text:paid>fee?'OVERPAID':paid===fee?'PAID':paid>0?'PARTIAL':'UNPAID',cls:paid>=fee?'payment-paid':paid>0?'payment-partial':'payment-unpaid',paid,fee,due};
+}
+function paymentBadge(pid){if(!canSeePayments())return '';const x=paymentStatus(pid);return ` <small class="${x.cls}">${esc(x.text)}${x.fee===null?'':' · '+money(x.paid)+' / '+money(x.fee)}</small>`}
+function financeTotals(t){
+ const ppl=playersOf(t),hasFee=financesReady();const expected=hasFee?ppl.reduce((v,p)=>v+Math.max(0,playerFee(p.id)||0),0):null;
+ const paid=receipts().reduce((sum,x)=>sum+(x.kind==='refund'?-1:1)*Number(x.amount||0),0);
+ const dueRecords=expenseEvents().filter(x=>x.status==='due');const settled=new Set(expenseEvents().filter(x=>x.status==='paid'&&x.settledDueId).map(x=>x.settledDueId));
+ const unpaidBills=dueRecords.filter(x=>!settled.has(x.id)).reduce((a,x)=>a+Number(x.amount||0),0);
+ const expensesPaid=expenseEvents().filter(x=>x.status==='paid').reduce((a,x)=>a+Number(x.amount||0),0);
+ const owed=expected===null?null:Math.max(0,expected-paid),cashBalance=paid-expensesPaid;
+ const projected=expected===null?null:expected-expensesPaid-unpaidBills;
+ return {expected,paid,owed,expensesPaid,unpaidBills,cashBalance,projected,players:ppl.length};
+}
+function collectorSummary(){const map={};const add=(who,n)=>{const key=(who||'Not specified').trim();map[key]=(map[key]||0)+n};
+ for(const r of receipts())add(r.receivedBy,Number(r.amount)*(r.kind==='refund'?-1:1));
+ for(const e of expenseEvents())if(e.status==='paid')add(e.paidBy,-Number(e.amount));
+ for(const x of transfers()){add(x.from,-Number(x.amount));add(x.to,Number(x.amount))}
+ return Object.entries(map).sort((a,b)=>b[1]-a[1]);
+}
+function dropdown(name,values,selected=''){return `<select name="${name}" required>${values.map(x=>`<option value="${esc(x)}" ${selected===x?'selected':''}>${esc(x)}</option>`).join('')}</select>`}
+function playerDropdown(t,name='playerId'){return `<select name="${name}" required>${playersOf(t).map(p=>`<option value="${esc(p.id)}">${esc(p.name)} — ${esc(p.team)}</option>`).join('')}</select>`}
+function receiptForm(t){return `<form class="sub-form finance-edit" data-form="fin-receipt"><h3>＋ Record Player Payment / Refund</h3><div class="form-grid">
+ <label class="field"><span>Player</span>${playerDropdown(t)}</label><label class="field"><span>Entry Type</span>${dropdown('kind',['payment','refund'])}</label>
+ ${field('Amount (₹)','amount','','number','min="0.01" step="0.01" required')}
+ <label class="field"><span>Payment Mode</span>${dropdown('mode',payModes)}</label>
+ ${field('Received By (committee member)','receivedBy','','text','required maxlength="100"')}
+ ${field('Payment Date','date',today(),'date','required')}
+ ${field('Reference / UPI transaction ID (optional)','reference','','text','maxlength="120"')}
+ <label class="field"><span>Notes</span><input name="notes" maxlength="160"></label></div>
+ <div class="actions"><button class="btn primary" type="submit">Save Receipt</button></div>
+ <p class="helper">Refund is a separate negative ledger entry; old receipts are never overwritten.</p></form>`}
+function expenseForm(){return `<form class="sub-form finance-edit" data-form="fin-expense"><h3>＋ Add Tournament Expense</h3><div class="form-grid">
+ <label class="field"><span>Expense Category</span>${dropdown('category',expenseCategories)}</label>
+ ${field('Custom Expense / Description','description','','text','maxlength="160"')}
+ ${field('Amount (₹)','amount','','number','min="0.01" step="0.01" required')}
+ <label class="field"><span>Expense Status</span>${dropdown('status',['paid','due'])}</label>
+ <label class="field"><span>Payment Mode</span>${dropdown('mode',payModes)}</label>
+ ${field('Paid By / Responsible Person','paidBy','','text','maxlength="100" required')}
+ ${field('Expense Date','date',today(),'date','required')}
+ ${field('Vendor / Recipient (optional)','vendor','','text','maxlength="100"')}
+ </div><button class="btn primary" type="submit">Record Expense</button><p class="helper">Due bills do not reduce cash in hand until marked paid. Never record the same bill as two unrelated expenses.</p></form>`}
+function financeView(t){
+ if(!canViewFinance())return card('Tournament Overview','<p>Use the navigation above to view fixtures, results, and standings.</p>');
+ const f=financeTotals(t),full=canFullFinance(),canPay=can('paymentsWrite'),canFin=can('financeWrite'),canFees=can('feesWrite'),seePay=canSeePayments(),seeExp=canSeeExpenses();
+ const summary=full?[['Players',f.players],['Expected fees',f.expected===null?'Not configured':money(f.expected)],['Collected (net)',money(f.paid)],['Player balances due',f.owed===null?'Not configured':money(f.owed)],['Expenses paid',money(f.expensesPaid)],['Bills still due',money(f.unpaidBills)],['Cash / bank net balance',money(f.cashBalance)],['Projected final surplus',f.projected===null?'Not configured':money(f.projected)]]:[];
+ const cashTotal=receipts().filter(r=>r.mode==='Cash').reduce((v,r)=>v+(r.kind==='refund'?-1:1)*Number(r.amount||0),0);
+ const digitalTotal=f.paid-cashTotal;
+ if(full)summary.push(['Cash collected (net)',money(cashTotal)],['UPI / Other collected (net)',money(digitalTotal)]);
+ const cards=`<div class="finance-stats">${summary.map(([name,value])=>`<div class="finance-stat"><small>${esc(name)}</small><strong>${esc(value)}</strong></div>`).join('')}</div>`;
+ const options=playersOf(t).map(p=>{const v=paymentStatus(p.id);return `<tr><td>${esc(p.name)}<small>${esc(p.team)}</small></td><td>${v.fee===null?'—':money(v.fee)}</td><td>${money(v.paid)}</td><td class="${v.cls}">${v.text}</td><td>${v.due===null?'—':money(v.due)}</td></tr>`}).join('');
+ const playerTable=seePay?card('Player Fee & Payment Status',`<div class="scroll"><table class="fin-table"><thead><tr><th>Player</th><th>Fee</th><th>Received</th><th>Status</th><th>Balance</th></tr></thead><tbody>${options||'<tr><td colspan="5">Add players first</td></tr>'}</tbody></table></div>`):'';
+ const receiptsRows=receipts().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(playersOf(t).find(p=>p.id===x.playerId)?.name||'Player removed')}</td><td>${x.kind==='refund'?'-':''}${money(x.amount)}</td><td>${esc(x.mode)}</td><td>${esc(x.receivedBy)}</td><td>${esc(x.createdByEmail||x.createdBy||'')}</td></tr>`).join('');
+ const receiptsTable=seePay?card('Payment Register (Immutable Ledger)',`<div class="scroll"><table><thead><tr><th>Date</th><th>Player</th><th>Amount</th><th>Mode</th><th>Received By</th><th>Recorded By</th></tr></thead><tbody>${receiptsRows||'<tr><td colspan="6">No payments yet</td></tr>'}</tbody></table></div>`):'';
+ const expenseList=expenseEvents().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+ const outstanding=expenseList.filter(e=>e.status==='due'&&!expenseList.some(x=>x.status==='paid'&&x.settledDueId===e.id));
+ const expenseRows=expenseList.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.category)}${x.description?`<small>${esc(x.description)}</small>`:''}</td><td>${money(x.amount)}</td><td>${esc(x.status)}</td><td>${esc(x.paidBy)}</td><td>${esc(x.vendor||'')}</td><td>${esc(x.createdByEmail||x.createdBy||'')}</td></tr>`).join('');
+ const expenseTable=seeExp?card('Expense Register & Outstanding Bills',`<div class="scroll"><table><thead><tr><th>Date</th><th>Expense</th><th>Amount</th><th>Status</th><th>Paid / handled By</th><th>Vendor</th><th>Recorded By</th></tr></thead><tbody>${expenseRows||'<tr><td colspan="7">No expenses yet</td></tr>'}</tbody></table></div>${canFin&&outstanding.length?`<form data-form="fin-settle" class="sub-form finance-edit"><h3>Mark Outstanding Bill as Paid</h3><div class="form-grid"><label class="field"><span>Bill</span><select name="dueId" required>${outstanding.map(e=>`<option value="${esc(e.id)}">${esc(e.category)} — ${money(e.amount)} — ${esc(e.description||'')}</option>`).join('')}</select></label>${field('Paid By','paidBy','','text','required maxlength="100"')}<label class="field"><span>Payment Mode</span>${dropdown('mode',payModes)}</label>${field('Paid Date','date',today(),'date','required')}</div><button class="btn primary" type="submit">Mark Bill Paid</button></form>`:''}`):'';
+ const categoryTotals=full?card('Expense Totals by Category',`<div class="scroll"><table><thead><tr><th>Category</th><th>Paid</th><th>Due</th></tr></thead><tbody>${expenseCategories.filter(cat=>expenseEvents().some(e=>e.category===cat)).map(cat=>`<tr><td>${esc(cat)}</td><td>${money(expenseEvents().filter(e=>e.category===cat&&e.status==='paid').reduce((n,e)=>n+Number(e.amount),0))}</td><td>${money(outstanding.filter(e=>e.category===cat).reduce((n,e)=>n+Number(e.amount),0))}</td></tr>`).join('')||'<tr><td colspan="3">No expenses yet</td></tr>'}</tbody></table></div>`):'';
+ const transferRegister=full?card('Internal Transfers Register',`<div class="scroll"><table><thead><tr><th>Date</th><th>From</th><th>To</th><th>Amount</th><th>Entered By</th></tr></thead><tbody>${transfers().map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.from)}</td><td>${esc(x.to)}</td><td>${money(x.amount)}</td><td>${esc(x.createdByEmail||x.createdBy||'')}</td></tr>`).join('')||'<tr><td colspan="5">No internal transfers</td></tr>'}</tbody></table></div>`):'';
+ const collector=full?card('Collector / Committee Member Balances',`<p class="helper">Collected money minus expenses paid personally, adjusted for internal transfers. Reconcile these totals against actual Cash / UPI accounts.</p><div class="scroll"><table><thead><tr><th>Person</th><th>Net held</th></tr></thead><tbody>${collectorSummary().map(([name,balance])=>`<tr><td>${esc(name)}</td><td>${money(balance)}</td></tr>`).join('')||'<tr><td colspan="2">No transactions</td></tr>'}</tbody></table></div>`):'';
+ const config=canFees?card('Tournament Ground Fee Settings',`<form data-form="fin-fee" class="sub-form finance-edit"><div class="form-grid">${field('Default fee per player (₹)','fee',finance.config?.feePerPlayer??200,'number','min="0" step="0.01" required')}<div class="field"><span>&nbsp;</span><button class="btn primary" type="submit">Save Default Fee</button></div></div><p class="helper">A new tournament shows NOT RECORDED until a fee is explicitly saved. Fee can be ₹0 when waived.</p></form><form data-form="fin-override" class="sub-form finance-edit"><h3>Individual Fee Override / Waiver</h3><div class="form-grid"><label class="field"><span>Player</span>${playerDropdown(t)}</label>${field('Special fee (₹)','fee','','number','min="0" step="0.01" required')}${field('Reason','reason','','text','maxlength="160"')}</div><button class="btn" type="submit">Save Individual Fee</button></form>`):'';
+ const transfer=canFin?card('Internal Cash / UPI Transfer',`<form data-form="fin-transfer" class="form-grid finance-edit">${field('From (collector)','from','','text','required maxlength="100"')}${field('To (collector)','to','','text','required maxlength="100"')}${field('Amount (₹)','amount','','number','min="0.01" step="0.01" required')}${field('Date','date',today(),'date','required')}<div class="full"><button class="btn primary" type="submit">Record Internal Transfer</button></div></form><p class="helper">Transfer only reallocates money between collectors; it does not change tournament income or profit.</p>`):'';
+ return `${full?`<section class="card"><h2>💰 Full Finance Dashboard · ${esc(t.name)}</h2><p class="helper">Super Admin has specifically granted the full finance view. Projected surplus is not cash already available.</p>${cards}</section>`:`<section class="card"><h2>💰 Finance · Limited Access</h2><p class="helper">You can access only the specific payment or expense functions granted by the Super Admin. Full income, expenditure, profit, collector balances and aggregate dashboard are private.</p></section>`}${config}${playerTable}${canPay?card('Record Payment',receiptForm(t)):''}${receiptsTable}${canFin?card('Record Expense',expenseForm()):''}${expenseTable}${categoryTotals}${collector}${transfer}${transferRegister}`;
+}
+function accessView(){if(!isSuper())return card('User Roles','<p>Only Super Admin can manage user permissions. Use “Request an Editing Role” above.</p>');
+ const list=Object.entries(accessList).sort((a,b)=>String(a[1].email||'').localeCompare(String(b[1].email||''))).map(([id,x])=>`<tr><td>${esc(x.email||id)}<small>${esc(id)}</small></td><td>${esc(x.role||'viewer')}</td><td>${x.active?'Active':'Disabled'}</td><td>${Object.entries(x.permissions||{}).filter(([,v])=>v).map(([k])=>esc(k)).join(', ')||'View only'}</td><td><button class="btn" type="button" data-action="manage-user" data-id="${esc(id)}">Edit</button></td></tr>`).join('');
+ const req=Object.entries(accessRequests).map(([id,x])=>`<tr><td>${esc(x.email||id)}<small>${esc(x.name||'')} · ${esc(x.note||'')}</small></td><td><button class="btn" data-action="manage-user" data-id="${esc(id)}" type="button">Set Rights</button></td></tr>`).join('');
+ const selected=editor?.kind==='access'?editor.id:'';const existing=accessList[selected]||{};
+ const form=`<form data-form="access" class="sub-form access-panel"><h3>Assign or Revoke User Permissions</h3>
+ ${field('Firebase User UID (from their Copy UID button)','userUid',selected,'text','required maxlength="128"')}
+ ${field('User email (label)','userEmail',existing.email||accessRequests[selected]?.email||'','email','maxlength="160"')}
+ <label class="field"><span>Role Preset (then customize individual rights below)</span><select name="role" id="role-preset">${Object.keys(rolePresets).map(role=>`<option value="${esc(role)}" ${existing.role===role?'selected':''}>${esc(role)}</option>`).join('')}</select></label>
+ <label class="choice"><input name="active" type="checkbox" ${existing.active===false?'':'checked'}> Account role active</label>
+ <div class="checklist">${permissionsList.map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div>
+ <div class="actions"><button type="button" data-action="apply-role-preset" class="btn">Fill Permissions from Role</button><button class="btn primary" type="submit">Save User Permissions</button></div>
+ <p class="helper">Original Super Admin access under admins/&lt;uid&gt; is preserved. Grant Super Admin rights only to trusted committee owners.</p></form>`;
+ return card('Super Admin · User & Roles Dashboard',`<h3>Pending Access Requests</h3><div class="scroll"><table><tbody>${req||'<tr><td>No pending requests</td></tr>'}</tbody></table></div>${form}<h3>Users with Explicit Permissions</h3><div class="scroll"><table><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Permissions</th><th>Actions</th></tr></thead><tbody>${list||'<tr><td colspan="5">No managed users yet</td></tr>'}</tbody></table></div>`);
+}
+async function createFinanceEvent(kind,payload,forcedId=null){
+ if(!authUser||!active())throw Error('Login and choose a tournament first');
+ const p=`v3/finance/${active().id}`;
+ const branch=kind==='receipt'?'payments':kind==='expense'?'expenses':'transfers';
+ const right=kind==='receipt'?'paymentsWrite':'financeWrite';if(!can(right))throw Error('You do not have '+right+' permission');
+ const id=forcedId||uid('fin');const record={...payload,createdBy:authUser.uid,createdByEmail:authUser.email||'',createdAt:Date.now()};
+ await set(ref(db,`${p}/${branch}/${id}`),record);
+ notice='Financial entry saved online. Other devices will update automatically.';render();
+}
+async function financeSubmit(kind,data){
+ const t=active(),get=x=>String(data.get(x)||'').trim();if(!t)throw Error('No tournament selected');
+ if(kind==='fin-fee'){
+  if(!can('feesWrite'))throw Error('Ground fee settings permission required');const fee=safeAmount(data.get('fee'),true);
+  await update(ref(db,`v3/finance/${t.id}/config`),{feePerPlayer:fee,updatedBy:authUser.uid,updatedAt:Date.now()});return;
+ }
+ if(kind==='fin-override'){
+  if(!can('feesWrite'))throw Error('Ground fee settings permission required');const id=get('playerId');if(!playersOf(t).some(p=>p.id===id))throw Error('Player not found');
+  await set(ref(db,`v3/finance/${t.id}/overrides/${id}`),{fee:safeAmount(data.get('fee'),true),reason:get('reason'),updatedBy:authUser.uid,updatedAt:Date.now()});return;
+ }
+ if(kind==='fin-receipt'){
+  const id=get('playerId');if(!playersOf(t).some(p=>p.id===id))throw Error('Player not found');
+  const mode=get('mode'),kind=get('kind'),receivedBy=get('receivedBy');if(!payModes.includes(mode)||!['payment','refund'].includes(kind)||!receivedBy)throw Error('Missing payment details');
+  const amount=safeAmount(data.get('amount'));
+  if(receipts().some(r=>r.playerId===id&&r.kind===kind&&Number(r.amount)===amount&&r.mode===mode&&r.receivedBy===receivedBy&&r.date===get('date'))&&!confirm('A matching payment already exists for this player today. Record a second separate transaction?'))return;
+  await createFinanceEvent('receipt',{playerId:id,kind,amount,mode,receivedBy,date:get('date'),reference:get('reference'),notes:get('notes')});return;
+ }
+ if(kind==='fin-expense'){
+  const cat=get('category'),status=get('status');if(!expenseCategories.includes(cat)||!['due','paid'].includes(status)||!get('paidBy'))throw Error('Missing expense details');
+  if(cat==='Other / Custom'&&!get('description'))throw Error('Describe the custom expense');
+  await createFinanceEvent('expense',{category:cat,description:get('description'),amount:safeAmount(data.get('amount')),status,mode:get('mode'),paidBy:get('paidBy'),vendor:get('vendor'),date:get('date')});return;
+ }
+ if(kind==='fin-settle'){
+  const dueId=get('dueId'),bill=finance.expenses?.[dueId];if(!bill||bill.status!=='due')throw Error('Pending bill not found');
+  if(expenseEvents().some(x=>x.status==='paid'&&x.settledDueId===dueId))throw Error('This bill is already marked paid');
+  await createFinanceEvent('expense',{...(({category,description,vendor,amount})=>({category,description,vendor,amount}))(bill),status:'paid',settledDueId:dueId,mode:get('mode'),paidBy:get('paidBy'),date:get('date')},dueId+'_settled');return;
+ }
+ if(kind==='fin-transfer'){
+  if(!get('from')||!get('to')||get('from')===get('to'))throw Error('Choose two different collector names');
+  await createFinanceEvent('transfer',{from:get('from'),to:get('to'),amount:safeAmount(data.get('amount')),date:get('date')});return;
+ }
+}
+async function accessSubmit(data){
+ if(!isSuper())throw Error('Super Admin only');
+ const uidString=String(data.get('userUid')||'').trim(),role=String(data.get('role')||'viewer');
+ if(!/^[A-Za-z0-9_-]{8,128}$/.test(uidString))throw Error('Invalid Firebase User UID');
+ if(!(role in rolePresets))throw Error('Unknown role');
+ const permitted=new Set(data.getAll('perm').map(String));
+ if(permitted.has('paymentsRead')&&permitted.has('financeRead')&&!permitted.has('financeDashboardRead'))throw Error('Full accounts would be reconstructable from both ledgers. Grant the explicit Full Finance Dashboard permission or choose one ledger only.');
+ const permissions=Object.fromEntries(permissionsList.map(([key])=>[key,permitted.has(key)]));
+ if(role==='super'&&!confirm('Give this person FULL Super Admin control, including finance and user permissions?'))return;
+ await update(ref(db),{['v3/access/'+uidString]:{role,active:data.has('active'),permissions,email:String(data.get('userEmail')||'').trim(),updatedBy:authUser.uid,updatedAt:Date.now()},['v3/accessRequests/'+uidString]:null});
+ editor=null;notice='User permissions saved to V3 Firebase.';render();
+}
+
 function playerPicker(){const names=libraryNames();return names.length?`<div class="reusable-picker"><p class="helper">Choose saved player names. These are copied as new, independent tournament players.</p><div class="reuse-grid">${names.map(name=>`<label class="choice"><input type="checkbox" name="reusePlayer" value="${esc(name)}"> ${esc(name)}</label>`).join('')}</div></div>`:'<p class="helper">No saved players yet. Add players to a team first.</p>'}
 function sourceTeamPicker(){const src=store.tournaments.find(t=>t.id===document.querySelector('form[data-form="tournament"] [name="copyFrom"]')?.value);const target=document.getElementById('source-team-picker');if(!target)return;target.innerHTML=src?`<div class="reuse-grid">${src.teams.map(team=>`<label class="choice"><input type="checkbox" name="copyTeam" value="${esc(team.id)}" checked><span><b>${esc(team.name)}</b> · ${team.players.length} players<small>${esc(team.players.map(p=>p.name).join(', '))}</small></span></label>`).join('')}</div><p class="helper">Only names and rosters will be copied. Previous categories, fixtures and results stay in the original tournament.</p>`:'<p class="helper">Choose a previous tournament above to select its teams.</p>'}
 
 function dateShow(d){return /^\d{4}-\d{2}-\d{2}$/.test(d||'')?`${d.slice(8,10)}-${d.slice(5,7)}-${d.slice(0,4)}`:'Date not set'}
 function lookup(t,id){return t.categories.find(c=>c.id===id)}
 function participants(t,m){const c=lookup(t,m.categoryId);return [entryLabel(t,c,m.a),entryLabel(t,c,m.b)]}
-function personLink(player){return `<button type="button" class="name-link" data-action="view-player" data-id="${esc(player.id)}" title="See player match history">${esc(player.name)}</button>`}
+function personLink(player){return `<button type="button" class="name-link" data-action="view-player" data-id="${esc(player.id)}" title="See player match history">${esc(player.name)}</button>${paymentBadge(player.id)}`}
 function teamLink(team){return `<button type="button" class="name-link team-link" data-action="view-team" data-id="${esc(team.id)}" title="See team results">${esc(team.name)}</button>`}
 function categoryLink(cat){return `<button type="button" class="name-link category-link" data-action="view-category" data-id="${esc(cat.id)}" title="View category groups, players, fixtures, results and standings">${esc(cat.name)}</button>`}
 
@@ -775,32 +984,39 @@ function button(label,action,data='',kind=''){return `<button class="btn ${kind}
 function field(label,name,value='',type='text',other=''){return `<label class="field"><span>${label}</span><input name="${name}" type="${type}" value="${esc(value)}" ${other}></label>`}
 function selectField(label,name,values,selected){return `<label class="field"><span>${label}</span><select name="${name}">${values.map(([value,text])=>`<option value="${esc(value)}" ${value===selected?'selected':''}>${esc(text)}</option>`).join('')}</select></label>`}
 function card(title,body,tools=''){return `<section class="card"><div class="section-head"><h2>${esc(title)}</h2><div class="actions noprint">${tools}</div></div>${body}</section>`}
-const viewerActions=new Set(['open-tournament','tournament-section','close-profile','view-player','view-team','view-category','print-now','export','cancel']);
+const viewerActions=new Set(['open-tournament','tournament-section','close-profile','view-player','view-team','view-category','print-now','export','cancel','migrate-v3','manage-user','apply-role-preset']);
 function render(){
- renderAuth();
- const content=document.getElementById('view');
- const nav=document.querySelector('nav[aria-label="Tournament management"]');
- if(!authUser){nav.hidden=true;content.innerHTML='<section class="card"><h2>Sign in required</h2><p>Use Google Login or your existing email/password account above.</p></section>';document.getElementById('profile-layer').innerHTML='';return}
- if(readError){nav.hidden=true;content.innerHTML='<section class="card"><h2>Cannot read test database</h2><p>'+esc(readError)+'</p><p>Verify the test Firebase Rules.</p></section>';return}
- if(!remoteReady){nav.hidden=true;content.innerHTML='<section class="card"><h2>Loading online tournaments…</h2></section>';return}
- nav.hidden=false;
- const t=active();
+ authState();
+ const nav=document.querySelector('nav[aria-label="Tournament management"]'),content=document.getElementById('view');
  document.querySelectorAll('[data-page]').forEach(el=>el.classList.toggle('selected',el.dataset.page===page));
- document.getElementById('notice').innerHTML=notice?`<div class="notice" role="status">${esc(notice)}</div>`:'';
- if(!t){
-  content.innerHTML=editor?.kind==='create'?tournamentView(null):
-   `<section class="card"><h2>V2 TEST Database is empty</h2><p>No demo or 2026 data was imported automatically.</p>${allowedToEdit()?button('＋ Create first Tournament','new-tournament'):'<p>Sign in as the designated Test Admin to create the first tournament. Use “Copy my User UID” above.</p>'}</section>`;
-  document.getElementById('profile-layer').innerHTML='';
-  return;
+ document.getElementById('notice').innerHTML=notice?`<div class="notice">${esc(notice)}</div>`:'';
+ document.querySelector('[data-page="access"]').hidden=!isSuper();
+ document.querySelector('[data-page="finance"]').hidden=!canViewFinance();
+ if(!canViewFinance()){if(page==='finance')page='tournaments';}
+ if(!canSeePayments()&&printReport==='payments')printReport='fixtures';
+ document.getElementById('venue-public').innerHTML=authUser&&remoteReady&&active()?venueCard(active()):'';drawVenueQr();
+ if(!authUser){nav.hidden=true;content.innerHTML='<section class="card"><h2>Sign in to view online tournaments</h2><p>Use Google or Email/Password login above. All new users are Viewer by default.</p></section>';document.getElementById('profile-layer').innerHTML='';return}
+ if(readError){nav.hidden=true;content.innerHTML=`<section class="card"><h2>Firebase Read Error</h2><p>${esc(readError)}</p><p>Publish the new V3 test database rules before using this app.</p></section>`;return}
+ if(!remoteReady){nav.hidden=true;content.innerHTML='<section class="card"><h2>Connecting to V3 Test Firebase…</h2></section>';return}
+ nav.hidden=false;
+ const t=active();if(!t&&page!=='access'){
+   content.innerHTML=editor?.kind==='create'?tournamentView(null):isSuper()?`<section class="card"><h2>V3 Test database is empty</h2><p>Your 4 imported V2 tournaments are still safe in /v2/state. Click below to COPY them into the separate V3 data structure.</p>${button('Copy Existing V2 Test Tournaments (One Time)','migrate-v3','','primary')} ${button('Create New Tournament','new-tournament')}</section>`:
+   '<section class="card"><h2>No V3 tournaments yet</h2><p>Ask the Super Admin to copy the V2 test tournaments first.</p></section>';
+   document.getElementById('profile-layer').innerHTML='';return;
  }
- const views={tournaments:tournamentView,teams:teamView,categories:categoryView,groups:groupView,fixtures:fixtureView,results:resultView,standings:standingsView,settings:settingsView,print:printView};
- content.innerHTML=views[page]?.(t)||'';
- document.getElementById('profile-layer').innerHTML=detailModal(t);
- document.getElementById('print-rule').textContent=`@page{size:A4 ${t.settings?.printOrientation==='portrait'?'portrait':'landscape'};margin:0}@media print{.print-sheet{font-size:${t.settings?.printFontSize||17}px}}`;
- if(!allowedToEdit()){document.querySelectorAll('[data-action]').forEach(el=>{if(!viewerActions.has(el.dataset.action))el.hidden=true});document.querySelectorAll('.tour-file-import').forEach(el=>el.hidden=true)}
- if(writePending)document.querySelectorAll('[data-form] button[type="submit"]').forEach(b=>b.disabled=true);
+ const views={tournaments:tournamentView,teams:teamView,categories:categoryView,groups:groupView,fixtures:fixtureView,results:resultView,standings:standingsView,settings:settingsView,finance:financeView,access:accessView,print:printView};
+ content.innerHTML=page==='access'?accessView():views[page]?.(t)||'';
+ document.getElementById('profile-layer').innerHTML=t?detailModal(t):'';
+ if(t)document.getElementById('print-rule').textContent=`@page{size:A4 ${t.settings?.printOrientation==='portrait'?'portrait':'landscape'};margin:0}@media print{.print-sheet{font-size:${t.settings?.printFontSize||17}px}}`;
+ document.querySelectorAll('[data-action]').forEach(el=>{if(!authorized(el.dataset.action))el.hidden=true});
+ document.querySelectorAll('form[data-form]').forEach(form=>{
+  const kind=form.dataset.form;
+  const k=kind==='result'?'scoresWrite':kind==='settings'?'settingsWrite':kind==='tournament'?(editor?.kind==='create'?'tournamentWrite':'settingsWrite'):
+    ['new-team','team'].includes(kind)?'teamsWrite':['new-category','category','entry','new-group','rename-group'].includes(kind)?'categoriesWrite':null;
+  if(k&&!can(k))form.querySelectorAll('button[type=submit],input,select,textarea').forEach(el=>el.disabled=true);
+ });
+ if(writePending)document.querySelectorAll('form[data-form] button[type="submit"]').forEach(el=>el.disabled=true);
 }
-
 function tournamentSummary(t){
  const total=t.fixtures?.length||0,played=(t.fixtures||[]).filter(m=>{const c=lookup(t,m.categoryId);return c&&scoreWinner(t.results[m.id],effectiveRules(t,c))}).length;
  return {total,played,remaining:total-played,teams:t.teams.length,players:t.teams.reduce((n,x)=>n+x.players.length,0),categories:t.categories.length,groups:t.categories.reduce((n,c)=>n+(c.groups||[]).length,0)};
@@ -817,20 +1033,42 @@ function tournamentHistoryPanel(t){
  const s=tournamentSummary(t);
  return `<h3>📜 Full Tournament History</h3><p class="helper">${s.played} completed of ${s.total} matches. History covers every category, group and court in this tournament.</p><div class="tour-history"><table><thead><tr><th>Slot / Court</th><th>Category / Group</th><th>Players / Pair</th><th>Score</th><th>Winner</th></tr></thead><tbody>${items||'<tr><td colspan="5">No fixtures yet. Create categories and fixtures first.</td></tr>'}</tbody></table></div>`;
 }
+const PROVIDED_VENUE_URL='https://maps.app.goo.gl/CzEkGAamLzLemngVA';
+function safeVenueUrl(raw){
+ const value=String(raw||'').trim();if(!value)return '';
+ let url;try{url=new URL(value)}catch{throw Error('Enter a valid HTTPS location link, for example a Google Maps share link.')}
+ if(url.protocol!=='https:'||!url.hostname)throw Error('Location link must begin with https://');
+ return url.href;
+}
+function venueCard(t){
+ const url=t.venueUrl||'';if(!url)return '';
+ let valid='';try{valid=safeVenueUrl(url)}catch{return ''}
+ return `<aside class="venue-location"><div><strong>📍 Tournament Location</strong><small>Scan me for location · Open in Maps</small><a href="${esc(valid)}" target="_blank" rel="noopener noreferrer">📍 Open Location</a></div><div class="venue-qr" data-venue-url="${esc(valid)}" aria-label="QR code for tournament location"><small>Scan me</small></div></aside>`;
+}
+function drawVenueQr(){
+ const root=document.getElementById('venue-public');if(!root)return;
+ for(const box of root.querySelectorAll('[data-venue-url]')){
+   const url=box.dataset.venueUrl;
+   if(typeof window.QRCode==='function'){
+     box.textContent='';try{new window.QRCode(box,{text:url,width:102,height:102,colorDark:'#101f3a',colorLight:'#ffffff',correctLevel:window.QRCode.CorrectLevel.M})}catch(e){box.textContent='Open location link';}
+   }else box.innerHTML='<small>QR unavailable; use Open Location link.</small>';
+ }
+}
 function tournamentDetailsPanel(t){
  const s=tournamentSummary(t);
  const facts=[['Teams',s.teams],['Players',s.players],['Categories',s.categories],['Groups',s.groups],['Matches',s.total],['Completed',s.played],['Pending',s.remaining],['Courts',t.courts]];
  return `<span class="eyebrow">Selected tournament</span><h3 style="font-size:22px">${esc(t.name)}</h3><p class="helper">📅 ${esc(dateShow(t.date))} · 🏆 ${esc(t.format.toUpperCase())} · ${t.courts} court(s)</p>
+ ${!t.venueUrl&&isSuper()?`<p class="helper">📍 Location link not added. Click Edit Tournament to add a Google Maps URL; the QR code will then appear automatically for all viewers.</p>`:''}
  <div class="tour-facts">${facts.map(([label,value])=>`<div class="tour-fact"><b>${value}</b><span>${label}</span></div>`).join('')}</div>
  <div class="tour-section"><h4>🗂 Categories & Groups</h4>${t.categories.map(c=>`<div class="tour-detail-line"><div>${categoryLink(c)} <small class="helper">${c.entrants.length} entries · ${(c.groups||[]).length} group(s)</small></div><span class="helper">${esc(effectiveFormat(t,c))} · Target ${effectiveRules(t,c).target}</span></div>`).join('')||'<p class="helper">No categories added yet.</p>'}</div>
- <div class="tour-section"><h4>👥 Teams & Players</h4><div class="tour-detail-roster">${t.teams.map(team=>`<div class="tour-detail-line"><div>${teamLink(team)}<small class="helper">${esc(team.players.map(p=>p.name).join(' · ')||'No players')}</small></div><span class="helper">${team.players.length} player(s)</span></div>`).join('')||'<p class="helper">No teams added yet.</p>'}</div></div>
+ <div class="tour-section"><h4>👥 Teams & Players</h4><div class="tour-detail-roster">${t.teams.map(team=>`<div class="tour-detail-line"><div>${teamLink(team)}<small class="helper">${team.players.map(p=>esc(p.name)+paymentBadge(p.id)).join(' · ')||'No players'}</small></div><span class="helper">${team.players.length} player(s)</span></div>`).join('')||'<p class="helper">No teams added yet.</p>'}</div></div>
  <div class="tour-section"><h4>📊 Scoring Settings</h4><p class="helper">Target ${t.rules.target}; ${t.rules.winByTwo?'Win by 2':'No 2-point lead required'}; Cutoff ${t.rules.cutoff??'None'}; League win ${t.rules.winPoints} pts, loss ${t.rules.lossPoints} pts.</p></div>`;
 }
 function tournamentLibrary(t){
  return `<div class="tournament-grid"><section class="tournament-column" aria-label="All tournaments">
- <div class="tournament-pane"><h3>🏆 All Tournaments (${store.tournaments.length})</h3><p class="helper">Every online tournament is listed below. Open one to see its details or history.</p>
+ <div class="tournament-pane"><h3>🏆 All Tournaments (${store.tournaments.length})</h3><p class="helper">All live V3 TEST tournaments are listed. The original 2026 Firebase remains separate.</p>
  ${store.tournaments.map(one=>{const s=tournamentSummary(one);return `<button class="tournament-pick" type="button" data-action="open-tournament" data-id="${esc(one.id)}" aria-pressed="${one.id===t.id?'true':'false'}"><strong>${esc(one.name)}</strong><small>📅 ${esc(dateShow(one.date))}</small><small>👥 ${s.teams} teams · 🗂 ${s.categories} categories · 🏟 ${one.courts} courts</small><span class="tour-badge">${s.played} / ${s.total} matches completed</span></button>`}).join('')}
- </div><div class="tour-file-import noprint"><label for="legacy-json-import">📥 Import old Firebase backup to TEST database (Admin only)</label><input id="legacy-json-import" type="file" accept=".json,application/json"><p class="helper">Admin-only migration: select a trusted JSON backup, confirm import, and save its tournament records to the NEW V2 TEST Firebase. Never import admins or passwords. The original database is never changed.</p></div>
+ </div><div class="tour-file-import noprint"><label for="legacy-json-import">📥 Import Legacy Firebase JSON (Super Admin only)</label><input id="legacy-json-import" type="file" accept=".json,application/json"><p class="helper">Optional: import legacy root JSON directly into new V3 TEST. For your already imported tournaments, use the safer Copy V2 State migration button instead.</p></div>
  </section><section class="tournament-pane" aria-label="Tournament details and history"><div class="tour-pane-tabs"><button class="btn" type="button" data-action="tournament-section" data-section="details" aria-pressed="${tournamentPanel==='details'}">📋 Full Details</button><button class="btn" type="button" data-action="tournament-section" data-section="history" aria-pressed="${tournamentPanel==='history'}">📜 History & Scores</button></div>${tournamentPanel==='history'?tournamentHistoryPanel(t):tournamentDetailsPanel(t)}</section></div>`;
 }
 // Handles a local Realtime Database root JSON export with {tournaments:{...},scores:{...}}.
@@ -856,6 +1094,8 @@ function tournamentView(t){
   return card(isNew?'Create New Tournament':'Edit Tournament',`<form data-form="tournament" class="form-grid">
    ${field('Tournament name','name',d.name,'text','required maxlength="100"')}
    ${field('Tournament date','date',d.date,'date')}
+   ${field('Venue Location URL (HTTPS Google Maps link; QR code auto-generates)','venueUrl',d.venueUrl||'','url','placeholder="https://maps.app.goo.gl/..."')}
+   <div class="full actions">${button('📍 Use supplied Maps location','use-provided-venue')}<small class="helper">Sets this link only for the tournament you are editing. Save Tournament to publish its location and QR. Existing venues are not overwritten automatically.</small></div>
    ${field('Number of courts','courts',d.courts,'number','min="1" required')}
    ${selectField('Tournament format','format',[['league','League'],['knockout','Knockout'],['combined','League + Knockout']],d.format)}
    ${isNew?`<div class="full reuse-section"><h3>Reuse Existing Teams & Players</h3><p class="helper">Start blank or import selected team rosters from an earlier tournament. This will not copy scores, fixtures or categories.</p>${selectField('Copy teams from tournament','copyFrom',[['','Start blank'],...store.tournaments.map(x=>[x.id,x.name+' · '+dateShow(x.date)])],'')}<div id="source-team-picker"><p class="helper">Choose a source tournament to see its teams.</p></div><details><summary>Or select saved individual player names</summary>${field('Team name for these selected players','poolName','Selected Players','text')}${playerPicker()}</details></div>`:''}
@@ -961,6 +1201,8 @@ function standingsView(t){return t.categories.map(c=>{
 function reportData(t,kind,catId='all',groupId='all'){
  const cats=t.categories.filter(c=>catId==='all'||c.id===catId),rows=[];
  const hasGroup=(c,e)=>groupId==='all'||(e?.groupId||'general')===groupId;
+ if(kind==='payments'&&canSeePayments()){for(const team of t.teams)for(const p of team.players){const v=paymentStatus(p.id);rows.push([team.name,p.name,v.fee===null?'Not set':money(v.fee),money(v.paid),v.due===null?'—':money(v.due),v.text])}return {head:['Team','Player','Fee','Received','Due','Status'],rows}}
+ if(kind==='payments')return reportData(t,'fixtures',catId,groupId); // No finance headings even for a stale viewer print selection.
  if(kind==='teams'){
   for(const team of t.teams)for(const p of team.players)rows.push([team.name,p.name,`${t.categories.filter(c=>c.entrants.some(e=>e.teamId===team.id&&e.playerIds.includes(p.id))).map(c=>c.name).join(', ')||'—'}`]);
   return {head:['Team','Player','Categories'],rows};
@@ -992,14 +1234,14 @@ function printSheets(t,kind,catId='all',groupId='all'){
  let html='';
  for(let n=0;n<pageCount;n++){
   const chunk=rows.slice(n*perPage,(n+1)*perPage);
-  const widths=kind==='fixtures'?[8,10,15,14,53]:kind==='results'?[8,15,13,43,21]:kind==='standings'?[14,12,38,9,9,9,9]:[27,38,35];
+  const widths=kind==='fixtures'?[8,10,15,14,53]:kind==='results'?[8,15,13,43,21]:kind==='standings'?[14,12,38,9,9,9,9]:kind==='payments'?[19,27,13,13,13,15]:[27,38,35];
   html+=`<article class="print-sheet ${orientation}" style="--p-font:${size}px"><div class="print-head"><div><strong>MBA TOURNAMENTS</strong><h2>${esc(t.name)}</h2><p>📅 ${esc(dateShow(t.date))} · ${esc(kind.toUpperCase())}${catId==='all'?'':' · '+esc(lookup(t,catId)?.name||'')}${groupId==='all'?'':' · '+esc(groupId==='general'?'General':lookup(t,catId)?.groups?.find(g=>g.id===groupId)?.name||'Group')}</p></div><span class="print-mark">${esc(orientation==='portrait'?'A4 PORTRAIT':'A4 LANDSCAPE')}</span></div><div class="print-body"><table class="print-table"><colgroup>${widths.map(w=>`<col style="width:${w}%">`).join('')}</colgroup><thead><tr>${head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${chunk.map((row,i)=>`<tr>${row.map((cell,j)=>`<td class="${j===(kind==='fixtures'?4:kind==='results'?3:kind==='standings'?2:1)?'print-main':''}">${esc(cell)}</td>`).join('')}</tr>`).join('')||`<tr><td colspan="${head.length}">No records for this selection</td></tr>`}</tbody></table></div><div class="print-foot"><span>${esc(t.name)} · ${esc(dateShow(t.date))}</span><span>Page ${n+1} / ${pageCount} · ${rows.length} records</span></div></article>`;
  }
  return html;
 }
 function printView(t){
  if(printCategory!=='all'&&!t.categories.some(c=>c.id===printCategory)){printCategory='all';printGroup='all'}
- const options=[['fixtures','Fixtures'],['results','Results & Scores'],['standings','Points Tables'],['teams','Teams & Players']];
+ const options=[['fixtures','Fixtures'],['results','Results & Scores'],['standings','Points Tables'],['teams','Teams & Players'],...(canSeePayments()?[['payments','Players Fee & Paid Status']]:[])];
  const groups=printCategory==='all'?[]:lookup(t,printCategory)?.groups||[];
  return card('A4 Print Center',`<div class="print-controls noprint">${selectField('Report','printType',options,printReport)}${selectField('Category','printCat',[['all','All Categories'],...t.categories.map(c=>[c.id,c.name])],printCategory)}${selectField('Group','printGroup',[['all','All Groups'],['general','General'],...groups.map(g=>[g.id,g.name])],printGroup)}${selectField('Orientation','printOrientation',[['landscape','A4 Landscape'],['portrait','A4 Portrait']],t.settings?.printOrientation||'landscape')}${field('Font size (11–24 px)','printSize',t.settings?.printFontSize||17,'number','min="11" max="24"')}<button class="btn primary" type="button" data-action="print-now">🖨 Print All Pages</button></div><p class="helper noprint">Preview pages use the complete A4 paper area with moderate, legible names and repeating headers. Use Chrome's Print settings → Paper A4 / Scale 100% / Margins None, and disable browser headers and footers if they appear.</p><div id="print-preview" class="print-preview">${printSheets(t,printReport,printCategory,printGroup)}</div>`);
 }
@@ -1017,42 +1259,20 @@ function settingsView(t){const r=t.rules,s=t.settings||{};return card('Tournamen
  <p class="full helper">Match rules cannot be changed after recorded results until results are intentionally cleared. Category-specific rules override tournament defaults.</p>
  </form>`)}
 function setNotice(s){notice=s;render()}
-async function op(fn){if(!allowedToEdit()){alert('You need V2 TEST Admin permissions to edit online data.');return}
- if(writePending){alert('Previous change is still saving. Please retry shortly.');return}
- const previous=deep(store),expectedRevision=remoteRevision;
- try{fn()}catch(e){store=previous;render();alert(e.message);console.error(e);return}
- store.playerLibrary=libraryNames();
- const changed=JSON.stringify({...store,selected:null})!==JSON.stringify({...previous,selected:null});
- if(!changed){render();return}
- const next=deep(store);writePending=true;notice='Saving to V2 TEST Firebase…';render();
- try{
-   const result=await runTransaction(liveStateRef,current=>{
-     if((Number(current?.revision)||0)!==expectedRevision)return; // another device already saved; do not overwrite it
-     return cloudPayload(next,expectedRevision+1);
-   },{applyLocally:false});
-   if(!result.committed)throw Error('Another device saved changes first. Latest online data will be reloaded; retry your change.');
-   remoteValue=result.snapshot.val();remoteRevision=Number(remoteValue?.revision)||expectedRevision+1;
-   store=parseCloudState(remoteValue);notice='Saved online to V2 TEST Firebase.';
- }catch(e){
-   store=remoteValue?parseCloudState(remoteValue):previous;
-   notice='Not saved. '+adminMessage(e);
-   alert(notice);
- }finally{
-   writePending=false;
-   // Re-read latest server state after any race instead of trusting a stale local copy.
-   try{const newest=await get(liveStateRef);setCloudData(newest.val())}catch(e){render()}
- }
- render();}
 function maybeWarnChanges(t){if(Object.keys(t.results).length)throw Error('There are recorded results. Changing scoring/court rules could invalidate them. Create a fresh tournament or deliberately clear results first.')}
 function entryPlayerForm(){const t=active(),selector=document.querySelector('form[data-form="entry"] [name="teamId"]'),list=document.getElementById('entry-player-list');if(!selector||!list)return;const team=t.teams.find(x=>x.id===selector.value);list.innerHTML=`<p class="helper">Select players (one or more):</p>${team?.players.map(p=>`<label class="choice"><input type="checkbox" name="playerId" value="${esc(p.id)}"> ${esc(p.name)}</label>`).join('')||'No players'}`}
-document.addEventListener('click',ev=>{
+document.addEventListener('click',async ev=>{
  const b=ev.target.closest('[data-action]');if(!b)return;
  if(b.classList.contains('profile-overlay')&&ev.target!==b)return;
  const t=active(),id=b.dataset.id,catId=b.dataset.cat,action=b.dataset.action;
  const safe=(fn)=>op(fn);
- if(!viewerActions.has(action)&&!allowedToEdit()){alert('Sign in as the V2 Test Admin to make changes.');return;}
- if(!viewerActions.has(action)&&writePending){alert('Wait for the previous save to complete.');return;}
- if(action==='open-tournament'){if(store.tournaments.some(x=>x.id===id)){store.selected=id;tournamentPanel='details';editor=null;profile=null;printCategory='all';printGroup='all';remember();render()}return}
+ if(action==='migrate-v3'){try{await migrateFromV2()}catch(e){alert(errText(e))}return}
+ if(action==='manage-user'){if(!isSuper())return;editor={kind:'access',id};page='access';render();return}
+ if(action==='apply-role-preset'){if(!isSuper())return;const form=b.closest('form'),role=form?.querySelector('[name=role]')?.value||'viewer',preset=rolePresets[role]||{};form?.querySelectorAll('[name=perm]').forEach(el=>el.checked=!!preset[el.value]);return}
+ if(!authorized(action)){alert('Your role does not allow this action.');return}
+ if(writePending&&!viewerActions.has(action)){alert('Previous change is still saving.');return}
+ if(action==='use-provided-venue'){const input=document.querySelector('form[data-form="tournament"] [name="venueUrl"]');if(input){input.value=PROVIDED_VENUE_URL;input.focus()}return}
+ if(action==='open-tournament'){if(store.tournaments.some(x=>x.id===id)){store.selected=id;tournamentPanel='details';editor=null;profile=null;printCategory='all';printGroup='all';remember();watchFinance();render()}return}
  if(action==='tournament-section'){if(['details','history'].includes(b.dataset.section)){tournamentPanel=b.dataset.section;render()}return}
  if(action==='close-profile'){if(b.closest('.profile-dialog')||b.classList.contains('profile-overlay')){profile=null;render()}return}
  if(['view-player','view-team','view-category'].includes(action)){profile={kind:action.slice(5),id};render();return}
@@ -1060,40 +1280,40 @@ document.addEventListener('click',ev=>{
  if(action==='cancel'){editor=null;render();return}
  if(action==='edit-tournament'){editor={kind:'tournament'};render();return}
  if(action==='new-tournament'){editor={kind:'create'};page='tournaments';render();return}
- if(action==='delete-tournament')return safe(()=>{const typed=prompt(`Type the exact name to delete this V2 TEST tournament and all scores:\n${t.name}`);if(typed!==t.name)return;store.tournaments=store.tournaments.filter(x=>x.id!==t.id);store.selected=store.tournaments[0]?.id||null;editor=null;notice='Test tournament deleted.'});
+ if(action==='delete-tournament')return safe(()=>{const typed=prompt(`Type the exact name to DELETE this V3 TEST tournament and all records:\n${t.name}`);if(typed!==t.name)return;store.tournaments=store.tournaments.filter(x=>x.id!==t.id);store.selected=store.tournaments[0]?.id||null;editor=null;notice='V3 TEST tournament deleted.'});
  if(action==='new-team'||action==='new-category'){editor={kind:action};render();return}
  if(action==='new-group'){editor={kind:'new-group',id};render();return}
  if(action==='rename-group'){editor={kind:'rename-group',id,cat:catId};render();return}
- if(action==='remove-group')return safe(()=>{const c=lookup(t,catId),g=c?.groups?.find(x=>x.id===id);if(!confirm(`Delete group ${g?.name}? Entries must first be moved.`))return;removeGroup(t,catId,id);notice='Group removed from test.'});
+ if(action==='remove-group')return safe(()=>{const c=lookup(t,catId),g=c?.groups?.find(x=>x.id===id);if(!confirm(`Delete group ${g?.name}? Entries must first be moved.`))return;removeGroup(t,catId,id);notice='Group removed in V3 TEST.'});
  if(action==='edit-team'){editor={kind:'team',id};render();return}
  if(action==='edit-category'){editor={kind:'category',id};render();return}
  if(action==='add-entry'){editor={kind:'entry',id};render();entryPlayerForm();return}
- if(action==='remove-team')return safe(()=>{const team=t.teams.find(x=>x.id===id);if(!confirm(`Remove ${team?.name}? Existing results will be protected.`))return;removeTeam(t,id);notice='Team removed from test.'});
+ if(action==='remove-team')return safe(()=>{const team=t.teams.find(x=>x.id===id);if(!confirm(`Remove ${team?.name}? Existing results will be protected.`))return;removeTeam(t,id);notice='Team removed from demo.'});
  if(action==='remove-category')return safe(()=>{const cat=lookup(t,id);if(!confirm(`Remove category ${cat?.name}?`))return;removeCategory(t,id)});
  if(action==='remove-entry')return safe(()=>{if(!confirm('Remove this category entry?'))return;removeEntry(t,catId,id)});
  if(action==='shuffle')return safe(()=>{scheduleLeague(t,{seed:Date.now(),minimumRestSlots:t.settings?.minRestSlots??1});const check=fixturesCheck(t);need(check.valid,check.problems.join(', '));notice=`Generated ${t.fixtures.filter(m=>m.stage==='league').length} league matches. ${check.restAlerts.length} rest warnings.`});
- if(action==='clear-knockout')return safe(()=>{const kos=t.fixtures.filter(m=>m.stage==='knockout');need(!kos.some(m=>t.results[m.id]),'Recorded knockout results: cannot clear the bracket');if(!confirm('Clear all unplayed knockout brackets in this V2 TEST tournament? League scores stay untouched.'))return;t.fixtures=t.fixtures.filter(m=>m.stage!=='knockout');notice='Unplayed knockout brackets cleared in V2 test.'});
+ if(action==='clear-knockout')return safe(()=>{const kos=t.fixtures.filter(m=>m.stage==='knockout');need(!kos.some(m=>t.results[m.id]),'Recorded knockout results: cannot clear the bracket');if(!confirm('Clear all unplayed knockout brackets in this DEMO tournament? League scores stay untouched.'))return;t.fixtures=t.fixtures.filter(m=>m.stage!=='knockout');notice='Unplayed knockout brackets cleared in V3 TEST.'});
  if(action==='knockout')return safe(()=>{const out=generateKnockout(t,id);notice=`Knockout bracket created: ${out.allMatches.length} matches across ${out.rounds.length} rounds, ${out.byes} byes. Winners advance automatically.`});
  if(action==='edit-result'){editor={kind:'result',id};mode=t.results[id]?.mode==='winner'?'winner':'score';render();return}
- if(action==='clear-result')return safe(()=>{if(!confirm('Clear this result?'))return;const match=t.fixtures.find(m=>m.id===id);delete t.results[id];if(match?.stage==='knockout')advanceKnockout(t,match.categoryId);editor=null;notice='Test result cleared.'});
+ if(action==='clear-result')return safe(()=>{if(!confirm('Clear this result?'))return;const match=t.fixtures.find(m=>m.id===id);delete t.results[id];if(match?.stage==='knockout')advanceKnockout(t,match.categoryId);editor=null;notice='V3 TEST result cleared.'});
  if(action==='export'){
   const blob=new Blob([JSON.stringify({version:VERSION,exportedAt:new Date().toISOString(),tournaments:store.tournaments},null,2)],{type:'application/json'});
-  const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='MBA-V2-TEST-Backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return;
+  const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='MBA-V3-TEST-Tournaments.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return;
  }
 });
 document.addEventListener('change',async e=>{
  if(e.target.id==='legacy-json-import'){
-  if(!allowedToEdit()){alert('Only Test Admin can import.');e.target.value='';return}
+  if(!isSuper()){alert('Only Super Admin can import.');return}
+  if(!confirm('Import legacy JSON into V3 TEST? The original Firebase remains untouched.'))return;
   const file=e.target.files?.[0];if(!file)return;
-  if(!confirm('Import tournaments & scores from this JSON file into the NEW TEST Firebase? It will be shared with signed-in TEST users. Original Firebase will not be changed.'))return;
   if(file.size>10*1024*1024){alert('Please select a backup smaller than 10 MB.');return}
   try{
    const data=JSON.parse(await file.text());
    op(()=>{
     const imported=legacyJsonForImport(data);
-    if(!imported.length){notice='Those tournaments are already imported in the test database.';return}
+    if(!imported.length){notice='These Firebase tournaments are already imported into this offline preview.';return}
     store.tournaments.push(...imported);store.selected=imported[0].id;tournamentPanel='details';editor=null;page='tournaments';
-    notice=`Importing ${imported.length} tournament(s) into V2 TEST Firebase. Original Firebase unchanged.`;
+    notice=`Imported ${imported.length} Firebase tournament(s) into this offline preview. Firebase data was not changed.`;
    });
   }catch(err){alert('Import failed: '+err.message)}
   return;
@@ -1104,7 +1324,7 @@ document.addEventListener('change',async e=>{
  }
  if(['printType','printCat','printGroup','printOrientation','printSize'].includes(e.target.name)){
    const v=e.target.value;
-   if(e.target.name==='printType')printReport=v;
+   if(e.target.name==='printType')printReport=v==='payments'&&!canSeePayments()?'fixtures':v;
    if(e.target.name==='printCat'){printCategory=v;printGroup='all'}
    if(e.target.name==='printGroup')printGroup=v;
    if(e.target.name==='printOrientation'){active().settings.printOrientation=v;remember()}
@@ -1115,11 +1335,16 @@ document.addEventListener('change',async e=>{
  if(e.target.name==='teamId'&&e.target.closest('form[data-form="entry"]')){entryPlayerForm();return}
  if(e.target.name==='mode'&&e.target.closest('form[data-form="result"]')){mode=e.target.value;render();return}
 });
-document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>{page=el.dataset.page;editor=null;render()}));
-document.addEventListener('submit',ev=>{
+document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>{if(el.dataset.page==='finance'&&!canViewFinance())return;if(el.dataset.page==='access'&&!isSuper())return;page=el.dataset.page;editor=null;render()}));
+document.addEventListener('submit',async ev=>{
  const form=ev.target.closest('form[data-form]');if(!form)return;ev.preventDefault();
- if(!allowedToEdit()){alert('Only V2 Test Admin can save changes.');return}
  const data=new FormData(form),kind=form.dataset.form,t=active();
+ if(kind.startsWith('fin-')||kind==='access'){
+  const btn=form.querySelector('button[type="submit"]');if(btn)btn.disabled=true;
+  try{if(kind==='access')await accessSubmit(data);else await financeSubmit(kind,data);notice='Saved online to V3 TEST Firebase.';render()}
+  catch(e){alert('Not saved: '+errText(e));if(btn)btn.disabled=false}return;
+ }
+ if(!allowedToEdit()){alert('Viewer is read-only.');return}
  op(()=>{
   if(kind==='new-group'){
    addGroup(t,form.dataset.id,String(data.get('name')));
@@ -1129,6 +1354,7 @@ document.addEventListener('submit',ev=>{
    const name=String(data.get('name')||'').trim();need(name,'Tournament name required');
    if(editor?.kind==='create'){
     const n=makeTournament({name,date:String(data.get('date')||''),courts:+data.get('courts'),format:String(data.get('format'))});
+    n.venueUrl=safeVenueUrl(data.get('venueUrl'));
     const src=store.tournaments.find(x=>x.id===String(data.get('copyFrom')||''));const sourceIds=data.getAll('copyTeam').map(String);
     if(src)copyPreviousTeams(n,src,sourceIds);
     const picked=[...new Set(data.getAll('reusePlayer').map(x=>String(x).trim()).filter(Boolean))];
@@ -1137,7 +1363,7 @@ document.addEventListener('submit',ev=>{
     if(extra.length)addTeam(n,String(data.get('poolName')||'Selected Players'),extra);
     store.tournaments.push(n);store.selected=n.id;page='tournaments';tournamentPanel='details';
    }
-   else{t.name=name;t.date=String(data.get('date')||'');if(t.format!==String(data.get('format')))maybeWarnChanges(t);t.format=String(data.get('format'));const courts=+data.get('courts');if(t.courts!==courts){maybeWarnChanges(t);t.courts=courts}}
+   else{t.venueUrl=safeVenueUrl(data.get('venueUrl'));t.name=name;t.date=String(data.get('date')||'');if(t.format!==String(data.get('format')))maybeWarnChanges(t);t.format=String(data.get('format'));const courts=+data.get('courts');if(t.courts!==courts){maybeWarnChanges(t);t.courts=courts}}
   }else if(kind==='new-team'){
    const typed=String(data.get('players')||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean),picked=data.getAll('reusePlayer').map(s=>String(s).trim()).filter(Boolean);
    const merged=[...new Map([...typed,...picked].map(name=>[name.normalize('NFKC').toLocaleLowerCase(),name])).values()];
@@ -1172,12 +1398,12 @@ document.addEventListener('submit',ev=>{
    if(previousRest!==minRestSlots&&t.fixtures.length&&Object.keys(t.results).length)throw Error('Rest settings cannot change after results have been recorded');
    t.settings={...t.settings,printOrientation:String(data.get('orientation')),printFontSize:+data.get('fontSize'),minRestSlots};
   }
-  editor=null;notice='Saving to test Firebase…';;
+  editor=null;notice='Saving changes to V3 TEST Firebase…';
  });
 });
+wireAuth();
 document.getElementById('print-page').addEventListener('click',()=>{page='print';profile=null;editor=null;render();document.getElementById('view').scrollIntoView({behavior:'smooth'});});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&profile){profile=null;render()}});
-wireAuth();
 render();
 
 </script></body></html>
