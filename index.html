@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101f3a"><title>MBA Tournaments — V2 Beta 5</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101f3a"><title>MBA Tournaments — V2 Live Test</title>
 <style>
 :root{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#17253d;background:#f2f5fa;color-scheme:light}
 *{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}
@@ -138,16 +138,63 @@ details>summary{cursor:pointer;color:#244e83;font-weight:700;padding:9px}
 .tour-file-import input{max-width:100%;font-size:13px}
 @media(max-width:760px){.tournament-grid{grid-template-columns:1fr}.tour-facts{grid-template-columns:repeat(2,minmax(0,1fr))}.tournament-pane{padding:12px}}
 @media print{.tournament-grid{display:block}.tournament-column,.tour-pane-tabs,.tour-file-import{display:none!important}}
+[hidden]{display:none!important}
+#v2-auth-panel .field{display:block;margin:8px 0;max-width:390px}
+#v2-auth-panel .field input{width:100%;min-height:38px;padding:8px}
+#v2-auth-panel .btn{margin:3px}
 </style><style id="print-rule"></style></head>
-<body><header><div class="container header-top"><div><h1>🏸 MBA Tournaments <span style="opacity:.75">V2</span></h1><p>Custom Tournament Engine · Working Preview</p></div><span class="tag">OFFLINE TEST ONLY</span></div></header>
-<main class="container"><div class="banner"><strong>Safe preview:</strong> Everything here is stored only in this browser. It does <strong>not</strong> read or change your Firebase database, existing 2026 tournaments, GitHub site, or real scores. The demo supports league fixtures and automatic knockout progression. Automatic Firebase sync, server-side security, and live-data migration are still pending. You can import a Firebase JSON backup into this offline preview for viewing.</div>
-<div class="toolbar noprint"><span class="helper" style="margin:0">All tournaments are listed below — tap a tournament to view its details or history.</span><button id="print-page" class="btn">🖨 Print A4</button></div>
+<body><header><div class="container header-top"><div><h1>🏸 MBA Tournaments <span style="opacity:.75">V2</span></h1><p>Custom Tournament Engine · Firebase Live Test</p></div><span class="tag">PRIVATE TEST • FIREBASE</span></div></header>
+<main class="container">
+<section class="card noprint" id="v2-auth-panel" style="margin:0 0 16px;padding:15px">
+  <h2 style="margin:0 0 10px">🔐 V2 Test Account</h2>
+  <div id="v2-login-state" role="status" aria-live="polite">Checking login…</div>
+  <div id="v2-login-actions" style="display:none;margin-top:10px">
+    <button type="button" class="btn primary" id="v2-google-login">Continue with Google</button>
+    <button type="button" class="btn" id="v2-toggle-email">Email / Password</button>
+    <form id="v2-email-form" style="display:none;max-width:360px;margin-top:10px">
+      <label class="field"><span>Email</span><input type="email" id="v2-email" autocomplete="email" required></label>
+      <label class="field"><span>Password</span><input type="password" id="v2-email-password" autocomplete="current-password" required></label>
+      <button type="submit" class="btn primary">Sign in</button>
+      <button type="button" class="btn" id="v2-reset-password">Forgot password?</button>
+    </form>
+  </div>
+  <div id="v2-account-actions" style="display:none;margin-top:10px">
+    <button class="btn" type="button" id="v2-copy-uid">Copy my User UID</button>
+    <button class="btn" type="button" id="v2-password-setup">Set app password</button>
+    <button class="btn danger-outline" type="button" id="v2-logout">Logout</button>
+    <form id="v2-link-form" style="display:none;max-width:380px;margin-top:12px">
+      <p class="helper">Create a separate password for this existing Google account; do not use your Gmail password.</p>
+      <label class="field"><span>New app password</span><input type="password" id="v2-new-password" autocomplete="new-password" minlength="12" required></label>
+      <label class="field"><span>Confirm app password</span><input type="password" id="v2-confirm-password" autocomplete="new-password" minlength="12" required></label>
+      <button class="btn primary" type="submit">Link to current account</button>
+    </form>
+  </div>
+  <p id="v2-auth-message" class="helper" role="status" aria-live="polite" style="margin:8px 0 0"></p>
+</section>
+<div class="banner"><strong>Private V2 Firebase Test:</strong> Sign in to see test tournaments shared across devices. Only authorized test admins can change results or settings. Nothing here connects to the original 2026 Firebase project. Existing offline demo data is <strong>not</strong> uploaded automatically.</div>
+<div class="toolbar noprint"><span class="helper" style="margin:0">Signed-in viewers see online tournament details; test admins can edit and save to Firebase.</span><button id="print-page" class="btn">🖨 Print A4</button></div>
 <nav class="noprint" aria-label="Tournament management"><button data-page="tournaments" class="selected">🏆 Tournaments</button><button data-page="teams">👥 Teams</button><button data-page="categories">🗂 Categories</button><button data-page="groups">🧩 Groups</button><button data-page="fixtures">🔀 Fixtures</button><button data-page="results">✅ Results</button><button data-page="standings">📊 Standings</button><button data-page="settings">⚙ Settings</button><button data-page="print">🖨 Print Center</button></nav>
-<div id="notice"></div><div id="view"></div></main><div id="profile-layer"></div><footer>MBA Tournaments V2 Beta 5 • Demo data only • No Firebase connection</footer>
+<div id="notice"></div><div id="view"></div></main><div id="profile-layer"></div><footer>MBA Tournaments V2 • Live Test Firebase ONLY • Original 2026 database untouched</footer>
 <script type="module">
-/* MBA Tournaments V2 – pure, offline-testable tournament engine.
-   No Firebase imports and no writes to a live account. */
-const VERSION='2.0.0-beta.5';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut, linkWithCredential, EmailAuthProvider, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { getDatabase, ref, onValue, get, runTransaction } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
+const firebaseConfig = {
+  "apiKey": "AIzaSyCMbC8Gx6IjPVW-MHbgTyx9MnrG8QNbJnw",
+  "authDomain": "mba-tournaments-v2-test.firebaseapp.com",
+  "databaseURL": "https://mba-tournaments-v2-test-default-rtdb.asia-southeast1.firebasedatabase.app",
+  "projectId": "mba-tournaments-v2-test",
+  "storageBucket": "mba-tournaments-v2-test.firebasestorage.app",
+  "messagingSenderId": "872128319294",
+  "appId": "1:872128319294:web:768133f86c435054a0666f"
+};
+const firebaseApp = initializeApp(firebaseConfig);
+const firebaseAuth = getAuth(firebaseApp);
+const firebaseDB = getDatabase(firebaseApp);
+const liveStateRef = ref(firebaseDB,'v2/state');
+
+/* MBA Tournaments V2 tournament engine. Data comes from the separate V2 TEST Firebase only. */
+const VERSION='2.0.0-beta.6-live-test';
 const deep=x=>JSON.parse(JSON.stringify(x));
 const clean=s=>String(s??'').trim();
 const need=(v,msg)=>{if(!v)throw Error(msg)};
@@ -567,14 +614,118 @@ function sampleTournament(){
  scheduleLeague(t,{seed:1986});return t;
 }
 
-const STORAGE='mba-tournaments-v2-staging-beta1'; // same key retains beta1 browser demo data
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const h=(strings,...vars)=>strings.reduce((s,x,i)=>s+x+(vars[i]??''),'');
-function readState(){try{const s=JSON.parse(localStorage.getItem(STORAGE));if(s?.tournaments?.length)return s;}catch{}const t=sampleTournament();return {tournaments:[t],selected:t.id}}
-let store=readState(),page='tournaments',editor=null,mode='score',notice='',profile=null,printReport='fixtures',printCategory='all',printGroup='all',tournamentPanel='details';
+// No localStorage: the old offline demo cannot silently become shared online data.
+const blankStore=()=>({tournaments:[],selected:null,playerLibrary:[]});
+let store=blankStore(),page='tournaments',editor=null,mode='score',notice='',profile=null,printReport='fixtures',printCategory='all',printGroup='all',tournamentPanel='details';
+let authUser=null,adminActive=false,remoteReady=false,remoteRevision=0,remoteValue=null,writePending=false;
+let stopState=null,stopAdmin=null,subscriptionGeneration=0,readError='';
 function active(){return store.tournaments.find(x=>x.id===store.selected)||store.tournaments[0]}
 function libraryNames(){return reusablePlayerNames(store.tournaments,store.playerLibrary||[])}
-function remember(){store.playerLibrary=libraryNames();localStorage.setItem(STORAGE,JSON.stringify(store))}
+// Selection and print preview are local UI controls; never write for just opening a screen.
+function remember(){}
+const allowedToEdit=()=>Boolean(authUser&&adminActive&&remoteReady&&!readError);
+function parseCloudState(raw){
+  const result=blankStore();
+  if(raw&&typeof raw==='object'&&Array.isArray(raw.tournaments)){
+    result.tournaments=raw.tournaments.map(t=>({
+      ...t,teams:Array.isArray(t.teams)?t.teams.map(team=>({...team,players:Array.isArray(team.players)?team.players:[]})):[],
+      categories:Array.isArray(t.categories)?t.categories.map(cat=>({...cat,groups:Array.isArray(cat.groups)?cat.groups:[],entrants:Array.isArray(cat.entrants)?cat.entrants:[]})):[],
+      fixtures:Array.isArray(t.fixtures)?t.fixtures:[],results:t.results||{},
+      settings:t.settings||{printOrientation:'landscape',printFontSize:17,minRestSlots:1}
+    }));
+    result.playerLibrary=Array.isArray(raw.playerLibrary)?raw.playerLibrary:[];
+  }
+  result.selected=result.tournaments.some(t=>t.id===store.selected)?store.selected:result.tournaments[0]?.id||null;
+  return result;
+}
+function cloudPayload(state,revision){return {schemaVersion:2,revision,updatedAt:Date.now(),tournaments:state.tournaments,playerLibrary:state.playerLibrary||[]}}
+function setCloudData(raw){
+  remoteValue=raw;
+  remoteRevision=Number(raw?.revision)||0;
+  store=parseCloudState(raw);
+  remoteReady=true;
+  if(!store.tournaments.length&&editor?.kind!=='create'){page='tournaments';editor=null;profile=null}
+  render();
+}
+function adminMessage(e){return e?.code||e?.message||'Unknown error'}
+function authErrorText(e){
+  if(e?.code==='auth/popup-blocked')return 'Popup was blocked. Open the V2 site in Chrome, not an in-app browser, and try again.';
+  if(e?.code==='auth/unauthorized-domain')return 'This website domain is not authorized in Firebase Authentication.';
+  if(e?.code==='auth/requires-recent-login')return 'Log out, sign in again using Google, then set your app password.';
+  if(e?.code==='auth/email-already-in-use'||e?.code==='auth/credential-already-in-use')return 'This email already has another password account. Do not create a new account.';
+  return adminMessage(e);
+}
+function renderAuth(){
+  const state=document.getElementById('v2-login-state'),actions=document.getElementById('v2-login-actions'),account=document.getElementById('v2-account-actions');
+  if(!authUser){state.textContent='Please sign in. Online test data is private.';actions.style.display='block';account.style.display='none';return}
+  const permission=adminActive?'🛡 Test Admin':'👁 View only';
+  state.textContent=(authUser.email||'Signed in')+' • '+permission+(remoteReady?' • Cloud connected':' • Loading cloud…');
+  actions.style.display='none';account.style.display='block';
+  document.getElementById('v2-password-setup').style.display=authUser.providerData.some(p=>p.providerId==='password')?'none':'inline-flex';
+}
+function updateUserSession(user){
+  subscriptionGeneration++; const generation=subscriptionGeneration;
+  if(stopState){stopState();stopState=null}if(stopAdmin){stopAdmin();stopAdmin=null}
+  authUser=user;adminActive=false;remoteReady=false;remoteValue=null;remoteRevision=0;readError='';writePending=false;
+  store=blankStore();editor=null;profile=null;page='tournaments';notice='';
+  renderAuth();render();
+  if(!user)return;
+  stopAdmin=onValue(ref(firebaseDB,'admins/'+user.uid),snapshot=>{
+    if(generation!==subscriptionGeneration)return;
+    adminActive=snapshot.val()?.active===true;
+    renderAuth();render();
+  },e=>{if(generation!==subscriptionGeneration)return;adminActive=false;renderAuth();render()});
+  stopState=onValue(liveStateRef,snapshot=>{
+    if(generation!==subscriptionGeneration)return;
+    if(writePending)return; // Avoid replacing an edit currently awaiting server acknowledgement.
+    setCloudData(snapshot.val());renderAuth();
+  },e=>{
+    if(generation!==subscriptionGeneration)return;
+    readError=adminMessage(e);remoteReady=false;renderAuth();render();
+  });
+}
+function wireAuth(){
+  onAuthStateChanged(firebaseAuth,updateUserSession);
+  const msg=document.getElementById('v2-auth-message');
+  document.getElementById('v2-google-login').addEventListener('click',async()=>{
+    msg.textContent='Opening Google Login…';
+    try{await signInWithPopup(firebaseAuth,new GoogleAuthProvider());msg.textContent=''}catch(e){msg.textContent=authErrorText(e)}
+  });
+  document.getElementById('v2-toggle-email').addEventListener('click',()=>{const f=document.getElementById('v2-email-form');f.style.display=f.style.display==='none'?'block':'none'});
+  document.getElementById('v2-email-form').addEventListener('submit',async e=>{
+    e.preventDefault();msg.textContent='Signing in…';
+    const email=document.getElementById('v2-email').value.trim(),pwd=document.getElementById('v2-email-password').value;
+    try{await signInWithEmailAndPassword(firebaseAuth,email,pwd);msg.textContent=''}catch(err){msg.textContent=authErrorText(err)}
+    document.getElementById('v2-email-password').value='';
+  });
+  document.getElementById('v2-reset-password').addEventListener('click',async()=>{
+    const email=document.getElementById('v2-email').value.trim();
+    if(!email){msg.textContent='Enter your email address first.';return}
+    try{await sendPasswordResetEmail(firebaseAuth,email);msg.textContent='If this email has password login, please check your inbox for reset instructions.'}
+    catch(e){msg.textContent=authErrorText(e)}
+  });
+  document.getElementById('v2-copy-uid').addEventListener('click',async()=>{
+    if(!authUser)return;
+    try{await navigator.clipboard.writeText(authUser.uid);msg.textContent='User UID copied. Add this UID under admins in your TEST Firebase Console.'}
+    catch{msg.textContent='Your test Firebase User UID: '+authUser.uid}
+  });
+  document.getElementById('v2-password-setup').addEventListener('click',()=>{const f=document.getElementById('v2-link-form');f.style.display=f.style.display==='none'?'block':'none'});
+  document.getElementById('v2-link-form').addEventListener('submit',async e=>{
+    e.preventDefault();if(!authUser?.email)return;
+    const p=document.getElementById('v2-new-password').value,q=document.getElementById('v2-confirm-password').value;
+    if(p!==q||p.length<12){msg.textContent='Use a matching app password with at least 12 characters.';return}
+    try{
+      const before=authUser.uid;
+      const result=await linkWithCredential(authUser,EmailAuthProvider.credential(authUser.email,p));
+      if(result.user.uid!==before)throw Error('UID unexpectedly changed');
+      msg.textContent='App password linked to the SAME account. UID preserved.';
+      document.getElementById('v2-new-password').value='';document.getElementById('v2-confirm-password').value='';renderAuth();
+    }catch(e){msg.textContent=authErrorText(e)}
+  });
+  document.getElementById('v2-logout').addEventListener('click',async()=>{try{await signOut(firebaseAuth)}catch(e){msg.textContent=authErrorText(e)}});
+}
 function playerPicker(){const names=libraryNames();return names.length?`<div class="reusable-picker"><p class="helper">Choose saved player names. These are copied as new, independent tournament players.</p><div class="reuse-grid">${names.map(name=>`<label class="choice"><input type="checkbox" name="reusePlayer" value="${esc(name)}"> ${esc(name)}</label>`).join('')}</div></div>`:'<p class="helper">No saved players yet. Add players to a team first.</p>'}
 function sourceTeamPicker(){const src=store.tournaments.find(t=>t.id===document.querySelector('form[data-form="tournament"] [name="copyFrom"]')?.value);const target=document.getElementById('source-team-picker');if(!target)return;target.innerHTML=src?`<div class="reuse-grid">${src.teams.map(team=>`<label class="choice"><input type="checkbox" name="copyTeam" value="${esc(team.id)}" checked><span><b>${esc(team.name)}</b> · ${team.players.length} players<small>${esc(team.players.map(p=>p.name).join(', '))}</small></span></label>`).join('')}</div><p class="helper">Only names and rosters will be copied. Previous categories, fixtures and results stay in the original tournament.</p>`:'<p class="helper">Choose a previous tournament above to select its teams.</p>'}
 
@@ -624,16 +775,32 @@ function button(label,action,data='',kind=''){return `<button class="btn ${kind}
 function field(label,name,value='',type='text',other=''){return `<label class="field"><span>${label}</span><input name="${name}" type="${type}" value="${esc(value)}" ${other}></label>`}
 function selectField(label,name,values,selected){return `<label class="field"><span>${label}</span><select name="${name}">${values.map(([value,text])=>`<option value="${esc(value)}" ${value===selected?'selected':''}>${esc(text)}</option>`).join('')}</select></label>`}
 function card(title,body,tools=''){return `<section class="card"><div class="section-head"><h2>${esc(title)}</h2><div class="actions noprint">${tools}</div></div>${body}</section>`}
+const viewerActions=new Set(['open-tournament','tournament-section','close-profile','view-player','view-team','view-category','print-now','export','cancel']);
 function render(){
+ renderAuth();
+ const content=document.getElementById('view');
+ const nav=document.querySelector('nav[aria-label="Tournament management"]');
+ if(!authUser){nav.hidden=true;content.innerHTML='<section class="card"><h2>Sign in required</h2><p>Use Google Login or your existing email/password account above.</p></section>';document.getElementById('profile-layer').innerHTML='';return}
+ if(readError){nav.hidden=true;content.innerHTML='<section class="card"><h2>Cannot read test database</h2><p>'+esc(readError)+'</p><p>Verify the test Firebase Rules.</p></section>';return}
+ if(!remoteReady){nav.hidden=true;content.innerHTML='<section class="card"><h2>Loading online tournaments…</h2></section>';return}
+ nav.hidden=false;
  const t=active();
  document.querySelectorAll('[data-page]').forEach(el=>el.classList.toggle('selected',el.dataset.page===page));
  document.getElementById('notice').innerHTML=notice?`<div class="notice" role="status">${esc(notice)}</div>`:'';
+ if(!t){
+  content.innerHTML=editor?.kind==='create'?tournamentView(null):
+   `<section class="card"><h2>V2 TEST Database is empty</h2><p>No demo or 2026 data was imported automatically.</p>${allowedToEdit()?button('＋ Create first Tournament','new-tournament'):'<p>Sign in as the designated Test Admin to create the first tournament. Use “Copy my User UID” above.</p>'}</section>`;
+  document.getElementById('profile-layer').innerHTML='';
+  return;
+ }
  const views={tournaments:tournamentView,teams:teamView,categories:categoryView,groups:groupView,fixtures:fixtureView,results:resultView,standings:standingsView,settings:settingsView,print:printView};
- document.getElementById('view').innerHTML=views[page]?.(t)||'';
+ content.innerHTML=views[page]?.(t)||'';
  document.getElementById('profile-layer').innerHTML=detailModal(t);
- const printStyle=document.getElementById('print-rule');
- printStyle.textContent=`@page{size:A4 ${t.settings?.printOrientation==='portrait'?'portrait':'landscape'};margin:0}@media print{.print-sheet{font-size:${t.settings?.printFontSize||17}px}}`;
+ document.getElementById('print-rule').textContent=`@page{size:A4 ${t.settings?.printOrientation==='portrait'?'portrait':'landscape'};margin:0}@media print{.print-sheet{font-size:${t.settings?.printFontSize||17}px}}`;
+ if(!allowedToEdit()){document.querySelectorAll('[data-action]').forEach(el=>{if(!viewerActions.has(el.dataset.action))el.hidden=true});document.querySelectorAll('.tour-file-import').forEach(el=>el.hidden=true)}
+ if(writePending)document.querySelectorAll('[data-form] button[type="submit"]').forEach(b=>b.disabled=true);
 }
+
 function tournamentSummary(t){
  const total=t.fixtures?.length||0,played=(t.fixtures||[]).filter(m=>{const c=lookup(t,m.categoryId);return c&&scoreWinner(t.results[m.id],effectiveRules(t,c))}).length;
  return {total,played,remaining:total-played,teams:t.teams.length,players:t.teams.reduce((n,x)=>n+x.players.length,0),categories:t.categories.length,groups:t.categories.reduce((n,c)=>n+(c.groups||[]).length,0)};
@@ -661,9 +828,9 @@ function tournamentDetailsPanel(t){
 }
 function tournamentLibrary(t){
  return `<div class="tournament-grid"><section class="tournament-column" aria-label="All tournaments">
- <div class="tournament-pane"><h3>🏆 All Tournaments (${store.tournaments.length})</h3><p class="helper">Every saved offline tournament appears below. No dropdown or popup menu.</p>
+ <div class="tournament-pane"><h3>🏆 All Tournaments (${store.tournaments.length})</h3><p class="helper">Every online tournament is listed below. Open one to see its details or history.</p>
  ${store.tournaments.map(one=>{const s=tournamentSummary(one);return `<button class="tournament-pick" type="button" data-action="open-tournament" data-id="${esc(one.id)}" aria-pressed="${one.id===t.id?'true':'false'}"><strong>${esc(one.name)}</strong><small>📅 ${esc(dateShow(one.date))}</small><small>👥 ${s.teams} teams · 🗂 ${s.categories} categories · 🏟 ${one.courts} courts</small><span class="tour-badge">${s.played} / ${s.total} matches completed</span></button>`}).join('')}
- </div><div class="tour-file-import noprint"><label for="legacy-json-import">📥 Import Existing Firebase Tournaments (JSON Backup)</label><input id="legacy-json-import" type="file" accept=".json,application/json"><p class="helper">Import a JSON export of your own Firebase Realtime Database to show existing live tournaments here. This reads the selected file only; it does not connect to or change Firebase. Your Firebase backup is not uploaded anywhere.</p></div>
+ </div><div class="tour-file-import noprint"><label for="legacy-json-import">📥 Import old Firebase backup to TEST database (Admin only)</label><input id="legacy-json-import" type="file" accept=".json,application/json"><p class="helper">Admin-only migration: select a trusted JSON backup, confirm import, and save its tournament records to the NEW V2 TEST Firebase. Never import admins or passwords. The original database is never changed.</p></div>
  </section><section class="tournament-pane" aria-label="Tournament details and history"><div class="tour-pane-tabs"><button class="btn" type="button" data-action="tournament-section" data-section="details" aria-pressed="${tournamentPanel==='details'}">📋 Full Details</button><button class="btn" type="button" data-action="tournament-section" data-section="history" aria-pressed="${tournamentPanel==='history'}">📜 History & Scores</button></div>${tournamentPanel==='history'?tournamentHistoryPanel(t):tournamentDetailsPanel(t)}</section></div>`;
 }
 // Handles a local Realtime Database root JSON export with {tournaments:{...},scores:{...}}.
@@ -850,7 +1017,32 @@ function settingsView(t){const r=t.rules,s=t.settings||{};return card('Tournamen
  <p class="full helper">Match rules cannot be changed after recorded results until results are intentionally cleared. Category-specific rules override tournament defaults.</p>
  </form>`)}
 function setNotice(s){notice=s;render()}
-function op(fn){const previous=JSON.stringify(store);try{fn();remember();render()}catch(e){store=JSON.parse(previous);render();alert(e.message);console.error(e)}}
+async function op(fn){if(!allowedToEdit()){alert('You need V2 TEST Admin permissions to edit online data.');return}
+ if(writePending){alert('Previous change is still saving. Please retry shortly.');return}
+ const previous=deep(store),expectedRevision=remoteRevision;
+ try{fn()}catch(e){store=previous;render();alert(e.message);console.error(e);return}
+ store.playerLibrary=libraryNames();
+ const changed=JSON.stringify({...store,selected:null})!==JSON.stringify({...previous,selected:null});
+ if(!changed){render();return}
+ const next=deep(store);writePending=true;notice='Saving to V2 TEST Firebase…';render();
+ try{
+   const result=await runTransaction(liveStateRef,current=>{
+     if((Number(current?.revision)||0)!==expectedRevision)return; // another device already saved; do not overwrite it
+     return cloudPayload(next,expectedRevision+1);
+   },{applyLocally:false});
+   if(!result.committed)throw Error('Another device saved changes first. Latest online data will be reloaded; retry your change.');
+   remoteValue=result.snapshot.val();remoteRevision=Number(remoteValue?.revision)||expectedRevision+1;
+   store=parseCloudState(remoteValue);notice='Saved online to V2 TEST Firebase.';
+ }catch(e){
+   store=remoteValue?parseCloudState(remoteValue):previous;
+   notice='Not saved. '+adminMessage(e);
+   alert(notice);
+ }finally{
+   writePending=false;
+   // Re-read latest server state after any race instead of trusting a stale local copy.
+   try{const newest=await get(liveStateRef);setCloudData(newest.val())}catch(e){render()}
+ }
+ render();}
 function maybeWarnChanges(t){if(Object.keys(t.results).length)throw Error('There are recorded results. Changing scoring/court rules could invalidate them. Create a fresh tournament or deliberately clear results first.')}
 function entryPlayerForm(){const t=active(),selector=document.querySelector('form[data-form="entry"] [name="teamId"]'),list=document.getElementById('entry-player-list');if(!selector||!list)return;const team=t.teams.find(x=>x.id===selector.value);list.innerHTML=`<p class="helper">Select players (one or more):</p>${team?.players.map(p=>`<label class="choice"><input type="checkbox" name="playerId" value="${esc(p.id)}"> ${esc(p.name)}</label>`).join('')||'No players'}`}
 document.addEventListener('click',ev=>{
@@ -858,6 +1050,8 @@ document.addEventListener('click',ev=>{
  if(b.classList.contains('profile-overlay')&&ev.target!==b)return;
  const t=active(),id=b.dataset.id,catId=b.dataset.cat,action=b.dataset.action;
  const safe=(fn)=>op(fn);
+ if(!viewerActions.has(action)&&!allowedToEdit()){alert('Sign in as the V2 Test Admin to make changes.');return;}
+ if(!viewerActions.has(action)&&writePending){alert('Wait for the previous save to complete.');return;}
  if(action==='open-tournament'){if(store.tournaments.some(x=>x.id===id)){store.selected=id;tournamentPanel='details';editor=null;profile=null;printCategory='all';printGroup='all';remember();render()}return}
  if(action==='tournament-section'){if(['details','history'].includes(b.dataset.section)){tournamentPanel=b.dataset.section;render()}return}
  if(action==='close-profile'){if(b.closest('.profile-dialog')||b.classList.contains('profile-overlay')){profile=null;render()}return}
@@ -866,38 +1060,40 @@ document.addEventListener('click',ev=>{
  if(action==='cancel'){editor=null;render();return}
  if(action==='edit-tournament'){editor={kind:'tournament'};render();return}
  if(action==='new-tournament'){editor={kind:'create'};page='tournaments';render();return}
- if(action==='delete-tournament')return safe(()=>{const typed=prompt(`Type the exact name to delete ONLY this local demo tournament:\n${t.name}`);if(typed!==t.name)return;need(store.tournaments.length>1,'Create another tournament before deleting the only demo.');store.tournaments=store.tournaments.filter(x=>x.id!==t.id);store.selected=store.tournaments[0].id;editor=null;notice='Demo tournament deleted locally.'});
+ if(action==='delete-tournament')return safe(()=>{const typed=prompt(`Type the exact name to delete this V2 TEST tournament and all scores:\n${t.name}`);if(typed!==t.name)return;store.tournaments=store.tournaments.filter(x=>x.id!==t.id);store.selected=store.tournaments[0]?.id||null;editor=null;notice='Test tournament deleted.'});
  if(action==='new-team'||action==='new-category'){editor={kind:action};render();return}
  if(action==='new-group'){editor={kind:'new-group',id};render();return}
  if(action==='rename-group'){editor={kind:'rename-group',id,cat:catId};render();return}
- if(action==='remove-group')return safe(()=>{const c=lookup(t,catId),g=c?.groups?.find(x=>x.id===id);if(!confirm(`Delete group ${g?.name}? Entries must first be moved.`))return;removeGroup(t,catId,id);notice='Group removed in this demo.'});
+ if(action==='remove-group')return safe(()=>{const c=lookup(t,catId),g=c?.groups?.find(x=>x.id===id);if(!confirm(`Delete group ${g?.name}? Entries must first be moved.`))return;removeGroup(t,catId,id);notice='Group removed from test.'});
  if(action==='edit-team'){editor={kind:'team',id};render();return}
  if(action==='edit-category'){editor={kind:'category',id};render();return}
  if(action==='add-entry'){editor={kind:'entry',id};render();entryPlayerForm();return}
- if(action==='remove-team')return safe(()=>{const team=t.teams.find(x=>x.id===id);if(!confirm(`Remove ${team?.name}? Existing results will be protected.`))return;removeTeam(t,id);notice='Team removed from demo.'});
+ if(action==='remove-team')return safe(()=>{const team=t.teams.find(x=>x.id===id);if(!confirm(`Remove ${team?.name}? Existing results will be protected.`))return;removeTeam(t,id);notice='Team removed from test.'});
  if(action==='remove-category')return safe(()=>{const cat=lookup(t,id);if(!confirm(`Remove category ${cat?.name}?`))return;removeCategory(t,id)});
  if(action==='remove-entry')return safe(()=>{if(!confirm('Remove this category entry?'))return;removeEntry(t,catId,id)});
  if(action==='shuffle')return safe(()=>{scheduleLeague(t,{seed:Date.now(),minimumRestSlots:t.settings?.minRestSlots??1});const check=fixturesCheck(t);need(check.valid,check.problems.join(', '));notice=`Generated ${t.fixtures.filter(m=>m.stage==='league').length} league matches. ${check.restAlerts.length} rest warnings.`});
- if(action==='clear-knockout')return safe(()=>{const kos=t.fixtures.filter(m=>m.stage==='knockout');need(!kos.some(m=>t.results[m.id]),'Recorded knockout results: cannot clear the bracket');if(!confirm('Clear all unplayed knockout brackets in this DEMO tournament? League scores stay untouched.'))return;t.fixtures=t.fixtures.filter(m=>m.stage!=='knockout');notice='Unplayed knockout brackets cleared in the demo.'});
+ if(action==='clear-knockout')return safe(()=>{const kos=t.fixtures.filter(m=>m.stage==='knockout');need(!kos.some(m=>t.results[m.id]),'Recorded knockout results: cannot clear the bracket');if(!confirm('Clear all unplayed knockout brackets in this V2 TEST tournament? League scores stay untouched.'))return;t.fixtures=t.fixtures.filter(m=>m.stage!=='knockout');notice='Unplayed knockout brackets cleared in V2 test.'});
  if(action==='knockout')return safe(()=>{const out=generateKnockout(t,id);notice=`Knockout bracket created: ${out.allMatches.length} matches across ${out.rounds.length} rounds, ${out.byes} byes. Winners advance automatically.`});
  if(action==='edit-result'){editor={kind:'result',id};mode=t.results[id]?.mode==='winner'?'winner':'score';render();return}
- if(action==='clear-result')return safe(()=>{if(!confirm('Clear this result?'))return;const match=t.fixtures.find(m=>m.id===id);delete t.results[id];if(match?.stage==='knockout')advanceKnockout(t,match.categoryId);editor=null;notice='Demo result cleared.'});
+ if(action==='clear-result')return safe(()=>{if(!confirm('Clear this result?'))return;const match=t.fixtures.find(m=>m.id===id);delete t.results[id];if(match?.stage==='knockout')advanceKnockout(t,match.categoryId);editor=null;notice='Test result cleared.'});
  if(action==='export'){
   const blob=new Blob([JSON.stringify({version:VERSION,exportedAt:new Date().toISOString(),tournaments:store.tournaments},null,2)],{type:'application/json'});
-  const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='MBA-V2-demo-backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return;
+  const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download='MBA-V2-TEST-Backup.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);return;
  }
 });
 document.addEventListener('change',async e=>{
  if(e.target.id==='legacy-json-import'){
+  if(!allowedToEdit()){alert('Only Test Admin can import.');e.target.value='';return}
   const file=e.target.files?.[0];if(!file)return;
+  if(!confirm('Import tournaments & scores from this JSON file into the NEW TEST Firebase? It will be shared with signed-in TEST users. Original Firebase will not be changed.'))return;
   if(file.size>10*1024*1024){alert('Please select a backup smaller than 10 MB.');return}
   try{
    const data=JSON.parse(await file.text());
    op(()=>{
     const imported=legacyJsonForImport(data);
-    if(!imported.length){notice='These Firebase tournaments are already imported into this offline preview.';return}
+    if(!imported.length){notice='Those tournaments are already imported in the test database.';return}
     store.tournaments.push(...imported);store.selected=imported[0].id;tournamentPanel='details';editor=null;page='tournaments';
-    notice=`Imported ${imported.length} Firebase tournament(s) into this offline preview. Firebase data was not changed.`;
+    notice=`Importing ${imported.length} tournament(s) into V2 TEST Firebase. Original Firebase unchanged.`;
    });
   }catch(err){alert('Import failed: '+err.message)}
   return;
@@ -922,6 +1118,7 @@ document.addEventListener('change',async e=>{
 document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>{page=el.dataset.page;editor=null;render()}));
 document.addEventListener('submit',ev=>{
  const form=ev.target.closest('form[data-form]');if(!form)return;ev.preventDefault();
+ if(!allowedToEdit()){alert('Only V2 Test Admin can save changes.');return}
  const data=new FormData(form),kind=form.dataset.form,t=active();
  op(()=>{
   if(kind==='new-group'){
@@ -975,11 +1172,12 @@ document.addEventListener('submit',ev=>{
    if(previousRest!==minRestSlots&&t.fixtures.length&&Object.keys(t.results).length)throw Error('Rest settings cannot change after results have been recorded');
    t.settings={...t.settings,printOrientation:String(data.get('orientation')),printFontSize:+data.get('fontSize'),minRestSlots};
   }
-  editor=null;notice='Saved in local preview only. Firebase unchanged.';
+  editor=null;notice='Saving to test Firebase…';;
  });
 });
 document.getElementById('print-page').addEventListener('click',()=>{page='print';profile=null;editor=null;render();document.getElementById('view').scrollIntoView({behavior:'smooth'});});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&profile){profile=null;render()}});
+wireAuth();
 render();
 
 </script></body></html>
