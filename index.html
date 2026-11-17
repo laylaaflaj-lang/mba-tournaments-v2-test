@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101f3a"><title>MBA Tournaments — V2 Finance, Roles & Venue Test</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101f3a"><meta name="description" content="MBA Tournaments: live badminton fixtures, scores, standings and role-based management."><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="MBA Tournaments"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="./mba-icon-192.png"><link rel="apple-touch-icon" href="./mba-icon-192.png"><title>MBA Tournaments — V2 Finance, Roles & Venue Test</title>
 <style>
 :root{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#17253d;background:#f2f5fa;color-scheme:light}
 *{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}
@@ -175,9 +175,9 @@ details>summary{cursor:pointer;color:#244e83;font-weight:700;padding:9px}
  <div id="auth-message" class="helper" role="status"></div></section>
 <div class="banner"><strong>V2 TEST with Roles & Finance:</strong> This uses a NEW v3 data area in your separate V2 TEST Firebase. Your existing <code>v2/state</code> and the ORIGINAL 2026 Firebase stay untouched. Super Admin starts a one-time copy of the already imported V2 test tournaments after publishing the new security rules. Finance is private.</div>
 <section id="global-tour-control" class="global-tournament-switcher noprint" hidden aria-label="Active tournament switcher"></section>
-<div class="toolbar noprint"><span class="helper" style="margin:0">Only Super Admin-published tournaments appear to viewers. The Super Admin assigns separate View / Edit access per tournament. Finance remains private.</span><button id="print-page" class="btn">🖨 Print A4</button></div>
+<div class="toolbar noprint"><span class="helper" style="margin:0">Only Super Admin-published tournaments appear to viewers. The Super Admin assigns separate View / Edit access per tournament. Finance remains private.</span><span class="actions"><button id="pwa-install" class="btn primary" type="button" hidden>📲 Install App</button><button id="print-page" class="btn">🖨 Print A4</button></span></div>
 <nav class="noprint" aria-label="Tournament management"><button data-page="tournaments" class="selected">🏆 Tournaments</button><button data-page="teams">👥 Teams</button><button data-page="categories">🗂 Categories</button><button data-page="groups">🧩 Groups</button><button data-page="fixtures">🔀 Fixtures</button><button data-page="results">✅ Results</button><button data-page="standings">📊 Standings</button><button data-page="settings">⚙ Settings</button><button data-page="finance">💰 Finance</button><button data-page="access">🛡 User Roles</button><button data-page="print">🖨 Print Center</button></nav>
-<div id="venue-public" class="venue-strip noprint"></div><div id="notice"></div><div id="view"></div></main><div id="profile-layer"></div><footer>MBA Tournaments V2 TEST • Firebase v3 roles & finance • Original 2026 database untouched</footer>
+<div id="connection-status" class="banner noprint" hidden>📡 Internet connection lost. Live scores, payments, permissions and changes require internet. Please reconnect before editing.</div><div id="venue-public" class="venue-strip noprint"></div><div id="notice"></div><div id="view"></div></main><div id="profile-layer"></div><footer>MBA Tournaments V2 TEST • Firebase v3 roles & finance • Original 2026 database untouched</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
@@ -191,7 +191,7 @@ const firebaseConfig={
  messagingSenderId:'872128319294',appId:'1:872128319294:web:768133f86c435054a0666f'
 };
 const fapp=initializeApp(firebaseConfig),auth=getAuth(fapp),db=getDatabase(fapp);
-const VERSION='2.2.0-tournament-visibility-scopes-test';
+const VERSION='2.3.0-PWA-install-test';
 const deep=x=>JSON.parse(JSON.stringify(x));
 const clean=s=>String(s??'').trim();
 const need=(v,msg)=>{if(!v)throw Error(msg)};
@@ -1193,7 +1193,7 @@ function tournamentLibrary(t){
  return `<div class="tournament-grid"><section class="tournament-column" aria-label="All tournaments">
  <div class="tournament-pane"><h3>🏆 All Tournaments (${store.tournaments.length})</h3><p class="helper">All live V3 TEST tournaments are listed. The original 2026 Firebase remains separate.</p>
  ${store.tournaments.map(one=>{const s=tournamentSummary(one);return `<button class="tournament-pick" type="button" data-action="open-tournament" data-id="${esc(one.id)}" aria-pressed="${one.id===t.id?'true':'false'}"><strong>${esc(one.name)}</strong><small>📅 ${esc(dateShow(one.date))}</small><small>👥 ${s.teams} teams · 🗂 ${s.categories} categories · 🏟 ${one.courts} courts</small><span class="tour-badge">${s.played} / ${s.total} matches completed</span></button>`}).join('')}
- </div><div class="tour-file-import noprint"><label for="legacy-json-import">📥 Import Legacy Firebase JSON (Super Admin only)</label><input id="legacy-json-import" type="file" accept=".json,application/json"><p class="helper">Optional: import legacy root JSON directly into new V3 TEST. For your already imported tournaments, use the safer Copy V2 State migration button instead.</p></div>
+ </div>
  </section><section class="tournament-pane" aria-label="Tournament details and history"><div class="tour-pane-tabs"><button class="btn" type="button" data-action="tournament-section" data-section="details" aria-pressed="${tournamentPanel==='details'}">📋 Full Details</button><button class="btn" type="button" data-action="tournament-section" data-section="history" aria-pressed="${tournamentPanel==='history'}">📜 History & Scores</button></div>${tournamentPanel==='history'?tournamentHistoryPanel(t):tournamentDetailsPanel(t)}</section></div>`;
 }
 // Handles a local Realtime Database root JSON export with {tournaments:{...},scores:{...}}.
@@ -1443,22 +1443,6 @@ document.addEventListener('change',async e=>{
  if(e.target.id==='tournament-switcher'){switchTournament(e.target.value);return}
  if(e.target.name==='scopeEdit'&&e.target.checked){const form=e.target.closest('form');const linked=[...form.querySelectorAll('[name=scopeView]')].find(x=>x.value===e.target.value);if(linked)linked.checked=true}
 
- if(e.target.id==='legacy-json-import'){
-  if(!isSuper()){alert('Only Super Admin can import.');return}
-  if(!confirm('Import legacy JSON into V3 TEST? The original Firebase remains untouched.'))return;
-  const file=e.target.files?.[0];if(!file)return;
-  if(file.size>10*1024*1024){alert('Please select a backup smaller than 10 MB.');return}
-  try{
-   const data=JSON.parse(await file.text());
-   op(()=>{
-    const imported=legacyJsonForImport(data);
-    if(!imported.length){notice='These Firebase tournaments are already imported into this offline preview.';return}
-    store.tournaments.push(...imported);store.selected=imported[0].id;tournamentPanel='details';editor=null;page='tournaments';
-    notice=`Imported ${imported.length} Firebase tournament(s) into this offline preview. Firebase data was not changed.`;
-   });
-  }catch(err){alert('Import failed: '+err.message)}
-  return;
- }
  if(e.target.dataset.change==='move-entry'){
   const catId=e.target.dataset.cat,entryId=e.target.dataset.id,to=e.target.value;
   op(()=>{assignEntryGroup(active(),catId,entryId,to||null);notice='Entry group updated. Re-generate league fixtures.'});return;
@@ -1542,9 +1526,34 @@ document.addEventListener('submit',async ev=>{
   editor=null;notice='Saving changes to V3 TEST Firebase…';
  });
 });
+// Installable Android PWA. Authentication and Firebase always remain online-only.
+let mbaInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',event=>{
+  event.preventDefault();mbaInstallPrompt=event;
+  document.getElementById('pwa-install').hidden=false;
+});
+window.addEventListener('appinstalled',()=>{mbaInstallPrompt=null;document.getElementById('pwa-install').hidden=true});
+document.getElementById('pwa-install').addEventListener('click',async()=>{
+  if(!mbaInstallPrompt)return;
+  const event=mbaInstallPrompt;mbaInstallPrompt=null;
+  document.getElementById('pwa-install').hidden=true;
+  try{await event.prompt();await event.userChoice}catch(error){console.warn('Install prompt:',error)}
+});
+function mbaOnlineNotice(){
+  const el=document.getElementById('connection-status');if(!el)return;
+  el.hidden=navigator.onLine;
+}
+window.addEventListener('online',mbaOnlineNotice);
+window.addEventListener('offline',mbaOnlineNotice);
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(error=>console.warn('PWA service worker:',error));
+  });
+}
 wireAuth();
 document.getElementById('print-page').addEventListener('click',()=>{page='print';profile=null;editor=null;render();document.getElementById('view').scrollIntoView({behavior:'smooth'});});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&profile){profile=null;render()}});
 render();
+mbaOnlineNotice();
 
 </script></body></html>
