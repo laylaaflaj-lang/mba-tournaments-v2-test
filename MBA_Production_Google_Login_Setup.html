@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>MBA Tournaments — Production Account Setup</title>
+  <style>
+    :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#152a45;background:#f2f5fa}
+    *{box-sizing:border-box}
+    body{margin:0;padding:18px}
+    main{max-width:640px;margin:36px auto;background:#fff;border:1px solid #dde5f1;border-radius:16px;padding:25px;box-shadow:0 10px 35px #19305216}
+    h1{font-size:25px;margin:0 0 8px;color:#15345d}
+    h2{font-size:17px;margin:15px 0 7px}
+    .sub{font-size:14px;color:#66758b;margin:0 0 20px}
+    .panel{background:#eff6fc;border-radius:10px;padding:14px;margin:14px 0}
+    .warning{background:#fff4db;border:1px solid #efd8a1;border-radius:10px;padding:12px;font-size:13px;line-height:1.5;margin:14px 0}
+    button{padding:12px 16px;font:inherit;font-weight:750;border-radius:10px;border:1px solid #b7c7dd;background:#fff;color:#24446d;margin:5px 5px 5px 0;cursor:pointer}
+    button.primary{background:#1e559b;color:#fff;border-color:#1e559b}
+    button:disabled{opacity:.5;cursor:default}
+    code{display:block;overflow-wrap:anywhere;background:#eaf1fc;padding:12px;border-radius:7px;font-size:13px;user-select:all}
+    .small{font-size:13px;color:#58708d;line-height:1.6}
+    #status{font-size:14px;line-height:1.5;margin:10px 0}
+    #account{display:none}
+  </style>
+</head>
+<body>
+<main>
+  <h1>🏸 MBA Tournaments</h1>
+  <p class="sub">Production Google Account Setup</p>
+  <div class="warning"><strong>Temporary setup page.</strong> This signs in to the <strong>MBA Tournaments Production</strong> Firebase Authentication project only. It does not read or write tournament data and it does not make you an admin automatically.</div>
+  <button id="login" class="primary">Continue with Google — Production</button>
+  <button id="logout" disabled>Sign out</button>
+  <p id="status" role="status">Loading Firebase Authentication…</p>
+  <section id="account" class="panel">
+    <h2>Production account found</h2>
+    <p class="small">Your Production Firebase user ID (UID) is:</p>
+    <code id="uid"></code>
+    <button id="copy">Copy UID</button>
+    <p class="small">Copy only this UID into your chat. Do not share your password, login codes, or authentication tokens. Your account will not become Super Admin until database permissions are set separately.</p>
+  </section>
+  <p class="small">Use the same Google account you want as Super Admin. Once setup is complete, this temporary page can be deleted from GitHub.</p>
+</main>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+const cfg = {
+  apiKey:'AIzaSyAVxitsfI-_nJ4-GwYHHwafExrY99N7tJ0',
+  authDomain:'mba-tournaments-production.firebaseapp.com',
+  databaseURL:'https://mba-tournaments-production-default-rtdb.asia-southeast1.firebasedatabase.app',
+  projectId:'mba-tournaments-production',
+  storageBucket:'mba-tournaments-production.firebasestorage.app',
+  messagingSenderId:'1072532890274',
+  appId:'1:1072532890274:web:8687524cc30f473361adfb'
+};
+const auth=getAuth(initializeApp(cfg));
+const login=document.querySelector('#login'),logout=document.querySelector('#logout');
+const status=document.querySelector('#status'),account=document.querySelector('#account'),uid=document.querySelector('#uid');
+onAuthStateChanged(auth,user=>{
+  if(user){status.textContent='Signed in to Production Authentication. You can now copy your UID.';account.style.display='block';uid.textContent=user.uid;login.disabled=true;logout.disabled=false;}
+  else{status.textContent='Not signed in yet.';account.style.display='none';uid.textContent='';login.disabled=false;logout.disabled=true;}
+},err=>{status.textContent='Authentication check failed: '+(err.code||err.message)});
+login.addEventListener('click',async()=>{login.disabled=true;status.textContent='Opening Google sign-in…';try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){login.disabled=false;status.textContent='Google sign-in error: '+(e.code||e.message)+' — Please ensure laylaaflaj-lang.github.io is an authorized domain in Production Firebase.'}});
+logout.addEventListener('click',async()=>{await signOut(auth)});
+document.querySelector('#copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(uid.textContent);status.textContent='UID copied.'}catch{status.textContent='Select and copy the UID displayed above.'}});
+</script>
+</body>
+</html>
