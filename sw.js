@@ -1,7 +1,7 @@
 /* MBA Tournaments V2 install shell — no user/auth/finance data is cached. */
-const CACHE_NAME='mba-v2-pwa-shell-20261117-v1';
+const CACHE_NAME='mba-v2-pwa-shell-20261117-v2';
 const OFFLINE='./offline.html';
-const SHELL=['./offline.html','./manifest.webmanifest','./mba-icon-192.png','./mba-icon-512.png','./mba-icon-maskable-512.png'];
+const SHELL=['./offline.html','./manifest.webmanifest','./mba-icon-192.png','./mba-icon-512.png','./mba-icon-maskable-512.png','./venue-location-qr.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE_NAME).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
 });
@@ -22,6 +22,6 @@ self.addEventListener('fetch',event=>{
     return;
   }
   const file=url.pathname.split('/').pop();
-  if(!['manifest.webmanifest','mba-icon-192.png','mba-icon-512.png','mba-icon-maskable-512.png','offline.html'].includes(file))return;
+  if(!['manifest.webmanifest','mba-icon-192.png','mba-icon-512.png','mba-icon-maskable-512.png','venue-location-qr.png','offline.html'].includes(file))return;
   event.respondWith(caches.match(request).then(cached=>cached||fetch(request)));
 });

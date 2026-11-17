@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101f3a"><meta name="description" content="MBA Tournaments: live badminton fixtures, scores, standings and role-based management."><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="MBA Tournaments"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="./mba-icon-192.png"><link rel="apple-touch-icon" href="./mba-icon-192.png"><title>MBA Tournaments — V2 Finance, Roles & Venue Test</title>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101f3a"><meta name="description" content="MBA Tournaments: live badminton fixtures, scores, standings and role-based management."><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="MBA Tournaments"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" type="image/png" sizes="192x192" href="./mba-icon-192.png"><link rel="apple-touch-icon" href="./mba-icon-192.png"><title>MBA Tournaments</title>
 <style>
 :root{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#17253d;background:#f2f5fa;color-scheme:light}
 *{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}
@@ -162,26 +162,33 @@ details>summary{cursor:pointer;color:#244e83;font-weight:700;padding:9px}
 .visibility-grid{display:grid;gap:8px}.visibility-row{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#f8fafd;border:1px solid #dbe5f1;border-radius:10px;padding:12px;flex-wrap:wrap}
 .visibility-row .btn{min-width:120px}.scope-grid{display:grid;gap:7px}.scope-line{display:grid;grid-template-columns:minmax(0,1fr) 95px 95px;gap:7px;align-items:center;border-bottom:1px solid #e0e8f1;padding:8px 3px}
 .scope-line .choice{margin:0}.scope-help{color:#5b6d85;font-size:12px}
+.fixture-payment-status{display:flex;gap:5px;flex-wrap:wrap;margin:5px 0 8px}
+.fixture-pay-pill{display:inline-block;border:1px solid #d9e4ef;background:#f4f7fb;padding:3px 7px;border-radius:8px;font-size:11px;line-height:1.3}
+.fixture-pay-pill.payment-paid{background:#e3f6ec;border-color:#b2dfc6}
+.fixture-pay-pill.payment-unpaid{background:#fff0f1;border-color:#efc6ce}
+.fixture-pay-pill.payment-partial{background:#fff5dd;border-color:#efdcab}
+.fixture-payment-control{padding:9px 12px;background:#f5f9ff;border:1px solid #dbe6f2;border-radius:10px}
+@media print{.fixture-payment-status,.fixture-payment-control{display:none!important}}
 @media(max-width:680px){.global-tournament-switcher{top:0;padding:10px}.global-tournament-switcher .switch-copy{min-width:auto}.global-tournament-switcher select{width:100%;flex-basis:100%}.scope-line{grid-template-columns:minmax(0,1fr) 60px 60px}.scope-line .choice{font-size:11px}}
 @media print{.global-tournament-switcher,.visibility-panel{display:none!important}}
 </style><style id="print-rule"></style></head>
-<body><header><div class="container header-top"><div><h1>🏸 MBA Tournaments <span style="opacity:.75">V2</span></h1><p>Tournament Manager · Secure Roles & Finance</p></div><span class="tag">V2 TEST • ROLE CONTROL</span></div></header>
+<body><header><div class="container header-top"><div><h1>🏸 MBA Tournaments</h1><p>Badminton Tournament Manager</p></div></div></header>
 <main class="container">
 <section class="card noprint" id="v2-auth-panel" style="margin:0 0 14px"><h2>🔐 MBA Tournaments Account</h2><div id="auth-status" class="helper">Checking login…</div>
  <div id="auth-login" hidden><button id="google-login" class="btn primary">Continue with Google</button><button class="btn" id="toggle-email">Email / Password</button>
  <form id="email-form" hidden class="sub-form"><label class="field">Email<input id="email" type="email" autocomplete="email" required></label><label class="field">Password<input id="password" type="password" autocomplete="current-password" required minlength="6"></label><div class="actions"><button class="btn primary" type="submit">Sign In</button><button id="signup" class="btn" type="button">Create Viewer Account</button><button id="reset-password" class="btn" type="button">Reset Password</button></div></form></div>
- <div id="auth-account" hidden><button class="btn" id="copy-uid">Copy my User UID</button><button class="btn" id="request-access">Request an Editing Role</button><button class="btn" id="password-setup">Set app password</button><button class="btn danger-outline" id="logout">Logout</button>
- <form id="link-form" hidden class="sub-form"><p class="helper">Use a separate app password, not your Gmail password. At least 12 characters.</p><label class="field">New app password<input id="new-password" type="password" minlength="12" autocomplete="new-password" required></label><label class="field">Confirm password<input id="confirm-password" type="password" minlength="12" autocomplete="new-password" required></label><button class="btn primary" type="submit">Link Password to Existing Account</button></form></div>
+ <div id="auth-account" hidden><button class="btn" id="copy-uid">Copy my User UID</button><button class="btn" id="request-access">Request an Editing Role</button><button class="btn danger-outline" id="logout">Logout</button>
+</div>
  <div id="auth-message" class="helper" role="status"></div></section>
-<div class="banner"><strong>V2 TEST with Roles & Finance:</strong> This uses a NEW v3 data area in your separate V2 TEST Firebase. Your existing <code>v2/state</code> and the ORIGINAL 2026 Firebase stay untouched. Super Admin starts a one-time copy of the already imported V2 test tournaments after publishing the new security rules. Finance is private.</div>
+<div class="banner"><strong>Test environment:</strong> This app currently uses the separate V2 TEST Firebase database, not the original 2026 database. Tournament access is role-controlled and finance data is private.</div>
 <section id="global-tour-control" class="global-tournament-switcher noprint" hidden aria-label="Active tournament switcher"></section>
 <div class="toolbar noprint"><span class="helper" style="margin:0">Only Super Admin-published tournaments appear to viewers. The Super Admin assigns separate View / Edit access per tournament. Finance remains private.</span><span class="actions"><button id="pwa-install" class="btn primary" type="button" hidden>📲 Install App</button><button id="print-page" class="btn">🖨 Print A4</button></span></div>
 <nav class="noprint" aria-label="Tournament management"><button data-page="tournaments" class="selected">🏆 Tournaments</button><button data-page="teams">👥 Teams</button><button data-page="categories">🗂 Categories</button><button data-page="groups">🧩 Groups</button><button data-page="fixtures">🔀 Fixtures</button><button data-page="results">✅ Results</button><button data-page="standings">📊 Standings</button><button data-page="settings">⚙ Settings</button><button data-page="finance">💰 Finance</button><button data-page="access">🛡 User Roles</button><button data-page="print">🖨 Print Center</button></nav>
-<div id="connection-status" class="banner noprint" hidden>📡 Internet connection lost. Live scores, payments, permissions and changes require internet. Please reconnect before editing.</div><div id="venue-public" class="venue-strip noprint"></div><div id="notice"></div><div id="view"></div></main><div id="profile-layer"></div><footer>MBA Tournaments V2 TEST • Firebase v3 roles & finance • Original 2026 database untouched</footer>
+<div id="connection-status" class="banner noprint" hidden>📡 Internet connection lost. Live scores, payments, permissions and changes require internet. Please reconnect before editing.</div><div id="venue-public" class="venue-strip noprint"></div><div id="notice"></div><div id="view"></div></main><div id="profile-layer"></div><footer>MBA Tournaments • Test Firebase environment • Original 2026 database unchanged</footer>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
-import { getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,linkWithCredential,EmailAuthProvider,sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
 import { getDatabase,ref,onValue,get,update,runTransaction,set } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-database.js';
 const firebaseConfig={
  apiKey:'AIzaSyCMbC8Gx6IjPVW-MHbgTyx9MnrG8QNbJnw',
@@ -191,7 +198,7 @@ const firebaseConfig={
  messagingSenderId:'872128319294',appId:'1:872128319294:web:768133f86c435054a0666f'
 };
 const fapp=initializeApp(firebaseConfig),auth=getAuth(fapp),db=getDatabase(fapp);
-const VERSION='2.3.0-PWA-install-test';
+const VERSION='2.4.0-clean-ui-private-fixture-payments';
 const deep=x=>JSON.parse(JSON.stringify(x));
 const clean=s=>String(s??'').trim();
 const need=(v,msg)=>{if(!v)throw Error(msg)};
@@ -701,7 +708,7 @@ function watchFinance(){
  finance={config:null,payments:{},overrides:{},expenses:{},transfers:{}};
  if(!t||!authUser)return;
  const p=`v3/finance/${t.id}`;
- function watch(part){const off=onValue(ref(db,p+'/'+part),snap=>{finance[part]=snap.val()|| (part==='config'?null:{});if(page==='finance'||page==='teams'||page==='tournaments'||page==='print')render()},e=>{document.getElementById('auth-message').textContent='Finance read: '+errText(e)});finListeners.push(off)}
+ function watch(part){const off=onValue(ref(db,p+'/'+part),snap=>{finance[part]=snap.val()|| (part==='config'?null:{});if(page==='finance'||page==='fixtures'||page==='teams'||page==='tournaments'||page==='print')render()},e=>{document.getElementById('auth-message').textContent='Finance read: '+errText(e)});finListeners.push(off)}
  if(canSeePayments()||can('feesWrite')){watch('config');watch('overrides')}
  if(canSeePayments())watch('payments');
  if(canSeeExpenses())watch('expenses');
@@ -713,7 +720,6 @@ function authState(){
  if(!authUser){status.textContent='Please sign in. Only tournaments approved by Super Admin are visible.';return}
  const roles=isSuper()?'🛡 Super Admin':accessRecord?.active?(accessRecord.role||'Custom Admin'):'👁 Viewer';
  status.textContent=(authUser.email||'Signed in')+' • '+roles+(remoteReady?' • Cloud connected':' • Loading cloud…');
- document.getElementById('password-setup').hidden=authUser.providerData?.some(p=>p.providerId==='password');
 }
 function clearTournamentListeners(){
  if(superTournamentListener){superTournamentListener();superTournamentListener=null}
@@ -871,11 +877,7 @@ function wireAuth(){
  document.getElementById('request-access').onclick=async()=>{if(!authUser)return;const note=prompt('Which editing access do you need? (Super Admin will approve.)','Score / Teams / Payments / Finance');if(note===null)return;
   try{await set(ref(db,`v3/accessRequests/${authUser.uid}`),{email:authUser.email||'',name:authUser.displayName||'',note:String(note).slice(0,160),requestedAt:Date.now()});msg.textContent='Request sent to Super Admin.'}catch(e){msg.textContent=errText(e)}
  };
- document.getElementById('password-setup').onclick=()=>{const f=document.getElementById('link-form');f.hidden=!f.hidden};
- document.getElementById('link-form').onsubmit=async e=>{e.preventDefault();const p=document.getElementById('new-password').value,q=document.getElementById('confirm-password').value;
-  if(p!==q||p.length<12){msg.textContent='Passwords must match and be 12+ characters';return}
-  try{const oldUid=authUser.uid;const x=await linkWithCredential(authUser,EmailAuthProvider.credential(authUser.email,p));if(x.user.uid!==oldUid)throw Error('UID changed unexpectedly');msg.textContent='Password linked; original UID preserved.';document.getElementById('link-form').hidden=true;authState()}catch(e){msg.textContent=errText(e)}
- };
+
 }
 
 /* Financial data: separate from public tournament data, append-only receipts and expenses. */
@@ -892,11 +894,10 @@ const expenseEvents=()=>Object.entries(dataObj(finance.expenses)).map(([id,x])=>
 const transfers=()=>Object.entries(dataObj(finance.transfers)).map(([id,x])=>({...x,id}));
 function paidForPlayer(pid){return receipts().filter(x=>x.playerId===pid).reduce((sum,x)=>sum+Number(x.amount||0)*(x.kind==='refund'?-1:1),0)}
 function paymentStatus(pid){
- const fee=playerFee(pid);if(fee===null)return {text:'NOT RECORDED',cls:'payment-unknown',fee:null,paid:paidForPlayer(pid),due:null};
+ const fee=playerFee(pid);if(fee===null)return {text:'FEE NOT SET',cls:'payment-unknown',fee:null,paid:paidForPlayer(pid),due:null};
  const paid=paidForPlayer(pid),due=Math.max(0,fee-paid);
  return {text:paid>fee?'OVERPAID':paid===fee?'PAID':paid>0?'PARTIAL':'UNPAID',cls:paid>=fee?'payment-paid':paid>0?'payment-partial':'payment-unpaid',paid,fee,due};
 }
-function paymentBadge(pid){if(!canSeePayments())return '';const x=paymentStatus(pid);return ` <small class="${x.cls}">${esc(x.text)}${x.fee===null?'':' · '+money(x.paid)+' / '+money(x.fee)}</small>`}
 function financeTotals(t){
  const ppl=playersOf(t),hasFee=financesReady();const expected=hasFee?ppl.reduce((v,p)=>v+Math.max(0,playerFee(p.id)||0),0):null;
  const paid=receipts().reduce((sum,x)=>sum+(x.kind==='refund'?-1:1)*Number(x.amount||0),0);
@@ -1041,7 +1042,7 @@ function sourceTeamPicker(){const src=store.tournaments.find(t=>t.id===document.
 function dateShow(d){return /^\d{4}-\d{2}-\d{2}$/.test(d||'')?`${d.slice(8,10)}-${d.slice(5,7)}-${d.slice(0,4)}`:'Date not set'}
 function lookup(t,id){return t.categories.find(c=>c.id===id)}
 function participants(t,m){const c=lookup(t,m.categoryId);return [entryLabel(t,c,m.a),entryLabel(t,c,m.b)]}
-function personLink(player){return `<button type="button" class="name-link" data-action="view-player" data-id="${esc(player.id)}" title="See player match history">${esc(player.name)}</button>${paymentBadge(player.id)}`}
+function personLink(player){return `<button type="button" class="name-link" data-action="view-player" data-id="${esc(player.id)}" title="See player match history">${esc(player.name)}</button>`}
 function teamLink(team){return `<button type="button" class="name-link team-link" data-action="view-team" data-id="${esc(team.id)}" title="See team results">${esc(team.name)}</button>`}
 function categoryLink(cat){return `<button type="button" class="name-link category-link" data-action="view-category" data-id="${esc(cat.id)}" title="View category groups, players, fixtures, results and standings">${esc(cat.name)}</button>`}
 
@@ -1176,7 +1177,7 @@ function drawVenueQr(){
    const url=box.dataset.venueUrl;
    if(typeof window.QRCode==='function'){
      box.textContent='';try{new window.QRCode(box,{text:url,width:102,height:102,colorDark:'#101f3a',colorLight:'#ffffff',correctLevel:window.QRCode.CorrectLevel.M})}catch(e){box.textContent='Open location link';}
-   }else box.innerHTML='<small>QR unavailable; use Open Location link.</small>';
+   }else if(url===PROVIDED_VENUE_URL)box.innerHTML='<img src="./venue-location-qr.png" width="102" height="102" alt="Scan for tournament location">';else box.innerHTML='<small>QR unavailable; use Open Location link.</small>';
  }
 }
 function tournamentDetailsPanel(t){
@@ -1186,7 +1187,7 @@ function tournamentDetailsPanel(t){
  ${!t.venueUrl&&isSuper()?`<p class="helper">📍 Location link not added. Click Edit Tournament to add a Google Maps URL; the QR code will then appear automatically for all viewers.</p>`:''}
  <div class="tour-facts">${facts.map(([label,value])=>`<div class="tour-fact"><b>${value}</b><span>${label}</span></div>`).join('')}</div>
  <div class="tour-section"><h4>🗂 Categories & Groups</h4>${t.categories.map(c=>`<div class="tour-detail-line"><div>${categoryLink(c)} <small class="helper">${c.entrants.length} entries · ${(c.groups||[]).length} group(s)</small></div><span class="helper">${esc(effectiveFormat(t,c))} · Target ${effectiveRules(t,c).target}</span></div>`).join('')||'<p class="helper">No categories added yet.</p>'}</div>
- <div class="tour-section"><h4>👥 Teams & Players</h4><div class="tour-detail-roster">${t.teams.map(team=>`<div class="tour-detail-line"><div>${teamLink(team)}<small class="helper">${team.players.map(p=>esc(p.name)+paymentBadge(p.id)).join(' · ')||'No players'}</small></div><span class="helper">${team.players.length} player(s)</span></div>`).join('')||'<p class="helper">No teams added yet.</p>'}</div></div>
+ <div class="tour-section"><h4>👥 Teams & Players</h4><div class="tour-detail-roster">${t.teams.map(team=>`<div class="tour-detail-line"><div>${teamLink(team)}<small class="helper">${team.players.map(p=>esc(p.name)).join(' · ')||'No players'}</small></div><span class="helper">${team.players.length} player(s)</span></div>`).join('')||'<p class="helper">No teams added yet.</p>'}</div></div>
  <div class="tour-section"><h4>📊 Scoring Settings</h4><p class="helper">Target ${t.rules.target}; ${t.rules.winByTwo?'Win by 2':'No 2-point lead required'}; Cutoff ${t.rules.cutoff??'None'}; League win ${t.rules.winPoints} pts, loss ${t.rules.lossPoints} pts.</p></div>`;
 }
 function tournamentLibrary(t){
@@ -1286,18 +1287,36 @@ function groupView(t){
   return `<div class="team-box"><div class="section-head"><h3>${categoryLink(c)}</h3><div class="actions noprint">${button('＋ Add Group','new-group',`data-id="${esc(c.id)}"`)}</div></div>${create}${rows}</div>`;
  }).join('')||'<p>Create a category first.</p>'}`);
 }
+
+/* Private fixture payment badges. Never render for Viewer-only accounts. */
+let showFixturePaymentStatus=true;
+function fixtureEntryPaymentStatus(t,cat,entryId){
+ if(!showFixturePaymentStatus||!canSeePayments()||!financesReady())return '';
+ const entry=cat?.entrants?.find(e=>e.id===entryId);
+ const team=t.teams.find(team=>team.id===entry?.teamId);
+ if(!entry||!team)return '';
+ const rows=entry.playerIds.map(pid=>{
+  const player=team.players.find(p=>p.id===pid);if(!player)return '';
+  const status=paymentStatus(pid);
+  if(status.fee===null)return '';
+  return `<span class="fixture-pay-pill ${esc(status.cls)}">${esc(player.name)}: ${esc(status.text)}</span>`;
+ }).filter(Boolean).join('');
+ return rows?`<div class="fixture-payment-status">${rows}</div>`:'';
+}
 function fixtureView(t){
  const checked=fixturesCheck(t),league=t.fixtures.filter(m=>m.stage==='league').sort((a,b)=>a.slot-b.slot||a.court-b.court);
- const rows=league.map(m=>{const [a,b]=participants(t,m),c=lookup(t,m.categoryId);return `<tr><td>${m.slot}</td><td>Court ${m.court}</td><td>${c?categoryLink(c):''}<small>${esc(groupLabel(c,m.groupId))}</small></td><td>${linkedEntry(t,c,m.a)}<span class="vs"> VS </span>${linkedEntry(t,c,m.b)}</td></tr>`}).join('');
+ const rows=league.map(m=>{const c=lookup(t,m.categoryId);return `<tr><td>${m.slot}</td><td>Court ${m.court}</td><td>${c?categoryLink(c):''}<small>${esc(groupLabel(c,m.groupId))}</small></td><td>${linkedEntry(t,c,m.a)}${fixtureEntryPaymentStatus(t,c,m.a)} <span class="vs"> VS </span>${linkedEntry(t,c,m.b)}${fixtureEntryPaymentStatus(t,c,m.b)}</td></tr>`}).join('');
  const ko=t.fixtures.filter(m=>m.stage==='knockout').sort((a,b)=>a.slot-b.slot||a.court-b.court);
+ const privatePaymentToggle=canSeePayments()?`<label class="choice noprint fixture-payment-control"><input type="checkbox" id="fixture-payment-toggle" ${showFixturePaymentStatus?'checked':''}> Show Player Payment Status (Private)</label>${showFixturePaymentStatus&&!financesReady()?'<p class="helper noprint">Ground fee is not configured yet; set it in Finance to show paid/unpaid statuses.</p>':''}`:'';
  return card('Fixtures & Shuffle',`<div class="metrics"><div><b>${league.length}</b><span>League matches</span></div><div><b>${new Set(league.map(x=>x.slot)).size}</b><span>Slots</span></div><div><b>${t.courts}</b><span>Courts</span></div></div>
   <p class="helper">Shuffle changes only the order, preserves match identities, and enforces <strong>${t.settings?.minRestSlots??1} rest slot(s)</strong> between matches for the same player, including across categories. Shuffle is blocked after results. Knockout brackets must be cleared before league reshuffling.</p>
   <div class="actions noprint">${button('Generate / Shuffle Fixtures','shuffle','','primary')}${t.categories.filter(c=>['knockout','combined'].includes(effectiveFormat(t,c))).map(c=>button(`Generate ${esc(c.name)} Knockout Bracket`,'knockout',`data-id="${esc(c.id)}"`)).join('')}${ko.length?button('Clear Unplayed Knockout Brackets','clear-knockout','','danger-outline'):''}</div>
+  ${privatePaymentToggle}
   <div class="validation ${checked.valid?'ok':'bad'}">${checked.valid?'✓ No missing, duplicate, or simultaneous player-clash matches':'⚠ '+checked.problems.length+' fixture problems'}${checked.restAlerts.length?` • ${checked.restAlerts.length} rest-gap warnings`:''}</div>
   ${checked.problems.length?`<div class="helper">${checked.problems.slice(0,5).map(esc).join('; ')}</div>`:''}
   ${checked.restAlerts.length?`<details><summary>Rest-gap warnings</summary>${checked.restAlerts.slice(0,12).map(x=>`<p class="helper">${esc(x)}</p>`).join('')}</details>`:''}
   <div class="scroll"><table><thead><tr><th>Slot</th><th>Court</th><th>Category / Group</th><th>Match</th></tr></thead><tbody>${rows||'<tr><td colspan="4">Generate fixtures to start.</td></tr>'}</tbody></table></div>
-  ${ko.length?`<h3>Knockout Bracket — Semis & Finals</h3><div class="scroll"><table><tbody>${ko.map(m=>`<tr><td>${esc(lookup(t,m.categoryId)?.name)}</td><td>${esc(koRoundLabel(t,m))}</td><td>${linkedEntry(t,lookup(t,m.categoryId),m.a)} <span class="vs">VS</span> ${linkedEntry(t,lookup(t,m.categoryId),m.b)}</td></tr>`).join('')}</tbody></table></div>`:''}`);
+  ${ko.length?`<h3>Knockout Bracket — Semis & Finals</h3><div class="scroll"><table><tbody>${ko.map(m=>`<tr><td>${esc(lookup(t,m.categoryId)?.name)}</td><td>${esc(koRoundLabel(t,m))}</td><td>${linkedEntry(t,lookup(t,m.categoryId),m.a)}${fixtureEntryPaymentStatus(t,lookup(t,m.categoryId),m.a)} <span class="vs">VS</span> ${linkedEntry(t,lookup(t,m.categoryId),m.b)}${fixtureEntryPaymentStatus(t,lookup(t,m.categoryId),m.b)}</td></tr>`).join('')}</tbody></table></div>`:''}`);
 }
 function koRoundLabel(t,m){const max=Math.max(...t.fixtures.filter(x=>x.stage==='knockout'&&x.categoryId===m.categoryId).map(x=>x.round));return m.round===max?'Final':m.round===max-1?'Semi-final':m.round===max-2?'Quarter-final':`Knockout Round ${m.round}`;}
 function resultView(t){
@@ -1441,6 +1460,7 @@ document.addEventListener('click',async ev=>{
 document.addEventListener('input',e=>{if(e.target.closest('#view form[data-form]'))unsavedFormChanges=true});
 document.addEventListener('change',async e=>{
  if(e.target.id==='tournament-switcher'){switchTournament(e.target.value);return}
+ if(e.target.id==='fixture-payment-toggle'){if(!canSeePayments())return;showFixturePaymentStatus=!!e.target.checked;render();return}
  if(e.target.name==='scopeEdit'&&e.target.checked){const form=e.target.closest('form');const linked=[...form.querySelectorAll('[name=scopeView]')].find(x=>x.value===e.target.value);if(linked)linked.checked=true}
 
  if(e.target.dataset.change==='move-entry'){
