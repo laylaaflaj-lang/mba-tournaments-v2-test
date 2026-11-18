@@ -630,6 +630,72 @@ nav[aria-label="Tournament management"] button{min-height:64px!important;min-wid
  .scroll>.fin-table .payment-unpaid,.scroll>.fin-table .payment-paid,.scroll>.fin-table .payment-partial{white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important}
 }
 :root[data-mba-theme="dark"] .mba-mobile-options{background:#17263e;color:#e8f1ff;border-color:#455d7b}
+.mba36-champion .mba36-bracket-match{background:#dcfce7!important;border-color:#22a26e!important;color:#086b3c!important}
+.mba372-reg-row{border:1px solid #d4e1ee;background:#fafcff;border-radius:11px;margin:7px 0;padding:10px;min-width:0}
+.mba372-reg-row>summary{cursor:pointer;overflow-wrap:anywhere;font-size:14px}
+.mba372-reg-row .form-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.mba372-status{font-size:10px;padding:3px 7px;border:1px solid #ccd;border-radius:20px;background:#eef4fa;display:inline-block}
+.mba372-active{color:#087545;background:#e3f6eb}.mba372-hold{color:#97620b;background:#fff3d4}.mba372-cancelled,.mba372-deleted{color:#a32935;background:#ffedf0}
+.mba372-collection-tools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,150px);gap:8px;margin:12px 0}
+.mba372-collection-tools .field{min-width:0}.mba372-collection-tools select,.mba372-collection-tools input{width:100%;max-width:100%;min-height:39px;border:1px solid #adc0d8;border-radius:9px;padding:6px}
+.mba372-quick{display:flex;gap:4px;align-items:center;flex-wrap:wrap;min-width:110px}.mba372-quick>input{width:78px;max-width:100%;min-height:33px;border:1px solid #b2c1d4;border-radius:7px;padding:4px}
+.mba372-quick label{white-space:nowrap;font-size:12px;font-weight:700}
+.mba372-quick .btn{padding:5px 7px;font-size:11px}
+.mba372-age-extra{border:1px solid #b6d9f0;border-radius:11px;padding:10px;margin:8px 0;background:#edf8ff}
+:root[data-mba-theme=dark] .mba372-reg-row,:root[data-mba-theme=dark] .mba372-age-extra{background:#192c45;border-color:#456180;color:#edf4ff}
+
+/* MBA_V373_CONSOLIDATED_RESPONSIVE */
+.mba-v373-age-setup{border:1px solid #cbdced;border-radius:12px;padding:12px;display:grid;gap:10px;margin:8px 0;background:#f4f9ff}
+.mba-v373-reentry-help{border:1px solid #a9c5dd;border-radius:10px;padding:10px;background:#f3f9ff;margin:9px 0}
+.mba-v373-payment-card{border:1px solid #cbd9e9;background:#fff;border-radius:12px;margin:9px 0;padding:12px;min-width:0}
+.mba-v373-payment-head{display:flex;justify-content:space-between;align-items:start;gap:9px;flex-wrap:wrap}
+.mba-v373-payment-head>span{font-weight:800;font-size:12px}
+.mba-v373-payment-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:12px 0}
+.mba-v373-payment-metrics>div{background:#f1f6fc;border-radius:9px;padding:10px 6px;min-width:0;text-align:center}
+.mba-v373-payment-metrics small{display:block;font-size:11px;color:#61748a;margin-bottom:5px}
+.mba-v373-payment-metrics b{font-size:clamp(12px,3.4vw,16px);white-space:nowrap;font-variant-numeric:tabular-nums}
+.mba-v373-payment-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
+.mba-v373-payment-actions>input{width:95px;min-width:0;min-height:44px;border-radius:8px;border:1px solid #abc1d9;padding:7px}
+.mba-v373-mobile-payment-list{display:none}
+.mba-round-semi>.mba36-bracket-match,.mba-fixture-item.mba-round-semi{border-color:#b7cfe0;background:#f3f8fd}
+.mba-round-final>.mba36-bracket-match,.mba-fixture-item.mba-round-final{border-color:#e2cf96;background:#fffaf0}
+.mba-round-final>h4{background:#f9edcc;color:#73550e}
+.mba-round-semi>h4{background:#e7f1fc;color:#2b5c81}
+:root[data-mba-theme="dark"] .mba-v373-age-setup,:root[data-mba-theme="dark"] .mba-v373-reentry-help,:root[data-mba-theme="dark"] .mba-v373-payment-card{background:#17283f;color:#e8f1ff;border-color:#496585}
+:root[data-mba-theme="dark"] .mba-v373-payment-metrics>div{background:#233b59}
+:root[data-mba-theme="dark"] .mba-v373-payment-metrics small{color:#bcd1e6}
+@media(max-width:680px){
+ .mba-v373-desktop-fee-table{display:none!important}
+ .mba-v373-mobile-payment-list{display:block!important}
+ .mba-v373-payment-metrics b{font-size:13px}
+ .mba-v373-payment-actions .btn{min-height:44px}
+ .mba-v373-payment-actions label{min-height:44px;display:flex;align-items:center}
+}
+@media print{.mba-v373-payment-actions,.mba-v373-reentry-help,.mba-v373-age-setup{display:none!important}}
+
+/* Embedded registration quick payments: normally collapsed until needed. */
+.mba-v373-registration-payment{margin:14px 0;border:1px solid #cddbeb;border-radius:12px;padding:9px}
+.mba-v373-registration-payment>summary{cursor:pointer;font-weight:750;padding:8px 6px}
+.mba-fixture-side.mba-winning,.match-row .winner,.mba36-bracket-row.won{color:#087e4c!important;font-weight:800}
+:root[data-mba-theme=dark] .mba-fixture-side.mba-winning,:root[data-mba-theme=dark] .match-row .winner,:root[data-mba-theme=dark] .mba36-bracket-row.won{color:#58e6a0!important}
+
+/* MBA_V374_NUMBERED_TEST_FINISH — supplementary mobile contrast & re-entry clarity */
+.mba-v373-payment-card .payment-paid,.mba-v373-payment-card .payment-unpaid,.mba-v373-payment-card .payment-partial{white-space:nowrap;overflow-wrap:normal}
+.mba-v373-payment-metrics{max-width:100%}
+.mba-v373-payment-metrics>div{overflow:hidden;text-overflow:ellipsis}
+.mba-v373-reentry-help{border-inline-start:3px solid #5c86bc}
+.mba-round-semi .mba36-bracket-match,.mba-round-semi.mba-fixture-item{border-color:#89b5d4;background:#f3f8fc}
+.mba-round-final .mba36-bracket-match,.mba-round-final.mba-fixture-item{border-color:#cbb573;background:#fffaf0}
+:root[data-mba-theme="dark"] .mba-round-semi .mba36-bracket-match,:root[data-mba-theme="dark"] .mba-round-semi.mba-fixture-item{background:#1e3248;border-color:#537b9a}
+:root[data-mba-theme="dark"] .mba-round-final .mba36-bracket-match,:root[data-mba-theme="dark"] .mba-round-final.mba-fixture-item{background:#392f24;border-color:#927b52}
+@media(max-width:680px){
+ .mba-v373-payment-card{margin:8px 0;padding:10px}
+ .mba-v373-payment-metrics b{font-size:clamp(12px,3.4vw,15px)}
+ .mba-v373-payment-head>b{overflow-wrap:anywhere}
+ .mba-v373-payment-actions{justify-content:space-between}
+ .mba-v373-payment-actions input{max-width:110px}
+}
+
 </style><style id="print-rule"></style></head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
@@ -689,7 +755,7 @@ const firebaseConfig={
  messagingSenderId:'872128319294',appId:'1:872128319294:web:768133f86c435054a0666f'
 };
 const fapp=initializeApp(firebaseConfig),auth=getAuth(fapp),db=getDatabase(fapp);
-const VERSION='3.7.1-registration-finance-share-table-fix';
+const VERSION='3.7.2-consolidated-test-age-reentry-finance';
 const deep=x=>JSON.parse(JSON.stringify(x));
 const clean=s=>String(s??'').trim();
 const need=(v,msg)=>{if(!v)throw Error(msg)};
@@ -1358,7 +1424,7 @@ async function op(fn){
     }
     if(Object.keys(catalogPatch).length)await update(ref(db),catalogPatch);
    }
-   notice='Saved online to Production Firebase.';
+   notice='Saved online to TEST Firebase.';
  }catch(e){store=previous;notice='Not saved: '+errText(e);alert(notice)}finally{
   writePending=false;
   try{const updated=await get(ref(db,'v3/tournaments'));setCloud(updated.val())}catch{render()}
@@ -1723,10 +1789,10 @@ function render(){
  document.getElementById('venue-public').innerHTML=authUser&&remoteReady&&active()?venueCard(active()):'';drawVenueQr();
  if(!authUser){nav.hidden=true;content.innerHTML='<section class="card"><h2>Sign in to view online tournaments</h2><p>Use Google or Email/Password login above. All new users are Viewer by default.</p></section>';document.getElementById('profile-layer').innerHTML='';return}
  if(readError){nav.hidden=true;content.innerHTML=`<section class="card"><h2>Firebase Read Error</h2><p>${esc(readError)}</p><p>Check the Production Firebase Database Rules before using this app.</p></section>`;return}
- if(!remoteReady){nav.hidden=true;content.innerHTML='<section class="card"><h2>Connecting to Production Firebase…</h2></section>';return}
+ if(!remoteReady){nav.hidden=true;content.innerHTML='<section class="card"><h2>Connecting to TEST Firebase…</h2></section>';return}
  nav.hidden=false;
  const t=active();if(!t&&page!=='access'){
-   content.innerHTML=editor?.kind==='create'?tournamentView(null):isSuper()?`<section class="card"><h2>No tournaments in Production</h2><p>There are no tournaments in this database. Create a tournament, or restore a verified backup through Firebase Console.</p>${button('Create New Tournament','new-tournament')}</section>`:
+   content.innerHTML=editor?.kind==='create'?tournamentView(null):isSuper()?`<section class="card"><h2>No tournaments in TEST database</h2><p>There are no tournaments in this database. Create a tournament, or restore a verified backup through Firebase Console.</p>${button('Create New Tournament','new-tournament')}</section>`:
    '<section class="card"><h2>No tournaments available to this account</h2><p>Super Admin must publish a tournament or grant you private View access. Hidden tournaments cannot be opened directly.</p></section>';
    document.getElementById('profile-layer').innerHTML='';return;
  }
@@ -1793,7 +1859,7 @@ function tournamentDetailsPanel(t){
 }
 function tournamentLibrary(t){
  return `<div class="tournament-grid"><section class="tournament-column" aria-label="All tournaments">
- <div class="tournament-pane"><h3>🏆 All Tournaments (${store.tournaments.length})</h3><p class="helper">All available production tournaments are listed.</p>
+ <div class="tournament-pane"><h3>🏆 All Tournaments (${store.tournaments.length})</h3><p class="helper">All available TEST tournaments are listed.</p>
  ${store.tournaments.map(one=>{const s=tournamentSummary(one);return `<button class="tournament-pick" type="button" data-action="open-tournament" data-id="${esc(one.id)}" aria-pressed="${one.id===t.id?'true':'false'}"><strong>${esc(one.name)}</strong><small>📅 ${esc(dateShow(one.date))}</small><small>👥 ${s.teams} teams · 🗂 ${s.categories} categories · 🏟 ${one.courts} courts</small><span class="tour-badge">${s.played} / ${s.total} matches completed</span></button>`}).join('')}
  </div>
  </section><section class="tournament-pane" aria-label="Tournament details and history"><div class="tour-pane-tabs"><button class="btn" type="button" data-action="tournament-section" data-section="details" aria-pressed="${tournamentPanel==='details'}">📋 Full Details</button><button class="btn" type="button" data-action="tournament-section" data-section="history" aria-pressed="${tournamentPanel==='history'}">📜 History & Scores</button></div>${tournamentPanel==='history'?tournamentHistoryPanel(t):tournamentDetailsPanel(t)}</section></div>`;
@@ -1913,7 +1979,7 @@ function fixtureView(t){
  const matchCard=m=>{const c=lookup(t,m.categoryId),rule=effectiveRules(t,c),w=scoreWinner(t.results[m.id],rule),result=t.results[m.id];
   const payment=showFixturePaymentStatus?`<div class="mba-fixture-pay">${fixtureEntryPaymentStatus(t,c,m.a)}${fixtureEntryPaymentStatus(t,c,m.b)}</div>`:'';
   const score=result?(result.mode==='winner'?'Win/Loss recorded':`${result.a} – ${result.b}`):'Pending';
-  return `<article class="mba-fixture-item"><div class="mba-fixture-meta"><span><b>Slot ${esc(m.slot||'—')}</b> · Court ${esc(m.court||'—')}</span><span>${esc(c?.name||'')}${m.stage==='knockout'?' · '+esc(koRoundLabel(t,m)):''}</span></div><div class="mba-fixture-pairs"><div class="mba-fixture-side ${w==='a'?'mba-winning':''}">${linkedEntry(t,c,m.a)}</div><span class="vs">VS</span><div class="mba-fixture-side ${w==='b'?'mba-winning':''}">${linkedEntry(t,c,m.b)}</div></div>${payment}<div class="mba-fixture-bottom"><span class="mba-fixture-result">${esc(score)}${w?' · 🏆 '+esc(participants(t,m)[w==='a'?0:1]):''}</span>${m.a&&m.b&&can('scoresWrite')&&editScope(t.id)?`<button type="button" class="btn mba-umpire-launch" data-mba-score-match="${esc(m.id)}">🏸 Umpire Score</button>`:''}</div></article>`;
+  return `<article class="mba-fixture-item ${m.stage==='knockout'?(koRoundLabel(t,m)==='Final'?'mba-round-final':koRoundLabel(t,m)==='Semi-final'?'mba-round-semi':''):''}"><div class="mba-fixture-meta"><span><b>Slot ${esc(m.slot||'—')}</b> · Court ${esc(m.court||'—')}</span><span>${esc(c?.name||'')}${m.stage==='knockout'?' · '+esc(koRoundLabel(t,m)):''}</span></div><div class="mba-fixture-pairs"><div class="mba-fixture-side ${w==='a'?'mba-winning':''}">${linkedEntry(t,c,m.a)}</div><span class="vs">VS</span><div class="mba-fixture-side ${w==='b'?'mba-winning':''}">${linkedEntry(t,c,m.b)}</div></div>${payment}<div class="mba-fixture-bottom"><span class="mba-fixture-result">${esc(score)}${w?' · 🏆 '+esc(participants(t,m)[w==='a'?0:1]):''}</span>${m.a&&m.b&&can('scoresWrite')&&editScope(t.id)?`<button type="button" class="btn mba-umpire-launch" data-mba-score-match="${esc(m.id)}">🏸 Umpire Score</button>`:''}</div></article>`;
  };
  const privatePaymentToggle=canSeePayments()?`<label class="choice noprint fixture-payment-control"><input type="checkbox" id="fixture-payment-toggle" ${showFixturePaymentStatus?'checked':''}> Show private payment status</label>`:'';
  const categoryAdvice=leagueCategories.map(c=>{
@@ -2153,7 +2219,7 @@ document.addEventListener('submit',async ev=>{
  const data=new FormData(form),kind=form.dataset.form,t=active();unsavedFormChanges=false;
  if(kind.startsWith('fin-')||kind==='access'){
   const btn=form.querySelector('button[type="submit"]');if(btn)btn.disabled=true;
-  try{if(kind==='access')await accessSubmit(data);else{await financeSubmit(kind,data);notice='Saved online to Production Firebase.';render()}}
+  try{if(kind==='access')await accessSubmit(data);else{await financeSubmit(kind,data);notice='Saved online to TEST Firebase.';render()}}
   catch(e){alert('Not saved: '+errText(e));if(btn)btn.disabled=false}return;
  }
  if(!allowedToEdit()){alert('Viewer is read-only.');return}
@@ -2183,9 +2249,9 @@ document.addEventListener('submit',async ev=>{
   }else if(kind==='team'){
    const team=t.teams.find(x=>x.id===form.dataset.id),names=String(data.get('players')||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
    const players=names.map((name,i)=>({id:team.players[i]?.id,name}));updateTeam(t,team.id,{name:String(data.get('teamName')),players});
-  }else if(kind==='new-category'){addCategory(t,String(data.get('name')))}
+  }else if(kind==='new-category'){const cat=addCategory(t,String(data.get('name')));const play=String(data.get('mba-v373-play-type')||'doubles');need(['singles','doubles','other'].includes(play),'Invalid play type');cat.playType=play;cat.playersPerSide=play==='singles'?1:play==='doubles'?2:0}
   else if(kind==='category'){
-   const cat=lookup(t,form.dataset.id);cat.name=String(data.get('name')).trim();need(cat.name,'Category name required');
+   const cat=lookup(t,form.dataset.id);cat.name=String(data.get('name')).trim();need(cat.name,'Category name required');const play=String(data.get('mba-v373-play-type')||cat.playType||mba37RegType(cat));need(['singles','doubles','other'].includes(play),'Invalid play type');if(cat.entrants.length&&play!==mba37RegType(cat))throw Error('Cannot change Singles/Doubles after registration. Create another category.');cat.playType=play;cat.playersPerSide=play==='singles'?1:play==='doubles'?2:cat.playersPerSide;
    if(cat.format!==(String(data.get('format'))||null)&&t.fixtures.some(m=>m.categoryId===cat.id&&t.results[m.id]))throw Error('Cannot change category format after recorded results');
    cat.format=String(data.get('format'))||null;cat.qualifiers=+data.get('qualifiers');cat.qualifierMode=String(data.get('qualifierMode'))||'per-group';
    if(data.has('override')){
@@ -2248,7 +2314,7 @@ if('serviceWorker' in navigator){
 
 /* Final UI preferences: scoped to this browser. No tournament, auth or finance data is stored. */
 const MBA_UI_PREFS={theme:'mba-production-theme-v1',lang:'mba-production-language-v1'};
-const MBA_UI_ML={"🖨 A4 Print / Print Center — Show or Hide for this user":"🖨 ഈ യൂസറിന് A4 പ്രിന്റ് കാണിക്കുക / മറയ്ക്കുക","HIDE — default (no print menu)":"HIDE — പ്രിന്റ് മെനു കാണിക്കേണ്ട","SHOW — allow printing":"SHOW — പ്രിന്റ് അനുവദിക്കുക","This affects only this user's print buttons and menu. Super Admin always has Print access. Viewers cannot access private data through printing.":"ഈ യൂസറിന്റെ പ്രിന്റ് ബട്ടണുകൾക്കു മാത്രമാണ് ഈ ക്രമീകരണം. സൂപ്പർ അഡ്മിന് എപ്പോഴും പ്രിന്റ് ചെയ്യാം.","🔒 Super Admin · Tournament Visibility":"🔒 സൂപ്പർ അഡ്മിൻ · ടൂർണമെന്റ് ദൃശ്യത","ℹ️ Access information":"ℹ️ അനുമതി വിവരങ്ങൾ","Badminton Tournament Manager":"ബാഡ്മിന്റൺ ടൂർണമെന്റ് മാനേജർ","🔐 MBA Tournaments Account":"🔐 MBA ടൂർണമെന്റ്സ് അക്കൗണ്ട്","Color Theme":"നിറ തീം","Language":"ഭാഷ","Time":"സമയം","Classic Blue":"ക്ലാസിക് ബ്ലൂ","Light":"ലൈറ്റ്","Dark":"ഡാർക്ക്","Navy & Gold":"നേവി & ഗോൾഡ്","Tournaments":"ടൂർണമെന്റുകൾ","Teams":"ടീമുകൾ","Categories":"വിഭാഗങ്ങൾ","Groups":"ഗ്രൂപ്പുകൾ","Fixtures":"ഫിക്സ്ചറുകൾ","Results":"ഫലങ്ങൾ","Standings":"പോയിന്റ് പട്ടിക","Settings":"ക്രമീകരണങ്ങൾ","Finance":"ഫിനാൻസ്","User Roles":"യൂസർ റോളുകൾ","Print Center":"പ്രിന്റ് സെന്റർ","MBA Tournaments Account":"MBA ടൂർണമെന്റ്സ് അക്കൗണ്ട്","Continue with Google":"ഗൂഗിൾ വഴി പ്രവേശിക്കുക","Email / Password":"ഇമെയിൽ / പാസ്‌വേഡ്","Email":"ഇമെയിൽ","Password":"പാസ്‌വേഡ്","Sign In":"ലോഗിൻ","Create Viewer Account":"വ്യൂവർ അക്കൗണ്ട് സൃഷ്ടിക്കുക","Reset Password":"പാസ്‌വേഡ് പുനഃസജ്ജമാക്കുക","Copy my User UID":"യൂസർ UID കോപ്പി ചെയ്യുക","Logout":"ലോഗൗട്ട്","Account & Permissions":"അക്കൗണ്ടും അനുമതികളും","Request an Editing Role":"എഡിറ്റിങ് അനുമതി അപേക്ഷിക്കുക","Editing access is approved only by Super Admin. Ordinary viewers can use the tournament without making a request.":"എഡിറ്റ് ചെയ്യാനുള്ള അനുമതി സൂപ്പർ അഡ്മിൻ മാത്രമാണ് നൽകുക. സാധാരണ കാഴ്ചക്കാർക്ക് അപേക്ഷിക്കാതെ തന്നെ ടൂർണമെന്റ് കാണാം.","Your editing request is pending Super Admin approval.":"നിങ്ങളുടെ അപേക്ഷ സൂപ്പർ അഡ്മിന്റെ അംഗീകാരത്തിനായി കാത്തിരിക്കുന്നു.","Checking existing requests…":"നിലവിലെ അപേക്ഷ പരിശോധിക്കുന്നു…","Request sent to Super Admin.":"അപേക്ഷ സൂപ്പർ അഡ്മിന് അയച്ചു.","An editing request is already pending.":"ഒരു അപേക്ഷ ഇതിനകം പരിഗണനയിലാണ്.","Only Super Admin-published tournaments appear to viewers. The Super Admin assigns separate View / Edit access per tournament. Finance remains private.":"സൂപ്പർ അഡ്മിൻ പ്രസിദ്ധീകരിച്ച ടൂർണമെന്റുകൾ മാത്രമാണ് വ്യൂവർമാർക്ക് കാണാനാവുക. ഓരോ ടൂർണമെന്റിനും പ്രത്യേകം കാണൽ / എഡിറ്റ് അനുമതി നൽകാം. ഫിനാൻസ് സ്വകാര്യമാണ്.","Print A4":"A4 പ്രിന്റ്","Install App":"ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്യുക","ACTIVE TOURNAMENT":"നിലവിലെ ടൂർണമെന്റ്","Active tournament":"നിലവിലെ ടൂർണമെന്റ്","Switch anywhere — current tab stays open":"എവിടെനിന്നും മാറ്റാം — നിലവിലെ ടാബ് അതേപടി തുടരും","SUPER ADMIN":"സൂപ്പർ അഡ്മിൻ","Super Admin":"സൂപ്പർ അഡ്മിൻ","Viewer":"വ്യൂവർ","Custom Admin":"കസ്റ്റം അഡ്മിൻ","Cloud connected":"ക്ലൗഡ് ബന്ധിപ്പിച്ചു","Loading cloud…":"ക്ലൗഡ് ലോഡ് ചെയ്യുന്നു…","Signed in":"ലോഗിൻ ചെയ്തു","Tournament Location":"ടൂർണമെന്റ് സ്ഥലം","Scan me for location · Open in Maps":"സ്ഥലത്തിനായി QR സ്കാൻ ചെയ്യുക · മാപ്പിൽ തുറക്കുക","Open Location":"ലൊക്കേഷൻ തുറക്കുക","Tournament Management":"ടൂർണമെന്റ് നിയന്ത്രണം","Tournament Settings":"ടൂർണമെന്റ് ക്രമീകരണങ്ങൾ","Create New Tournament":"പുതിയ ടൂർണമെന്റ് സൃഷ്ടിക്കുക","Edit Tournament":"ടൂർണമെന്റ് തിരുത്തുക","Delete Tournament":"ടൂർണമെന്റ് നീക്കുക","New Tournament":"പുതിയ ടൂർണമെന്റ്","All Tournaments":"എല്ലാ ടൂർണമെന്റുകളും","All available production tournaments are listed.":"ലഭ്യമായ എല്ലാ പ്രൊഡക്ഷൻ ടൂർണമെന്റുകളും ഇവിടെ കാണാം.","Full Details":"പൂർണ്ണ വിവരങ്ങൾ","History & Scores":"ചരിത്രവും സ്കോറുകളും","Full Tournament History":"ടൂർണമെന്റ് ചരിത്രം","Tournament details and history":"ടൂർണമെന്റ് വിവരങ്ങളും ചരിത്രവും","Edit":"തിരുത്തുക","Save":"സേവ് ചെയ്യുക","Cancel":"റദ്ദാക്കുക","Remove":"നീക്കുക","Close":"അടയ്ക്കുക","Delete":"ഡിലീറ്റ് ചെയ്യുക","Add":"ചേർക്കുക","Add Entry":"എൻട്രി ചേർക്കുക","Create Category":"വിഭാഗം സൃഷ്ടിക്കുക","Save Category":"വിഭാഗം സേവ് ചെയ്യുക","Save Tournament":"ടൂർണമെന്റ് സേവ് ചെയ്യുക","Save Group":"ഗ്രൂപ്പ് സേവ് ചെയ്യുക","Save Result":"ഫലം സേവ് ചെയ്യുക","Save Settings":"ക്രമീകരണങ്ങൾ സേവ് ചെയ്യുക","Download JSON Backup":"JSON ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക","Tournament name":"ടൂർണമെന്റ് പേര്","Tournament date":"ടൂർണമെന്റ് തീയതി","Number of courts":"കോർട്ടുകളുടെ എണ്ണം","Courts":"കോർട്ടുകൾ","Court":"കോർട്ട്","Teams & Players":"ടീമുകളും കളിക്കാരും","Team":"ടീം","Player":"കളിക്കാരൻ","Players":"കളിക്കാർ","Player(s)":"കളിക്കാർ","Group":"ഗ്രൂപ്പ്","Category":"വിഭാഗം","Category name":"വിഭാഗത്തിന്റെ പേര്","New category name":"പുതിയ വിഭാഗത്തിന്റെ പേര്","Group name":"ഗ്രൂപ്പിന്റെ പേര്","Format":"ഫോർമാറ്റ്","League":"ലീഗ്","Knockout":"നോക്കൗട്ട്","League + Knockout":"ലീഗ് + നോക്കൗട്ട്","Inherit tournament format":"ടൂർണമെന്റ് ഫോർമാറ്റ് പിന്തുടരുക","Target score":"ലക്ഷ്യ സ്കോർ","Winning league points":"വിജയ പോയിന്റുകൾ","Losing league points":"തോൽവി പോയിന്റുകൾ","Win by 2":"രണ്ട് പോയിന്റ് വ്യത്യാസത്തിൽ വിജയം","Win by 2 points":"രണ്ട് പോയിന്റ് വ്യത്യാസത്തിൽ വിജയം","Target":"ലക്ഷ്യം","Cutoff":"പരമാവധി സ്കോർ","None":"ഒന്നുമില്ല","Rest between a player’s matches (slots)":"ഒരു കളിക്കാരന്റെ മത്സരങ്ങൾക്കിടയിലെ വിശ്രമം (സ്ലോട്ടുകൾ)","Print paper orientation":"പേപ്പറിന്റെ ദിശ","Print font size (px)":"പ്രിന്റ് ഫോണ്ട് വലുപ്പം","A4 Landscape":"A4 ലാൻഡ്‌സ്‌കേപ്പ്","A4 Portrait":"A4 പോർട്രെയിറ്റ്","Create a category first.":"ആദ്യം ഒരു വിഭാഗം സൃഷ്ടിക്കുക.","No entries":"എൻട്രികളില്ല","No entries yet.":"ഇതുവരെ എൻട്രികളില്ല.","No players":"കളിക്കാരില്ല","No categories configured.":"വിഭാഗങ്ങൾ സജ്ജമാക്കിയിട്ടില്ല.","General":"പൊതുവായ","General / Ungrouped":"പൊതുവായ / ഗ്രൂപ്പില്ലാത്തവ","All Entries":"എല്ലാ എൻട്രികളും","Edit Name":"പേര് മാറ്റുക","Delete Group":"ഗ്രൂപ്പ് നീക്കുക","Move to group":"ഗ്രൂപ്പിലേക്ക് മാറ്റുക","New Category":"പുതിയ വിഭാഗം","Add Pair / Entry":"ജോടി / എൻട്രി ചേർക്കുക","Select players (one or more):":"കളിക്കാരെ തിരഞ്ഞെടുക്കുക (ഒന്നോ അതിലധികമോ):","Slot":"സ്ലോട്ട്","Score":"സ്കോർ","Winner":"വിജയി","WON":"ജയിച്ചു","LOST":"തോറ്റു","VS":"VS","Pending":"ബാക്കി","Not played":"കളിച്ചിട്ടില്ല","Score not recorded":"സ്കോർ രേഖപ്പെടുത്തിയിട്ടില്ല","Awaiting previous round":"മുൻ റൗണ്ടിനായി കാത്തിരിക്കുന്നു","Results & Scores":"ഫലങ്ങളും സ്കോറുകളും","Points Tables":"പോയിന്റ് പട്ടികകൾ","A4 Print Center":"A4 പ്രിന്റ് സെന്റർ","Report":"റിപ്പോർട്ട്","All Categories":"എല്ലാ വിഭാഗങ്ങളും","All Groups":"എല്ലാ ഗ്രൂപ്പുകളും","Orientation":"ദിശ","Print All Pages":"എല്ലാ പേജുകളും പ്രിന്റ് ചെയ്യുക","Font size (11–24 px)":"ഫോണ്ട് വലുപ്പം (11–24 px)","Received":"ലഭിച്ചത്","Due":"ബാക്കി","Status":"നില","Fee":"ഫീസ്","Paid":"അടച്ചു","Unpaid":"അടച്ചിട്ടില്ല","Partial":"ഭാഗികം","PAID":"അടച്ചു","UNPAID":"അടച്ചിട്ടില്ല","PARTIAL":"ഭാഗികം","OVERPAID":"കൂടുതൽ അടച്ചു","FEE NOT SET":"ഫീസ് നിശ്ചയിച്ചിട്ടില്ല","Payment":"പേയ്മെന്റ്","Payments":"പേയ്മെന്റുകൾ","Expenses":"ചെലവുകൾ","Cash":"പണം","Amount":"തുക","Notes":"കുറിപ്പുകൾ","Date":"തീയതി","Print":"പ്രിന്റ്","Details":"വിവരങ്ങൾ","History":"ചരിത്രം","Score / Winner":"സ്കോർ / വിജയി","Slot / Court":"സ്ലോട്ട് / കോർട്ട്","Category / Group":"വിഭാഗം / ഗ്രൂപ്പ്","Players / Pair":"കളിക്കാർ / ജോടി","Match / Players":"മത്സരം / കളിക്കാർ","No tournaments in Production":"പ്രൊഡക്ഷനിൽ ടൂർണമെന്റുകളില്ല","No tournaments available to this account":"ഈ അക്കൗണ്ടിന് ടൂർണമെന്റുകൾ ലഭ്യമല്ല","Firebase Read Error":"Firebase വായനയിലെ പിശക്","Sign in to view online tournaments":"ഓൺലൈൻ ടൂർണമെന്റുകൾ കാണാൻ ലോഗിൻ ചെയ്യുക","Connecting to Production Firebase…":"Production Firebase-ലേക്ക് കണക്റ്റ് ചെയ്യുന്നു…","Please sign in. Only tournaments approved by Super Admin are visible.":"ലോഗിൻ ചെയ്യുക. സൂപ്പർ അഡ്മിൻ അനുമതി നൽകിയ ടൂർണമെന്റുകൾ മാത്രമേ കാണാൻ കഴിയൂ.","Use Google or Email/Password login above. All new users are Viewer by default.":"മുകളിലെ Google അല്ലെങ്കിൽ Email/Password ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യുക. പുതിയ അക്കൗണ്ടുകൾക്ക് ആദ്യം Viewer അനുമതിയാണ്.","Super Admin must publish a tournament or grant you private View access. Hidden tournaments cannot be opened directly.":"സൂപ്പർ അഡ്മിൻ ടൂർണമെന്റ് പ്രസിദ്ധീകരിക്കുകയോ കാണാനുള്ള അനുമതി നൽകുകയോ വേണം. സ്വകാര്യ ടൂർണമെന്റുകൾ നേരിട്ട് തുറക്കാനാവില്ല.","Saved online to Production Firebase.":"Production Firebase-ൽ സേവ് ചെയ്തു.","Saving changes to Production Firebase…":"Production Firebase-ൽ മാറ്റങ്ങൾ സേവ് ചെയ്യുന്നു…","Show Player Payment Status (Private)":"കളിക്കാരുടെ പേയ്മെന്റ് നില കാണിക്കുക (സ്വകാര്യം)","Ground fee is not configured yet; set it in Finance to show paid/unpaid statuses.":"ഗ്രൗണ്ട് ഫീസ് സജ്ജമാക്കിയിട്ടില്ല. പേയ്മെന്റ് നില കാണിക്കാൻ Finance-ൽ ഫീസ് നൽകുക.","Match rules cannot be changed after recorded results until results are intentionally cleared. Category-specific rules override tournament defaults.":"ഫലങ്ങൾ രേഖപ്പെടുത്തിയ ശേഷം അവ നീക്കാതെ മത്സരനിയമങ്ങൾ മാറ്റാനാവില്ല. വിഭാഗത്തിന്റെ നിയമങ്ങൾക്ക് മുൻഗണന ലഭിക്കും.","Edit Result":"ഫലം തിരുത്തുക","Enter Result":"ഫലം നൽകുക","Clear Result":"ഫലം നീക്കുക","Switch tournament":"ടൂർണമെന്റ് മാറ്റുക","All tournaments":"എല്ലാ ടൂർണമെന്റുകളും","Match history":"മത്സര ചരിത്രം","No fixtures yet. Create categories and fixtures first.":"ഇതുവരെ മത്സരക്രമമില്ല. ആദ്യം വിഭാഗങ്ങളും ഫിക്സ്ചറുകളും സൃഷ്ടിക്കുക.","There are no tournaments in this database. Create a tournament, or restore a verified backup through Firebase Console.":"ഈ ഡാറ്റാബേസിൽ ടൂർണമെന്റുകളില്ല. പുതിയ ടൂർണമെന്റ് സൃഷ്ടിക്കുകയോ പരിശോധിച്ച ബാക്കപ്പ് Firebase Console വഴി പുനഃസ്ഥാപിക്കുകയോ ചെയ്യുക.","🏆 Tournaments":"🏆 ടൂർണമെന്റുകൾ","👥 Teams":"👥 ടീമുകൾ","🗂 Categories":"🗂 വിഭാഗങ്ങൾ","🧩 Groups":"🧩 ഗ്രൂപ്പുകൾ","🔀 Fixtures":"🔀 ഫിക്സ്ചറുകൾ","✅ Results":"✅ ഫലങ്ങൾ","📊 Standings":"📊 പോയിന്റ് പട്ടിക","⚙ Settings":"⚙ ക്രമീകരണങ്ങൾ","💰 Finance":"💰 ഫിനാൻസ്","🛡 User Roles":"🛡 യൂസർ റോളുകൾ","🖨 Print Center":"🖨 പ്രിന്റ് സെന്റർ","🏆 All Tournaments":"🏆 എല്ലാ ടൂർണമെന്റുകളും","📋 Full Details":"📋 പൂർണ്ണ വിവരങ്ങൾ","📜 History & Scores":"📜 ചരിത്രവും സ്കോറുകളും","🛡 Super Admin":"🛡 സൂപ്പർ അഡ്മിൻ","👁 Viewer":"👁 വ്യൂവർ","📍 Tournament Location":"📍 ടൂർണമെന്റ് സ്ഥലം","📍 Open Location":"📍 ലൊക്കേഷൻ തുറക്കുക","🕒 Time":"🕒 സമയം","🎨 Color Theme":"🎨 നിറ തീം","🌐 Language":"🌐 ഭാഷ","🔐 Account & Permissions":"🔐 അക്കൗണ്ടും അനുമതികളും","🖨 Print A4":"🖨 A4 പ്രിന്റ്","📲 Install App":"📲 ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്യുക","＋ Add Category":"＋ വിഭാഗം ചേർക്കുക","＋ Add Players / Pair":"＋ കളിക്കാർ / ജോടി ചേർക്കുക","＋ Add Group":"＋ ഗ്രൂപ്പ് ചേർക്കുക","✏ Edit":"✏ തിരുത്തുക","✏ Edit Result":"✏ ഫലം തിരുത്തുക","＋ Enter Result":"＋ ഫലം നൽകുക"};
+const MBA_UI_ML={"🖨 A4 Print / Print Center — Show or Hide for this user":"🖨 ഈ യൂസറിന് A4 പ്രിന്റ് കാണിക്കുക / മറയ്ക്കുക","HIDE — default (no print menu)":"HIDE — പ്രിന്റ് മെനു കാണിക്കേണ്ട","SHOW — allow printing":"SHOW — പ്രിന്റ് അനുവദിക്കുക","This affects only this user's print buttons and menu. Super Admin always has Print access. Viewers cannot access private data through printing.":"ഈ യൂസറിന്റെ പ്രിന്റ് ബട്ടണുകൾക്കു മാത്രമാണ് ഈ ക്രമീകരണം. സൂപ്പർ അഡ്മിന് എപ്പോഴും പ്രിന്റ് ചെയ്യാം.","🔒 Super Admin · Tournament Visibility":"🔒 സൂപ്പർ അഡ്മിൻ · ടൂർണമെന്റ് ദൃശ്യത","ℹ️ Access information":"ℹ️ അനുമതി വിവരങ്ങൾ","Badminton Tournament Manager":"ബാഡ്മിന്റൺ ടൂർണമെന്റ് മാനേജർ","🔐 MBA Tournaments Account":"🔐 MBA ടൂർണമെന്റ്സ് അക്കൗണ്ട്","Color Theme":"നിറ തീം","Language":"ഭാഷ","Time":"സമയം","Classic Blue":"ക്ലാസിക് ബ്ലൂ","Light":"ലൈറ്റ്","Dark":"ഡാർക്ക്","Navy & Gold":"നേവി & ഗോൾഡ്","Tournaments":"ടൂർണമെന്റുകൾ","Teams":"ടീമുകൾ","Categories":"വിഭാഗങ്ങൾ","Groups":"ഗ്രൂപ്പുകൾ","Fixtures":"ഫിക്സ്ചറുകൾ","Results":"ഫലങ്ങൾ","Standings":"പോയിന്റ് പട്ടിക","Settings":"ക്രമീകരണങ്ങൾ","Finance":"ഫിനാൻസ്","User Roles":"യൂസർ റോളുകൾ","Print Center":"പ്രിന്റ് സെന്റർ","MBA Tournaments Account":"MBA ടൂർണമെന്റ്സ് അക്കൗണ്ട്","Continue with Google":"ഗൂഗിൾ വഴി പ്രവേശിക്കുക","Email / Password":"ഇമെയിൽ / പാസ്‌വേഡ്","Email":"ഇമെയിൽ","Password":"പാസ്‌വേഡ്","Sign In":"ലോഗിൻ","Create Viewer Account":"വ്യൂവർ അക്കൗണ്ട് സൃഷ്ടിക്കുക","Reset Password":"പാസ്‌വേഡ് പുനഃസജ്ജമാക്കുക","Copy my User UID":"യൂസർ UID കോപ്പി ചെയ്യുക","Logout":"ലോഗൗട്ട്","Account & Permissions":"അക്കൗണ്ടും അനുമതികളും","Request an Editing Role":"എഡിറ്റിങ് അനുമതി അപേക്ഷിക്കുക","Editing access is approved only by Super Admin. Ordinary viewers can use the tournament without making a request.":"എഡിറ്റ് ചെയ്യാനുള്ള അനുമതി സൂപ്പർ അഡ്മിൻ മാത്രമാണ് നൽകുക. സാധാരണ കാഴ്ചക്കാർക്ക് അപേക്ഷിക്കാതെ തന്നെ ടൂർണമെന്റ് കാണാം.","Your editing request is pending Super Admin approval.":"നിങ്ങളുടെ അപേക്ഷ സൂപ്പർ അഡ്മിന്റെ അംഗീകാരത്തിനായി കാത്തിരിക്കുന്നു.","Checking existing requests…":"നിലവിലെ അപേക്ഷ പരിശോധിക്കുന്നു…","Request sent to Super Admin.":"അപേക്ഷ സൂപ്പർ അഡ്മിന് അയച്ചു.","An editing request is already pending.":"ഒരു അപേക്ഷ ഇതിനകം പരിഗണനയിലാണ്.","Only Super Admin-published tournaments appear to viewers. The Super Admin assigns separate View / Edit access per tournament. Finance remains private.":"സൂപ്പർ അഡ്മിൻ പ്രസിദ്ധീകരിച്ച ടൂർണമെന്റുകൾ മാത്രമാണ് വ്യൂവർമാർക്ക് കാണാനാവുക. ഓരോ ടൂർണമെന്റിനും പ്രത്യേകം കാണൽ / എഡിറ്റ് അനുമതി നൽകാം. ഫിനാൻസ് സ്വകാര്യമാണ്.","Print A4":"A4 പ്രിന്റ്","Install App":"ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്യുക","ACTIVE TOURNAMENT":"നിലവിലെ ടൂർണമെന്റ്","Active tournament":"നിലവിലെ ടൂർണമെന്റ്","Switch anywhere — current tab stays open":"എവിടെനിന്നും മാറ്റാം — നിലവിലെ ടാബ് അതേപടി തുടരും","SUPER ADMIN":"സൂപ്പർ അഡ്മിൻ","Super Admin":"സൂപ്പർ അഡ്മിൻ","Viewer":"വ്യൂവർ","Custom Admin":"കസ്റ്റം അഡ്മിൻ","Cloud connected":"ക്ലൗഡ് ബന്ധിപ്പിച്ചു","Loading cloud…":"ക്ലൗഡ് ലോഡ് ചെയ്യുന്നു…","Signed in":"ലോഗിൻ ചെയ്തു","Tournament Location":"ടൂർണമെന്റ് സ്ഥലം","Scan me for location · Open in Maps":"സ്ഥലത്തിനായി QR സ്കാൻ ചെയ്യുക · മാപ്പിൽ തുറക്കുക","Open Location":"ലൊക്കേഷൻ തുറക്കുക","Tournament Management":"ടൂർണമെന്റ് നിയന്ത്രണം","Tournament Settings":"ടൂർണമെന്റ് ക്രമീകരണങ്ങൾ","Create New Tournament":"പുതിയ ടൂർണമെന്റ് സൃഷ്ടിക്കുക","Edit Tournament":"ടൂർണമെന്റ് തിരുത്തുക","Delete Tournament":"ടൂർണമെന്റ് നീക്കുക","New Tournament":"പുതിയ ടൂർണമെന്റ്","All Tournaments":"എല്ലാ ടൂർണമെന്റുകളും","All available TEST tournaments are listed.":"ലഭ്യമായ എല്ലാ പ്രൊഡക്ഷൻ ടൂർണമെന്റുകളും ഇവിടെ കാണാം.","Full Details":"പൂർണ്ണ വിവരങ്ങൾ","History & Scores":"ചരിത്രവും സ്കോറുകളും","Full Tournament History":"ടൂർണമെന്റ് ചരിത്രം","Tournament details and history":"ടൂർണമെന്റ് വിവരങ്ങളും ചരിത്രവും","Edit":"തിരുത്തുക","Save":"സേവ് ചെയ്യുക","Cancel":"റദ്ദാക്കുക","Remove":"നീക്കുക","Close":"അടയ്ക്കുക","Delete":"ഡിലീറ്റ് ചെയ്യുക","Add":"ചേർക്കുക","Add Entry":"എൻട്രി ചേർക്കുക","Create Category":"വിഭാഗം സൃഷ്ടിക്കുക","Save Category":"വിഭാഗം സേവ് ചെയ്യുക","Save Tournament":"ടൂർണമെന്റ് സേവ് ചെയ്യുക","Save Group":"ഗ്രൂപ്പ് സേവ് ചെയ്യുക","Save Result":"ഫലം സേവ് ചെയ്യുക","Save Settings":"ക്രമീകരണങ്ങൾ സേവ് ചെയ്യുക","Download JSON Backup":"JSON ബാക്കപ്പ് ഡൗൺലോഡ് ചെയ്യുക","Tournament name":"ടൂർണമെന്റ് പേര്","Tournament date":"ടൂർണമെന്റ് തീയതി","Number of courts":"കോർട്ടുകളുടെ എണ്ണം","Courts":"കോർട്ടുകൾ","Court":"കോർട്ട്","Teams & Players":"ടീമുകളും കളിക്കാരും","Team":"ടീം","Player":"കളിക്കാരൻ","Players":"കളിക്കാർ","Player(s)":"കളിക്കാർ","Group":"ഗ്രൂപ്പ്","Category":"വിഭാഗം","Category name":"വിഭാഗത്തിന്റെ പേര്","New category name":"പുതിയ വിഭാഗത്തിന്റെ പേര്","Group name":"ഗ്രൂപ്പിന്റെ പേര്","Format":"ഫോർമാറ്റ്","League":"ലീഗ്","Knockout":"നോക്കൗട്ട്","League + Knockout":"ലീഗ് + നോക്കൗട്ട്","Inherit tournament format":"ടൂർണമെന്റ് ഫോർമാറ്റ് പിന്തുടരുക","Target score":"ലക്ഷ്യ സ്കോർ","Winning league points":"വിജയ പോയിന്റുകൾ","Losing league points":"തോൽവി പോയിന്റുകൾ","Win by 2":"രണ്ട് പോയിന്റ് വ്യത്യാസത്തിൽ വിജയം","Win by 2 points":"രണ്ട് പോയിന്റ് വ്യത്യാസത്തിൽ വിജയം","Target":"ലക്ഷ്യം","Cutoff":"പരമാവധി സ്കോർ","None":"ഒന്നുമില്ല","Rest between a player’s matches (slots)":"ഒരു കളിക്കാരന്റെ മത്സരങ്ങൾക്കിടയിലെ വിശ്രമം (സ്ലോട്ടുകൾ)","Print paper orientation":"പേപ്പറിന്റെ ദിശ","Print font size (px)":"പ്രിന്റ് ഫോണ്ട് വലുപ്പം","A4 Landscape":"A4 ലാൻഡ്‌സ്‌കേപ്പ്","A4 Portrait":"A4 പോർട്രെയിറ്റ്","Create a category first.":"ആദ്യം ഒരു വിഭാഗം സൃഷ്ടിക്കുക.","No entries":"എൻട്രികളില്ല","No entries yet.":"ഇതുവരെ എൻട്രികളില്ല.","No players":"കളിക്കാരില്ല","No categories configured.":"വിഭാഗങ്ങൾ സജ്ജമാക്കിയിട്ടില്ല.","General":"പൊതുവായ","General / Ungrouped":"പൊതുവായ / ഗ്രൂപ്പില്ലാത്തവ","All Entries":"എല്ലാ എൻട്രികളും","Edit Name":"പേര് മാറ്റുക","Delete Group":"ഗ്രൂപ്പ് നീക്കുക","Move to group":"ഗ്രൂപ്പിലേക്ക് മാറ്റുക","New Category":"പുതിയ വിഭാഗം","Add Pair / Entry":"ജോടി / എൻട്രി ചേർക്കുക","Select players (one or more):":"കളിക്കാരെ തിരഞ്ഞെടുക്കുക (ഒന്നോ അതിലധികമോ):","Slot":"സ്ലോട്ട്","Score":"സ്കോർ","Winner":"വിജയി","WON":"ജയിച്ചു","LOST":"തോറ്റു","VS":"VS","Pending":"ബാക്കി","Not played":"കളിച്ചിട്ടില്ല","Score not recorded":"സ്കോർ രേഖപ്പെടുത്തിയിട്ടില്ല","Awaiting previous round":"മുൻ റൗണ്ടിനായി കാത്തിരിക്കുന്നു","Results & Scores":"ഫലങ്ങളും സ്കോറുകളും","Points Tables":"പോയിന്റ് പട്ടികകൾ","A4 Print Center":"A4 പ്രിന്റ് സെന്റർ","Report":"റിപ്പോർട്ട്","All Categories":"എല്ലാ വിഭാഗങ്ങളും","All Groups":"എല്ലാ ഗ്രൂപ്പുകളും","Orientation":"ദിശ","Print All Pages":"എല്ലാ പേജുകളും പ്രിന്റ് ചെയ്യുക","Font size (11–24 px)":"ഫോണ്ട് വലുപ്പം (11–24 px)","Received":"ലഭിച്ചത്","Due":"ബാക്കി","Status":"നില","Fee":"ഫീസ്","Paid":"അടച്ചു","Unpaid":"അടച്ചിട്ടില്ല","Partial":"ഭാഗികം","PAID":"അടച്ചു","UNPAID":"അടച്ചിട്ടില്ല","PARTIAL":"ഭാഗികം","OVERPAID":"കൂടുതൽ അടച്ചു","FEE NOT SET":"ഫീസ് നിശ്ചയിച്ചിട്ടില്ല","Payment":"പേയ്മെന്റ്","Payments":"പേയ്മെന്റുകൾ","Expenses":"ചെലവുകൾ","Cash":"പണം","Amount":"തുക","Notes":"കുറിപ്പുകൾ","Date":"തീയതി","Print":"പ്രിന്റ്","Details":"വിവരങ്ങൾ","History":"ചരിത്രം","Score / Winner":"സ്കോർ / വിജയി","Slot / Court":"സ്ലോട്ട് / കോർട്ട്","Category / Group":"വിഭാഗം / ഗ്രൂപ്പ്","Players / Pair":"കളിക്കാർ / ജോടി","Match / Players":"മത്സരം / കളിക്കാർ","No tournaments in TEST database":"പ്രൊഡക്ഷനിൽ ടൂർണമെന്റുകളില്ല","No tournaments available to this account":"ഈ അക്കൗണ്ടിന് ടൂർണമെന്റുകൾ ലഭ്യമല്ല","Firebase Read Error":"Firebase വായനയിലെ പിശക്","Sign in to view online tournaments":"ഓൺലൈൻ ടൂർണമെന്റുകൾ കാണാൻ ലോഗിൻ ചെയ്യുക","Connecting to TEST Firebase…":"Production Firebase-ലേക്ക് കണക്റ്റ് ചെയ്യുന്നു…","Please sign in. Only tournaments approved by Super Admin are visible.":"ലോഗിൻ ചെയ്യുക. സൂപ്പർ അഡ്മിൻ അനുമതി നൽകിയ ടൂർണമെന്റുകൾ മാത്രമേ കാണാൻ കഴിയൂ.","Use Google or Email/Password login above. All new users are Viewer by default.":"മുകളിലെ Google അല്ലെങ്കിൽ Email/Password ഉപയോഗിച്ച് ലോഗിൻ ചെയ്യുക. പുതിയ അക്കൗണ്ടുകൾക്ക് ആദ്യം Viewer അനുമതിയാണ്.","Super Admin must publish a tournament or grant you private View access. Hidden tournaments cannot be opened directly.":"സൂപ്പർ അഡ്മിൻ ടൂർണമെന്റ് പ്രസിദ്ധീകരിക്കുകയോ കാണാനുള്ള അനുമതി നൽകുകയോ വേണം. സ്വകാര്യ ടൂർണമെന്റുകൾ നേരിട്ട് തുറക്കാനാവില്ല.","Saved online to TEST Firebase.":"Production Firebase-ൽ സേവ് ചെയ്തു.","Saving changes to Production Firebase…":"Production Firebase-ൽ മാറ്റങ്ങൾ സേവ് ചെയ്യുന്നു…","Show Player Payment Status (Private)":"കളിക്കാരുടെ പേയ്മെന്റ് നില കാണിക്കുക (സ്വകാര്യം)","Ground fee is not configured yet; set it in Finance to show paid/unpaid statuses.":"ഗ്രൗണ്ട് ഫീസ് സജ്ജമാക്കിയിട്ടില്ല. പേയ്മെന്റ് നില കാണിക്കാൻ Finance-ൽ ഫീസ് നൽകുക.","Match rules cannot be changed after recorded results until results are intentionally cleared. Category-specific rules override tournament defaults.":"ഫലങ്ങൾ രേഖപ്പെടുത്തിയ ശേഷം അവ നീക്കാതെ മത്സരനിയമങ്ങൾ മാറ്റാനാവില്ല. വിഭാഗത്തിന്റെ നിയമങ്ങൾക്ക് മുൻഗണന ലഭിക്കും.","Edit Result":"ഫലം തിരുത്തുക","Enter Result":"ഫലം നൽകുക","Clear Result":"ഫലം നീക്കുക","Switch tournament":"ടൂർണമെന്റ് മാറ്റുക","All tournaments":"എല്ലാ ടൂർണമെന്റുകളും","Match history":"മത്സര ചരിത്രം","No fixtures yet. Create categories and fixtures first.":"ഇതുവരെ മത്സരക്രമമില്ല. ആദ്യം വിഭാഗങ്ങളും ഫിക്സ്ചറുകളും സൃഷ്ടിക്കുക.","There are no tournaments in this database. Create a tournament, or restore a verified backup through Firebase Console.":"ഈ ഡാറ്റാബേസിൽ ടൂർണമെന്റുകളില്ല. പുതിയ ടൂർണമെന്റ് സൃഷ്ടിക്കുകയോ പരിശോധിച്ച ബാക്കപ്പ് Firebase Console വഴി പുനഃസ്ഥാപിക്കുകയോ ചെയ്യുക.","🏆 Tournaments":"🏆 ടൂർണമെന്റുകൾ","👥 Teams":"👥 ടീമുകൾ","🗂 Categories":"🗂 വിഭാഗങ്ങൾ","🧩 Groups":"🧩 ഗ്രൂപ്പുകൾ","🔀 Fixtures":"🔀 ഫിക്സ്ചറുകൾ","✅ Results":"✅ ഫലങ്ങൾ","📊 Standings":"📊 പോയിന്റ് പട്ടിക","⚙ Settings":"⚙ ക്രമീകരണങ്ങൾ","💰 Finance":"💰 ഫിനാൻസ്","🛡 User Roles":"🛡 യൂസർ റോളുകൾ","🖨 Print Center":"🖨 പ്രിന്റ് സെന്റർ","🏆 All Tournaments":"🏆 എല്ലാ ടൂർണമെന്റുകളും","📋 Full Details":"📋 പൂർണ്ണ വിവരങ്ങൾ","📜 History & Scores":"📜 ചരിത്രവും സ്കോറുകളും","🛡 Super Admin":"🛡 സൂപ്പർ അഡ്മിൻ","👁 Viewer":"👁 വ്യൂവർ","📍 Tournament Location":"📍 ടൂർണമെന്റ് സ്ഥലം","📍 Open Location":"📍 ലൊക്കേഷൻ തുറക്കുക","🕒 Time":"🕒 സമയം","🎨 Color Theme":"🎨 നിറ തീം","🌐 Language":"🌐 ഭാഷ","🔐 Account & Permissions":"🔐 അക്കൗണ്ടും അനുമതികളും","🖨 Print A4":"🖨 A4 പ്രിന്റ്","📲 Install App":"📲 ആപ്പ് ഇൻസ്റ്റാൾ ചെയ്യുക","＋ Add Category":"＋ വിഭാഗം ചേർക്കുക","＋ Add Players / Pair":"＋ കളിക്കാർ / ജോടി ചേർക്കുക","＋ Add Group":"＋ ഗ്രൂപ്പ് ചേർക്കുക","✏ Edit":"✏ തിരുത്തുക","✏ Edit Result":"✏ ഫലം തിരുത്തുക","＋ Enter Result":"＋ ഫലം നൽകുക"};
 let mbaCurrentLanguage='en';
 const mbaOriginalText=new WeakMap();
 function mbaTranslateString(value){
@@ -2494,7 +2560,7 @@ async function mbaFinishUmpire(){
  if(!confirm('Save '+u.a+' – '+u.b+' as the FINAL result? Points Table will update automatically.'))return;
  const btn=document.getElementById('mba-umpire-final');if(btn)btn.disabled=true;
  await op(()=>{const current=active();if(current?.id!==u.tournamentId)throw Error('Tournament changed');recordResult(current,u.matchId,{a:u.a,b:u.b});notice='Final Umpire Result saved to Production Firebase.'});
- if(notice==='Saved online to Production Firebase.'){
+ if(notice==='Saved online to TEST Firebase.'){
   try{sessionStorage.removeItem(mbaDraftKey(u.tournamentId,u.matchId))}catch{}
   mbaUmpire=null;mbaRenderUmpire();
  }else mbaRenderUmpire();
@@ -2583,7 +2649,7 @@ function mbaV34RasterSection(target){
  const clone=target.cloneNode(true);
  clone.querySelectorAll('button,input,select,textarea,.noprint,script,style,.mba-share-menu,.mba-share-dock,.mba-share-mini')
    .forEach(el=>el.remove());
- let blocks=[...clone.querySelectorAll('h2,h3,h4,p,li,.mba-fixture-meta,.mba-fixture-pairs,.mba-fixture-result,.entry-line,.player,.tour-detail-line')]
+ let blocks=[...clone.querySelectorAll('h2,h3,h4,p,li,.mba-fixture-meta,.mba-fixture-pairs,.mba-fixture-result,.entry-line,.player,.tour-detail-line,.mba36-bracket-row,.mba36-bracket-foot,.mba36-champion')]
    .filter(el=>!el.closest('table'))
    .map(plain).filter(Boolean);
  if(!blocks.length){
@@ -2751,7 +2817,7 @@ async function mbaExportClicked(button){
  if(!authUser||!canPrint())throw Error('Super Admin must grant Print access.');
  const kind=button.dataset.mbaExport;
  if(kind==='link'){const url=location.href;try{await navigator.clipboard.writeText(url);alert('App link copied.')}catch{prompt('Copy link:',url)}return}
- if(page==='finance'&&!confirm('This report contains private finance information. Export only to trusted recipients. Continue?'))return;
+ if(['finance','registration'].includes(page)&&!confirm('This report may contain PRIVATE payment/contact information. Export only to trusted recipients. Continue?'))return;
  const target=button.closest('.mba-share-menu')?.closest('[data-mba-share-target]');if(!target)throw Error('Report section not found.');
  mbaShareBusy=true;const old=button.textContent;button.disabled=true;button.textContent='Creating file…';
  try{const canvases=await mbaCaptureReport(target);if(!canvases.length)throw Error('No data to export');
@@ -2759,7 +2825,7 @@ async function mbaExportClicked(button){
   if(kind==='png'){for(let i=0;i<canvases.length;i++)files.push(new File([await mbaCanvasBlob(canvases[i])],base+'-A4-'+(i+1)+'.png',{type:'image/png'}));}
   else files=[new File([mbaPdfFromCanvases(canvases,orient)],base+'-Report.pdf',{type:'application/pdf'})];
   if(kind==='whatsapp'&&navigator.canShare?.({files})&&navigator.share){try{await navigator.share({files,title:'MBA Tournaments'});return}catch(err){if(err.name==='AbortError')return;console.warn('Android share failed:',err)}}
-  for(const f of files)await mbaDownloadBlob(f,f.name);
+  await mbaV374DownloadFiles(files);
   if(kind==='whatsapp')alert('PDF saved to Downloads. Open WhatsApp and attach the PDF from Downloads.');
   else alert(files.length===1?'File saved to Downloads.':'A4 image pages saved to Downloads.');
  }finally{button.disabled=false;button.textContent=old;mbaShareBusy=false}
@@ -2767,7 +2833,7 @@ async function mbaExportClicked(button){
 
 document.addEventListener('click',async ev=>{
  if(ev.target.closest('#mba-global-share-link')){
-  try{await navigator.clipboard.writeText('https://laylaaflaj-lang.github.io/mba-tournaments-production/');alert('App link copied for WhatsApp.')}catch{prompt('Copy this app link:','https://laylaaflaj-lang.github.io/mba-tournaments-production/')}return;
+  try{await navigator.clipboard.writeText('https://laylaaflaj-lang.github.io/mba-tournaments-v2-test/v372/');alert('App link copied for WhatsApp.')}catch{prompt('Copy this TEST app link:','https://laylaaflaj-lang.github.io/mba-tournaments-v2-test/v372/')}return;
  }
  const b=ev.target.closest('[data-mba-export]');if(!b)return;
  ev.preventDefault();
@@ -2902,7 +2968,7 @@ function mba36Bracket(t,c){
  const labelFor=(m,side)=>{if(m[side]){const e=c.entrants.find(x=>x.id===m[side]);return entryLabel(t,c,m[side])+(e?.clubName?' · '+e.clubName:'')}return m['source'+side.toUpperCase()]?.type==='match'?'Winner of previous match':'Awaiting winner'};
  const cols=roundsOrdered.map(([round,list])=>{
   const heading=round===0?'Qualifiers / Re-entry':round===maxRound?'🏆 Final':round===maxRound-1?'Semi-finals':round===maxRound-2?'Quarter-finals':`Round ${round}`;
-  return `<div class="mba36-bracket-column"><h4>${heading}</h4>${list.sort((a,b)=>(a.bracketIndex||0)-(b.bracketIndex||0)).map(m=>{
+  return `<div class="mba36-bracket-column ${round===maxRound?'mba-round-final':round===maxRound-1?'mba-round-semi':''}"><h4>${heading}</h4>${list.sort((a,b)=>(a.bracketIndex||0)-(b.bracketIndex||0)).map(m=>{
    const winner=scoreWinner(t.results[m.id],effectiveRules(t,c)),result=t.results[m.id];
    const score=result?(result.mode==='winner'?'Winner saved':`${result.a} – ${result.b}`):m.a&&m.b?'Not played':'Waiting';
    return `<div class="mba36-bracket-match"><div class="mba36-bracket-row ${winner==='a'?'won':''}">${esc(labelFor(m,'a'))}${winner==='a'?'<span>✓</span>':''}</div><div class="mba36-bracket-row ${winner==='b'?'won':''}">${esc(labelFor(m,'b'))}${winner==='b'?'<span>✓</span>':''}</div><div class="mba36-bracket-foot"><small>Court ${esc(m.court)} · ${esc(score)}</small>${m.a&&m.b&&can('scoresWrite')&&editScope(t.id)?`<button type="button" data-mba-score-match="${esc(m.id)}" class="btn">✍ Score</button>`:''}</div></div>`;
@@ -3113,7 +3179,7 @@ const mba37OriginalPlayerFee=playerFee;
 const mba37OriginalFinanceTotals=financeTotals;
 const mba37PrizeAmount=(t,k)=>Number(t?.[k==='winner'?'prizeWinner':'prizeRunner']||0);
 const mba37PrizeLabel=k=>k==='winner'?'Winner':'Runner-up';
-const mba37PrizeAlreadyPaid=(t,k)=>expenseEvents().filter(x=>x.prizeKey===k&&x.prizeTournament===t.id&&x.status==='paid').reduce((n,x)=>n+Number(x.amount||0),0);
+const mba37PrizeAlreadyPaid=(t,k)=>mba372EffectiveExpenses().filter(x=>x.prizeKey===k&&x.prizeTournament===t.id&&x.status==='paid').reduce((n,x)=>n+Number(x.amount||0),0);
 const mba37PrizeRemaining=(t,k)=>Math.max(0,mba37PrizeAmount(t,k)-mba37PrizeAlreadyPaid(t,k));
 const mba37PrizePaid=(t,k)=>mba37PrizeAmount(t,k)>0&&mba37PrizeRemaining(t,k)<.005;
 financeTotals=function(t){
@@ -3173,9 +3239,11 @@ function mba37RegistrationView(t){
   const done=outcomes.some(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c)));
   const team=t.teams.find(x=>x.id===e.teamId);
   const latest=receipts().filter(x=>e.playerIds.includes(x.playerId)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0]||null;
-  const fees=e.playerIds.reduce((n,p)=>n+Math.max(0,Number(playerFee(p)||0)),0);
-  const paid=e.playerIds.reduce((n,p)=>n+paidForPlayer(p),0);
-  return `<tr><td><b class="${done?'mba37-done':'mba37-pending'}">${esc(names)}</b><small>${esc(c.name)}${e.clubName?' · '+esc(e.clubName):''}</small></td><td>${count} ${count===1?'player':'players'}</td>${paymentAccess?`<td>${esc(row.mobile||'—')}</td><td>${esc(money(paid))} / ${esc(money(fees))}</td><td>${paid>=fees&&fees>0?'✅ PAID':paid>0?'PARTIAL':'UNPAID'}</td><td>${esc(latest?.mode||'—')}</td><td>${esc(latest?.receivedBy||'—')}</td>`:''}<td><label><input type="checkbox" data-mba37-complete="${esc(c.id)}:${esc(e.id)}" ${done?'checked':''} ${!can('scoresWrite')?'disabled':''} aria-label="Mark match completed by recording winner"> ${done?'Completed':'Pending'}</label></td></tr>`;
+  const entryCharge=mba372FeeRows(t).find(r=>r.entryId===e.id);
+  const chargeRows=entryCharge?[entryCharge]:mba372FeeRows(t).filter(r=>r.kind==='player'&&e.playerIds.includes(r.primary));
+  const fees=chargeRows.reduce((n,r)=>n+Number(r.fee||0),0);
+  const paid=chargeRows.reduce((n,r)=>n+Number(r.paid||0),0);
+  return `<tr><td><b class="${done?'mba37-done':'mba37-pending'}">${esc(names)}</b><small>${esc(c.name)}${e.clubName?' · '+esc(e.clubName):''}</small></td><td>${count} ${count===1?'player':'players'}</td>${paymentAccess?`<td>${esc(row.mobile||'—')}</td><td>${esc(money(paid))} / ${esc(money(fees))}</td><td>${fees===0?'NO FEE':paid>=fees?'✅ PAID':paid>0?'PARTIAL':'UNPAID'}</td><td>${esc(latest?.mode||'—')}</td><td>${esc(latest?.receivedBy||'—')}</td>`:''}<td><label><input type="checkbox" data-mba37-complete="${esc(c.id)}:${esc(e.id)}" ${done?'checked':''} ${!can('scoresWrite')?'disabled':''} aria-label="Mark match completed by recording winner"> ${done?'Completed':'Pending'}</label></td></tr>`;
  })).join('');
  const typeOptions=[['singles','Singles (1 player)'],['doubles','Doubles (2 players)'],['other','Other / Custom']].map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
  const form=editor?`<form class="mba37-reg-form" id="mba37-register-form"><h3>＋ Register directly to Category & Fixtures</h3>
@@ -3186,10 +3254,10 @@ function mba37RegistrationView(t){
   <label class="field">Player(s) / Pair(s), one entry per line<textarea name="players" rows="5" required placeholder="Singles: Shamil\nDoubles: Nithin & Shamil\nOptional Club: Jafar & Mubarak | Tirur Club"></textarea></label>
   <div class="mba37-name-quick"><label class="field">Saved player name suggestions<input id="mba37-quick-name" list="mba37-saved-names" placeholder="Start typing a previously saved player name"></label><button type="button" class="btn" id="mba37-add-saved-name">＋ Insert Saved Name</button></div>
   <p class="helper">Each line becomes one tournament entry in the selected Category automatically; ready to generate Fixtures without retyping. Bulk registrations are saved as UNPAID unless an amount is collected. Club after | is optional.</p>
-  ${paymentAccess?`<div class="mba37-finance-fields"><label class="field">Mobile number (optional, for SINGLE ENTRY only)<input name="mobile" inputmode="tel" maxlength="20" placeholder="Private — not public"></label>
+  ${paymentAccess?`<div class="mba37-finance-fields"><label class="field">Contact mobile for ONE registration (Singles or Doubles)<input name="mobile" inputmode="tel" maxlength="20" placeholder="Private — not public"></label>
   <label class="field">Amount received TOTAL (₹, optional)<input type="number" name="received" min="0" step="0.01" value="0"></label>
   <label class="field">Payment Method<select name="mode">${payModes.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select></label>
-  <label class="field">Paid to committee member<input name="receivedBy" maxlength="100" placeholder="Required when received > ₹0"></label></div>`:''}
+  <label class="field">Paid to committee member${mba372WhoSelect()}<input name="receivedByOther" maxlength="100" placeholder="Use only if Other person selected"></label></div>`:''}
   <datalist id="mba37-saved-names">${mba37Names().slice(0,160).map(n=>`<option value="${esc(n)}"></option>`).join('')}</datalist>
   <div class="actions"><button type="submit" class="btn primary">💾 Save Registration & Sync Finance</button></div></form>`:'<p class="helper">View only. Super Admin must grant Team + Category editing access for Registration.</p>';
  const hint=`<div class="mba37-stat">${entryCount} entries · ${players} player seats · ${t.categories.length} categories</div>`;
@@ -3222,7 +3290,7 @@ async function mba37Register(form){
  if(type==='other'&&!catName)throw Error('For Other, enter an event name.');
  if(c&&mba37RegType(c)!==type)throw Error('The selected Category has a different play type.');
  if(c&&c.playersPerSide&&c.playersPerSide!==count)throw Error('Category requires '+c.playersPerSide+' players per side.');
- if(c&&t.fixtures.some(m=>m.categoryId===c.id))throw Error('This category has fixtures. Clear unplayed fixtures BEFORE registering more players; scored fixtures cannot be cleared.');
+ if(c&&t.fixtures.some(m=>m.categoryId===c.id)&&!mbaV373CanLateReentry(t,c,fd))throw Error('This category has fixtures. Only safe paid re-entry is permitted while Round 1 remains partly unplayed; old scores cannot be cleared.');
  const entries=mba37ParseEntries(fd.get('players'),type,count);
  const namesSeen=new Set((c?.entrants||[]).map(e=>entryLabel(t,c,e.id).split(' & ').map(v=>v.toLowerCase()).sort().join('&')+'|'+(e.clubName||'').toLowerCase()));
  for(const e of entries){if(namesSeen.has(e.key))throw Error('Duplicate registration: '+e.players.join(' & '));namesSeen.add(e.key)}
@@ -3231,7 +3299,7 @@ async function mba37Register(form){
  const mobile=String(fd.get('mobile')||'').trim();if(mobile&&!/^[0-9+()\s-]{6,20}$/.test(mobile))throw Error('Check mobile number format.');
  if(mobile&&entries.length>1)throw Error('Enter mobile number only when adding a single registration. For bulk, leave mobile blank.');
  if(received>0&&!mba37CanTakePayment())throw Error('Payments Write permission required to record collected cash.');
- const receivedBy=String(fd.get('receivedBy')||'').trim();if(received>0&&!receivedBy)throw Error('Enter the committee member who received the payment.');
+ const receivedBy=received>0?mba372ResolveCollector(fd):'';if(received>0&&!receivedBy)throw Error('Enter the committee member who received the payment.');
  if(received>0&&entries.length!==1)throw Error('Record collected amount for ONE entry at a time; bulk names can be saved unpaid.');
  const now=Date.now(),cat=c?deep(c):{id:uid('cat'),name:catName,format:t.format==='league'?'league':'knockout',qualifiers:4,qualifierMode:'per-group',rules:null,groups:[],entrants:[]};
  cat.playType=type;cat.playersPerSide=count;
@@ -3241,12 +3309,13 @@ async function mba37Register(form){
   const teamId=uid('team'),players=entry.players.map(name=>({id:uid('player'),name}));
   const team={id:teamId,name:entry.players.join(' & '),players,isDirectRegistration:true};
   const entrantId=uid('entry');newTeamIds.push(teamId);
-  cat.entrants.push({id:entrantId,teamId,playerIds:players.map(p=>p.id),groupId:null,clubName:entry.club,directRegistration:true});
+  cat.entrants.push({id:entrantId,teamId,playerIds:players.map(p=>p.id),groupId:null,clubName:entry.club,directRegistration:true,...(fd.has('mba-v373-reentry')?{registrationStatus:'hold',paidReentry:true,reentryPending:true,reentryRequestedAt:now,reentryRequestedBy:authUser.uid}:{})});
   patch['v3/tournaments/'+t.id+'/teams/'+teamId]=team;
-  const privateRec={categoryId:cat.id,club:entry.club,mobile,createdBy:authUser.uid,createdAt:now};
+  const privateRec={categoryId:cat.id,club:entry.club,mobile,contactName:String(fd.get('contactName')||entry.players[0]||'').trim(),createdBy:authUser.uid,createdAt:now,...(mba372AgeMinimum(cat)?{birthYears:[Number(fd.get('birthYear1')),Number(fd.get('birthYear2'))],ageOverride:!!fd.has('ageOverride'),ageOverrideReason:String(fd.get('ageOverrideReason')||'').trim(),ageOverrideBy:fd.has('ageOverride')?authUser.uid:''}:{}),...(fd.has('mba-v373-reentry')?{paidReentry:true,reentryRequestedBy:authUser.uid,reentryRequestedAt:now}:{})};
   patch['v3/privateRegistrations/'+t.id+'/'+entrantId]=privateRec;
-  for(const p of players){const part=Math.min(remaining,Number(finance.config?.feePerPlayer??t.registrationFeePerPlayer??received)||received);if(part>0){
-   const id=uid('receipt');patch['v3/finance/'+t.id+'/payments/'+id]={playerId:p.id,kind:'payment',amount:Math.round(part*100)/100,mode:String(fd.get('mode')||'Cash'),receivedBy,date:today(),reference:'',notes:'Registration: '+cat.name,createdBy:authUser.uid,createdByEmail:authUser.email||'',createdAt:now};remaining=Math.round((remaining-part)*100)/100;
+  const isKnockout=mba372EventFmt(t,cat)==='knockout';
+  for(const p of (isKnockout?players.slice(0,1):players)){const part=Math.min(remaining,Number((isKnockout?(finance.config?.feePerEntry??t.registrationFeePerPair):null)??finance.config?.feePerPlayer??t.registrationFeePerPlayer??received)||received);if(part>0){
+   const id=uid('receipt');patch['v3/finance/'+t.id+'/payments/'+id]={playerId:p.id,chargeId:isKnockout?'entry:'+cat.id+':'+entrantId:'player:'+p.id,entryId:isKnockout?entrantId:'',categoryId:cat.id,kind:'payment',amount:Math.round(part*100)/100,mode:String(fd.get('mode')||'Cash'),receivedBy,date:today(),reference:'',notes:'Registration: '+cat.name+(fd.has('mba-v373-reentry')?' · Paid Re-entry':''),createdBy:authUser.uid,createdByEmail:authUser.email||'',createdAt:now};remaining=Math.round((remaining-part)*100)/100;
   }}
  });
  if(remaining>0)throw Error('Collected amount exceeds configured player fee; record extra separately in Finance.');
@@ -3268,7 +3337,7 @@ async function mba37Register(form){
 /* Knockout: manually assign entrants / BYEs to round-one seed slots, or draw at random. */
 function mba37Power2(n){let p=2;while(p<n)p*=2;return p}
 function mba37BracketFromLeafSlots(t,cat,slots,allowQualifiers=false){
- const entries=cat.entrants.map(x=>x.id),ids=slots.filter(Boolean);
+ const entries=cat.entrants.filter(mba372EntryActive).map(x=>x.id),ids=slots.filter(Boolean);
  need(ids.length>=2&&new Set(ids).size===ids.length&&ids.every(id=>entries.includes(id))&&(allowQualifiers||ids.length===entries.length),'Each qualified / registered entry must be selected exactly once.');
  need(!t.fixtures.some(m=>m.categoryId===cat.id&&m.stage==='knockout'&&t.results[m.id]&&(!allowQualifiers||m.round!==0)),'Recorded main knockout results are protected.');
  need(!t.fixtures.some(m=>m.categoryId===cat.id&&m.stage==='knockout'&&(!allowQualifiers||m.round!==0)),'Clear existing unplayed main bracket before building a new one.');
@@ -3446,10 +3515,10 @@ function mba37ShuffleStrong(xs){
 }
 async function mba37LuckyStart(id){
  const t=active(),c=t?.categories.find(x=>x.id===id);if(!c||!(can('fixturesWrite')&&can('categoriesWrite')&&editScope(t.id)))throw Error('Fixture + Category editing permission needed.');
- if(effectiveFormat(t,c)!=='knockout'||c.entrants.length<5)throw Error('Special re-entry requires 5 or more knockout entries.');
+ if(effectiveFormat(t,c)!=='knockout'||c.entrants.filter(mba372EntryActive).length<5)throw Error('Special re-entry requires 5 or more ACTIVE knockout entries.');
  if(t.fixtures.some(m=>m.categoryId===id)||c.luckyMode)throw Error('This category already has fixtures. Never replace recorded results.');
  if(!confirm('Activate SPECIAL Lucky Loser / Re-entry instead of standard knockout for '+c.name+'? Participants must be informed in advance.'))return;
- const ids=mba37ShuffleStrong(c.entrants.map(e=>e.id));let waiter=null;
+ const ids=mba37ShuffleStrong(c.entrants.filter(mba372EntryActive).map(e=>e.id));let waiter=null;
  if(ids.length%2){const wanted=document.querySelector(`[data-mba37-wait="${CSS.escape(id)}"]`)?.value;
   if(wanted){const i=ids.indexOf(wanted);if(i<0)throw Error('Waiting entrant unavailable');waiter=ids.splice(i,1)[0]}
   else waiter=ids.pop();
@@ -3615,6 +3684,829 @@ document.addEventListener('click',e=>{
   update(ref(db),{['v3/posters/'+tid+'/'+id]:null,['v3/galleryCatalog/'+tid+'/'+id]:null,['v3/galleryPermissions/'+tid+'/'+id]:null}).catch(x=>alert('Photo Delete: '+errText(x)));return;
  }
 },true);
+
+/* MBA_V372_SAFE_FEATURES — generated over verified V3.7.1 source.
+   No migration or writes happen at startup. All writes require a human action.
+   Every correction is append-only: original financial events remain for audit. */
+const MBA372_VERSION = '3.7.2-development-finance-registration-manual-ui';
+rolePresets.umpire = {scoresWrite:true};
+mbaV372RoleLabels.umpire='Umpire';
+// Important V3.7.2 UI labels in both languages. Existing preferences stay intact.
+Object.assign(MBA_UI_ML,{
+ 'Quick Paid · Partial · Balance':'വേഗം പെയ്ഡ് · ഭാഗികം · ബാക്കി',
+ 'Manual Receipt / Refund':'പേയ്മെന്റ് രസീത് / റീഫണ്ട്',
+ 'Payment Register · Permanent Receipts':'പേയ്മെന്റ് രജിസ്റ്റർ · സ്ഥിരം രസീതുകൾ',
+ 'Committee Members · Collectors':'കമ്മിറ്റി അംഗങ്ങൾ · കളക്ടർമാർ',
+ 'Registration Management · Edit / Hold / Cancel / Restore / Delete':'രജിസ്ട്രേഷൻ നിയന്ത്രണം · തിരുത്തുക / ഹോൾഡ് / റദ്ദാക്കുക / തിരികെ കൊണ്ടുവരുക / നീക്കുക',
+ 'Create custom Doubles Age Category (80+, 90+, 100+...)':'കസ്റ്റം ഡബിൾസ് പ്രായവിഭാഗം സൃഷ്ടിക്കുക',
+ 'Create Doubles Age Category':'ഡബിൾസ് പ്രായവിഭാഗം സൃഷ്ടിക്കുക',
+ 'Player 1 Birth Year':'ഒന്നാമത്തെ കളിക്കാരന്റെ ജനനവർഷം',
+ 'Player 2 Birth Year':'രണ്ടാമത്തെ കളിക്കാരന്റെ ജനനവർഷം',
+ 'Player 1 birth year':'ഒന്നാമത്തെ കളിക്കാരന്റെ ജനനവർഷം',
+ 'Player 2 birth year':'രണ്ടാമത്തെ കളിക്കാരന്റെ ജനനവർഷം',
+ 'Team contact person':'ടീം ബന്ധപ്പെടേണ്ട വ്യക്തി',
+ 'Contact person':'ബന്ധപ്പെടേണ്ട വ്യക്തി',
+ 'Private mobile':'സ്വകാര്യ മൊബൈൽ നമ്പർ',
+ 'Minimum combined age of 2 doubles players':'രണ്ട് ഡബിൾസ് കളിക്കാരുടെയും ആകെ കുറഞ്ഞ പ്രായം',
+ 'Age-qualified Doubles (when selected)':'പ്രായപരിധിയുള്ള ഡബിൾസ് വിഭാഗം',
+ 'Expenses · Details · Edit / Void':'ചെലവുകൾ · വിവരങ്ങൾ · തിരുത്തൽ / റദ്ദാക്കൽ',
+ 'Pay Outstanding Expense':'ബാക്കിയുള്ള ചെലവ് അടയ്ക്കുക',
+ 'Mark Bill Paid':'ബിൽ അടച്ചതായി രേഖപ്പെടുത്തുക',
+ 'Internal Transfers Register':'ആന്തരിക പണകൈമാറ്റ രജിസ്റ്റർ',
+ 'Committee Member Balances':'കമ്മിറ്റി അംഗങ്ങളുടെ പണ ബാലൻസ്',
+ 'Add Expense':'ചെലവ് ചേർക്കുക',
+ 'Add Tournament Expense':'ടൂർണമെന്റ് ചെലവ് ചേർക്കുക',
+ 'Tournament Fee Settings':'ടൂർണമെന്റ് ഫീസ് ക്രമീകരണം',
+ 'Save Default Fee':'ഡിഫോൾട്ട് ഫീസ് സേവ് ചെയ്യുക',
+ 'Save Committee Names':'കമ്മിറ്റി പേരുകൾ സേവ് ചെയ്യുക',
+ 'Select committee member':'കമ്മിറ്റി അംഗത്തെ തിരഞ്ഞെടുക്കുക',
+ 'Record / Refund a Registration Payment':'രജിസ്ട്രേഷൻ പേയ്മെന്റ് / റീഫണ്ട്',
+ 'Registration / Charge':'രജിസ്ട്രേഷൻ / ഫീസ്',
+ 'Transaction':'ഇടപാട്',
+ 'Collected by':'പണം സ്വീകരിച്ച വ്യക്തി',
+ 'Received by (for Quick Paid)':'പണം വാങ്ങിയ വ്യക്തി (വേഗം പെയ്ഡ്)',
+ 'Payment method':'പേയ്മെന്റ് രീതി',
+ 'Save Transaction':'ഇടപാട് സേവ് ചെയ്യുക',
+ 'Save registration changes':'രജിസ്ട്രേഷൻ മാറ്റങ്ങൾ സേവ് ചെയ്യുക',
+ 'Save Expense Correction':'ചെലവിന്റെ തിരുത്തൽ സേവ് ചെയ്യുക',
+ 'Delete / Void':'ഡിലീറ്റ് / റദ്ദാക്കുക',
+ 'Hold / Pending':'ഹോൾഡ് / കാത്തിരിപ്പ്',
+ 'Restore':'വീണ്ടെടുക്കുക',
+ 'Save fee':'ഫീസ് സേവ് ചെയ്യുക',
+ 'Set fee / waiver':'ഫീസ് മാറ്റുക / ഒഴിവാക്കുക',
+ 'Full Finance Dashboard':'പൂർണ്ണ ഫിനാൻസ് ഡാഷ്ബോർഡ്',
+ 'Finance · Limited Access':'ഫിനാൻസ് · പരിമിത അനുമതി',
+ 'Planned Winner / Runner Prizes':'വിജയി / റണ്ണർ സമ്മാനത്തുക',
+ 'Save Expense Correction':'ചെലവിന്റെ തിരുത്തൽ സേവ് ചെയ്യുക',
+ 'NO FEE':'ഫീസ് ഇല്ല',
+ 'REVIEW':'പരിശോധിക്കണം',
+ 'VOIDED':'റദ്ദാക്കി',
+ 'AUDIT REVERSAL':'തിരുത്തൽ രേഖ',
+ 'REVERSED':'തിരുത്തിയിട്ടുണ്ട്',
+ 'One name per line':'ഓരോ വരിയിലും ഒരു പേര്',
+ 'Date':'തീയതി',
+ 'Status':'നില',
+ 'Details':'വിവരങ്ങൾ',
+ 'Edit':'തിരുത്തുക',
+ 'Partial':'ഭാഗികം',
+ 'PAID':'അടച്ചു'
+});
+const mba372RegStatus = e => ['active','hold','cancelled','deleted'].includes(e?.registrationStatus) ? e.registrationStatus : 'active';
+const mba372EntryActive = e => mba372RegStatus(e)==='active';
+const mba372EventFmt = (t,c) => effectiveFormat(t,c)==='knockout'?'knockout':'league';
+const mba372FeeDefault = t => {
+  const x=finance.config?.feePerPlayer??t?.registrationFeePerPlayer;
+  return x==null?null:Number(x);
+};
+const mba372Signed = r => Number(r.amount||0)*(r.kind==='refund'?-1:1);
+function mba372FeeRows(t) {
+  if(!t)return [];
+  const defaultFee=mba372FeeDefault(t),out=[],leaguePlayers=new Set();
+  const associatedLeague=new Set();
+  for(const c of t.categories||[]){
+    for(const e of c.entrants||[]){
+      if(mba372EventFmt(t,c)==='knockout'){
+        out.push({id:'entry:'+c.id+':'+e.id,entryId:e.id,categoryId:c.id,category:c.name,
+          kind:'entry',name:entryLabel(t,c,e.id),primary:e.playerIds?.[0],playerIds:[...(e.playerIds||[])],status:mba372RegStatus(e)});
+      }else for(const pid of e.playerIds||[]){leaguePlayers.add(pid);associatedLeague.add(pid)}
+    }
+  }
+  if(!t.categories?.length&&t.format==='league')for(const p of playersOf(t))leaguePlayers.add(p.id);
+  const players=new Map(playersOf(t).map(p=>[p.id,p]));
+  for(const pid of leaguePlayers){const p=players.get(pid);if(!p)continue;
+    out.push({id:'player:'+pid,kind:'player',name:p.name,category:'League · '+p.team,primary:pid,
+      playerIds:[pid],status:'active'});
+  }
+  // Legacy receipts have playerId only. Attribute only if that player is in exactly one charge;
+  // otherwise flag for reconciliation, rather than counting one receipt twice.
+  const legacyMembership=new Map();
+  for(const row of out)for(const pid of row.playerIds)legacyMembership.set(pid,(legacyMembership.get(pid)||0)+1);
+  const payments=receipts();
+  for(const row of out){
+    const v=finance.overrides?.[row.id]?.fee ?? (row.kind==='player'?finance.overrides?.[row.primary]?.fee:null);
+    const entryFee=row.kind==='entry'?(finance.config?.feePerEntry??t?.registrationFeePerPair??defaultFee):defaultFee;
+    row.fee=entryFee===null&&v==null?null:Number(v??entryFee);
+    row.paid=0;row.ambiguous=0;
+    for(const r of payments){
+      if(r.chargeId){if(r.chargeId===row.id)row.paid+=mba372Signed(r);continue}
+      if(r.entryId){if(row.entryId===r.entryId)row.paid+=mba372Signed(r);continue}
+      if(row.playerIds.includes(r.playerId)){
+        if(legacyMembership.get(r.playerId)===1)row.paid+=mba372Signed(r);
+        else row.ambiguous+=mba372Signed(r);
+      }
+    }
+    row.paid=Math.round(row.paid*100)/100;
+    row.due=row.fee===null?null:Math.max(0,Math.round((row.fee-row.paid)*100)/100);
+    row.text=row.fee===null?'FEE NOT SET':row.fee===0?'NO FEE':row.ambiguous?'REVIEW':row.paid>=row.fee?'PAID':row.paid>0?'PARTIAL':'UNPAID';
+    row.cls=['PAID','NO FEE'].includes(row.text)?'payment-paid':row.text==='PARTIAL'?'payment-partial':row.text==='UNPAID'?'payment-unpaid':'payment-unknown';
+  }
+  return out;
+}
+function mba372EffectiveExpenses(){
+ const list=expenseEvents(),voided=new Set(list.filter(e=>e.reversalOf).map(e=>e.reversalOf));
+ return list.filter(e=>!e.reversalOf&&!voided.has(e.id));
+}
+function mba372ExpensesSummary(){
+ const rows=mba372EffectiveExpenses();const settled=new Set(rows.filter(x=>x.status==='paid'&&x.settledDueId).map(x=>x.settledDueId));
+ const unpaid=rows.filter(x=>x.status==='due'&&!settled.has(x.id));
+ return {rows,unpaid,paid:rows.filter(x=>x.status==='paid').reduce((n,x)=>n+Number(x.amount||0),0),
+    due:unpaid.reduce((n,x)=>n+Number(x.amount||0),0)};
+}
+function mba372PrizeRemain(t,k){const a=Number(t[k==='winner'?'prizeWinner':'prizeRunner']||0);
+ const already=mba372EffectiveExpenses().filter(x=>x.prizeKey===k&&x.prizeTournament===t.id&&x.status==='paid').reduce((n,x)=>n+Number(x.amount||0),0);
+ return Math.max(0,a-already);
+}
+financeTotals=function(t){
+ const feeRows=mba372FeeRows(t),configured=feeRows.every(r=>r.fee!==null),collected=receipts().reduce((n,r)=>n+mba372Signed(r),0);
+ const exp=mba372ExpensesSummary(),planned=mba372PrizeRemain(t,'winner')+mba372PrizeRemain(t,'runner');
+ const expected=configured?feeRows.reduce((n,r)=>n+Number(r.fee||0),0):null;
+ const owed=configured?feeRows.reduce((n,r)=>n+Number(r.due||0),0):null;
+ return {players:playersOf(t).length,entries:feeRows.length,expected,paid:collected,owed,expensesPaid:exp.paid,
+  unpaidBills:exp.due+planned,cashBalance:collected-exp.paid,
+  projected:expected===null?null:expected-exp.paid-exp.due-planned,prizeCommittedDue:planned};
+};
+collectorSummary=function(){
+ const map={};const add=(name,amount)=>{name=String(name||'Not specified').trim();map[name]=(map[name]||0)+amount};
+ receipts().forEach(r=>add(r.receivedBy,mba372Signed(r)));
+ mba372EffectiveExpenses().filter(x=>x.status==='paid').forEach(e=>add(e.paidBy,-Number(e.amount)));
+ transfers().forEach(x=>{add(x.from,-Number(x.amount));add(x.to,Number(x.amount))});
+ return Object.entries(map).sort((a,b)=>b[1]-a[1]);
+};
+function mba372Committee(){const values=finance.config?.committeeMembers;return Array.isArray(values)?values.filter(x=>typeof x==='string'&&x.trim()).slice(0,75):[]}
+function mba372WhoSelect(name='receivedBy',required=true){
+ const saved=mba372Committee();let previous='';try{previous=localStorage.getItem('mba372-collector-'+authUser?.uid)||''}catch{}
+ const selected=saved.includes(previous)?previous:(saved[0]||'');return `<select name="${name}" ${required?'required':''} class="mba372-collector-select">
+  <option value="" ${selected?'':'selected'}>Select committee member</option>${saved.map(v=>`<option value="${esc(v)}" ${selected===v?'selected':''}>${esc(v)}</option>`).join('')}
+  <option value="__other">Other person (type below)</option></select>`;
+}
+const mba372ResolveCollector=(data,key='receivedBy')=>{
+ const sel=String(data.get(key)||'').trim(),other=String(data.get(key+'Other')||'').trim();
+ const result=sel==='__other'?other:sel;
+ if(!result||result.length>100)throw Error('Select or enter the committee member who collected the cash.');
+ return result;
+};
+function mba372ChargeForm(t){
+ const rows=mba372FeeRows(t),options=rows.map(r=>`<option value="${esc(r.id)}">${esc(r.name)} · ${esc(r.category)} · Due ${esc(r.due===null?'Not set':money(r.due))}</option>`).join('');
+ return `<form class="sub-form finance-edit" data-form="fin-receipt"><h3>Record / Refund a Registration Payment</h3>
+ <div class="form-grid"><label class="field"><span>Registration / Charge</span><select name="chargeId" required>${options}</select></label>
+ <label class="field"><span>Transaction</span>${dropdown('kind',['payment','refund'])}</label>
+ ${field('Amount (₹)','amount','','number','min="0.01" step="0.01" required')}
+ <label class="field"><span>Payment method</span>${dropdown('mode',payModes)}</label>
+ <label class="field"><span>Collected by</span>${mba372WhoSelect()}<input name="receivedByOther" placeholder="Only when Other is selected" maxlength="100"></label>
+ ${field('Date','date',today(),'date','required')}
+ ${field('Reference / UPI ID','reference','','text','maxlength="120"')}
+ ${field('Notes','notes','','text','maxlength="160"')}</div>
+ <button class="btn primary" type="submit">Save Transaction</button><p class="helper">Financial receipts are permanent. Wrong receipts must be corrected using a refund, not erased. Legacy receipts are preserved.</p></form>`;
+}
+function mba372FeeCard(t){
+ const rows=mba372FeeRows(t),editable=can('paymentsWrite')&&canSeePayments(),canFees=can('feesWrite');
+ const table=rows.map(r=>`<tr><td><b>${esc(r.name)}</b><small>${esc(r.category)} · ${r.kind==='entry'?'Per registration':'Per player'}</small>${r.status!=='active'?`<small>${esc(r.status.toUpperCase())} — history retained</small>`:''}</td>
+ <td>${r.fee===null?'—':money(r.fee)}</td><td>${money(r.paid)}${r.ambiguous?`<small>Legacy ambiguous: ${money(r.ambiguous)}</small>`:''}</td>
+ <td><b class="${r.cls}">${r.text}</b></td><td>${r.due===null?'—':money(r.due)}</td><td>${editable&&r.fee!==null&&r.fee>0?`<div class="mba372-quick">
+  <label><input type="checkbox" data-mba372-paid="${esc(r.id)}" ${r.due===0?'checked':''} ${r.due===0||r.ambiguous?'disabled':''}> PAID</label>
+  <input aria-label="Amount to record for ${esc(r.name)}" data-mba372-amount="${esc(r.id)}" type="number" min="0.01" step="0.01" value="${esc(r.due)}" ${r.due===0?'disabled':''}>
+  <button class="btn" type="button" data-mba372-partial="${esc(r.id)}" ${r.due===0||r.ambiguous?'disabled':''}>Partial</button></div>`:''}
+  ${canFees?`<details><summary>Set fee / waiver</summary><input type="number" data-mba372-fee="${esc(r.id)}" value="${r.fee??''}" min="0" step="0.01" style="width:100px"><button type="button" class="btn" data-mba372-fee-save="${esc(r.id)}">Save fee</button></details>`:''}</td></tr>`).join('');
+ return card('✅ Quick Paid · Partial · Balance',`<p class="helper">League: one fee per player. Knockout: one fee per registration (a doubles pair pays ONCE). A PAID tick records the prefilled balance. For partial cash, change the amount and tap Partial. Recorded receipts are never silently duplicated.</p>
+ ${editable?`<div class="mba372-collection-tools"><label class="field"><span>Received by (for Quick Paid)</span>${mba372WhoSelect('mba372QuickWho')}<input name="mba372QuickWhoOther" placeholder="Other committee member" maxlength="100"></label><label class="field"><span>Method</span><select id="mba372-quick-mode">${payModes.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('')}</select></label></div>`:''}
+ <div class="scroll"><table class="fin-table"><thead><tr><th>Registration / Player</th><th>Fee</th><th>Received</th><th>Status</th><th>Balance</th><th>Action</th></tr></thead><tbody>${table||'<tr><td colspan="6">No registrations yet</td></tr>'}</tbody></table></div>`);
+}
+let mba372ExpenseEditing=null;
+function mba372ExpenseCard(){
+ const list=expenseEvents().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)),voids=new Set(list.filter(x=>x.reversalOf).map(x=>x.reversalOf)),canEdit=can('financeWrite');
+ const rows=list.map(e=>`<tr><td>${esc(e.date||'')}</td><td><b>${esc(e.category||'')}</b><small>${esc(e.description||'')}</small><small>${esc(e.vendor||'')}</small></td><td>${money(e.amount)}</td><td>${e.reversalOf?'AUDIT REVERSAL':voids.has(e.id)?'REVERSED':esc(e.status||'')}</td><td>${esc(e.paidBy||'')}</td><td>${canEdit&&!e.reversalOf&&!voids.has(e.id)?`<button class="btn" type="button" data-mba372-expense-edit="${esc(e.id)}">Edit</button> <button class="btn danger-outline" type="button" data-mba372-expense-void="${esc(e.id)}">Delete / Void</button>`:'—'}</td></tr>`).join('');
+ const editing=list.find(e=>e.id===mba372ExpenseEditing);
+ const editForm=editing&&canEdit?`<form class="sub-form" data-mba372-expense-update="${esc(editing.id)}"><h3>Edit: ${esc(editing.category||'Expense')}</h3><div class="form-grid">
+ <label class="field"><span>Category</span>${dropdown('category',expenseCategories,editing.category)}</label>
+ ${field('Description','description',editing.description||'','text','maxlength="160"')}
+ ${field('Amount (₹)','amount',editing.amount,'number','required min="0.01" step="0.01"')}
+ <label class="field"><span>Status</span>${dropdown('status',['paid','due'],editing.status)}</label>
+ <label class="field"><span>Method</span>${dropdown('mode',payModes,editing.mode||'Cash')}</label>
+ ${field('Handled / Paid by','paidBy',editing.paidBy||'','text','required maxlength="100"')}
+ ${field('Expense date','date',editing.date||today(),'date','required')}
+ ${field('Vendor / Recipient','vendor',editing.vendor||'','text','maxlength="100"')}
+ ${field('Correction reason','reason','','text','required maxlength="160"')}
+ </div><div class="actions"><button class="btn primary" type="submit">Save Expense Correction</button><button class="btn" type="button" data-mba372-expense-cancel="1">Cancel Edit</button></div></form>`:'';
+ return card('Expenses · Details · Edit / Void',`<p class="helper">Edits create a correction entry and reverse the original. Delete means audited void; no historical record is erased. A paid bill must be reversed before its linked due bill can be corrected.</p>${editForm}
+ <div class="scroll"><table><thead><tr><th>Date</th><th>Expense</th><th>Amount</th><th>Status</th><th>Handled by</th><th>Action</th></tr></thead><tbody>${rows||'<tr><td colspan="6">No expenses</td></tr>'}</tbody></table></div>`);
+}
+financeView=function(t){
+ if(!canViewFinance())return card('Finance','<p>Finance access is restricted.</p>');
+ const totals=financeTotals(t),full=canFullFinance(),showPay=canSeePayments(),showExp=canSeeExpenses();
+ let html=`<section class="card"><h2>💰 ${full?'Full Finance Dashboard':'Finance · Limited Access'} · ${esc(t.name)}</h2>`;
+ if(full){const data=[['Charge units',totals.entries],['Players',totals.players],['Expected',totals.expected===null?'Fee not configured':money(totals.expected)],['Collected (net)',money(totals.paid)],['Player balances due',totals.owed===null?'—':money(totals.owed)],['Expenses paid',money(totals.expensesPaid)],['Expenses & prizes due',money(totals.unpaidBills)],['Cash / bank net',money(totals.cashBalance)],['Projected surplus',totals.projected===null?'—':money(totals.projected)]];
+  html+=`<div class="finance-stats">${data.map(([a,b])=>`<div class="finance-stat"><small>${esc(a)}</small><strong>${esc(b)}</strong></div>`).join('')}</div>`;
+ }else html+='<p class="helper">Only explicitly granted finance functions are shown. Full accounts and profit are private.</p>';
+ html+='</section>';
+ if(can('feesWrite'))html+=card('Tournament Fee Settings',`<form data-form="fin-fee" class="sub-form finance-edit"><label class="field"><span>Default fee (₹) per charge unit: League player / Knockout entry</span><input type="number" name="fee" required min="0" step="0.01" value="${esc(mba372FeeDefault(t)??'')}"></label><button class="btn primary" type="submit">Save Default Fee</button><p class="helper">A fee of ₹0 displays NO FEE. Each registration's special fee can be set below.</p></form>`);
+ if((can('feesWrite')||can('paymentsWrite'))&&showPay)html+=card('Committee Members · Collectors',`<p class="helper">Save committee names once. Use the dropdown when collecting payments.</p><form data-mba372-committee><label class="field"><span>One name per line</span><textarea name="names" rows="4" ${can('feesWrite')?'':'readonly'}>${esc(mba372Committee().join('\n'))}</textarea></label>${can('feesWrite')?'<button type="submit" class="btn primary">Save Committee Names</button>':'<p class="helper">Ask the fee manager to edit committee names.</p>'}</form>`);
+ if(showPay){html+=mba372FeeCard(t);
+  if(can('paymentsWrite'))html+=card('Manual Receipt / Refund',mba372ChargeForm(t));
+  const rows=receipts().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(x=>`<tr><td>${esc(x.date||'')}</td><td>${esc(mba372FeeRows(t).find(r=>r.id===x.chargeId)?.name||playersOf(t).find(p=>p.id===x.playerId)?.name||'Legacy / deleted registration')}</td><td>${x.kind==='refund'?'-':''}${money(x.amount)}</td><td>${esc(x.mode||'')}</td><td>${esc(x.receivedBy||'')}</td><td>${esc(x.createdByEmail||'')}</td></tr>`).join('');
+  html+=card('Payment Register · Permanent Receipts',`<div class="scroll"><table><thead><tr><th>Date</th><th>Entry</th><th>Amount</th><th>Method</th><th>Collector</th><th>Recorded by</th></tr></thead><tbody>${rows||'<tr><td colspan="6">No receipts</td></tr>'}</tbody></table></div>`);
+ }
+ if(showExp){
+  if(can('financeWrite'))html+=card('Add Expense',expenseForm());
+  html+=mba372ExpenseCard();
+  if(can('financeWrite')&&mba372ExpensesSummary().unpaid.length){const options=mba372ExpensesSummary().unpaid.map(e=>`<option value="${esc(e.id)}">${esc(e.category)} · ${money(e.amount)}</option>`).join('');
+   html+=card('Pay Outstanding Expense',`<form class="sub-form finance-edit" data-form="fin-settle"><div class="form-grid"><label class="field"><span>Unpaid bill</span><select name="dueId" required>${options}</select></label>
+    ${field('Paid / Handled by','paidBy','','text','required maxlength="100"')}<label class="field"><span>Mode</span>${dropdown('mode',payModes)}</label>${field('Date','date',today(),'date','required')}</div><button class="btn primary" type="submit">Mark Bill Paid</button></form>`);
+  }
+  const planned=['winner','runner'].filter(k=>mba37PrizeAmount(t,k)>0).map(k=>`<div class="mba37-prize-row"><b>${esc(mba37PrizeLabel(k))} Prize</b><span>Planned: ${money(mba37PrizeAmount(t,k))}</span><span>Remaining: ${money(mba372PrizeRemain(t,k))}</span>${can('financeWrite')&&mba372PrizeRemain(t,k)>0?`<button class="btn" data-mba37-pay-prize="${k}">Record payout</button>`:''}</div>`).join('');
+  if(planned)html+=card('🏆 Planned Winner / Runner Prizes',planned);
+ }
+ if(can('financeWrite'))html+=card('Internal Transfer',`<form data-form="fin-transfer" class="sub-form finance-edit"><div class="form-grid">${field('From (collector)','from','','text','required')}${field('To (collector)','to','','text','required')}${field('Amount (₹)','amount','','number','min="0.01" step="0.01" required')}${field('Date','date',today(),'date','required')}</div><button class="btn primary" type="submit">Record Transfer</button></form>`);
+ if(full){html+=card('Internal Transfers Register',`<div class="scroll"><table><thead><tr><th>Date</th><th>From</th><th>To</th><th>Amount</th></tr></thead><tbody>${transfers().map(e=>`<tr><td>${esc(e.date||'')}</td><td>${esc(e.from||'')}</td><td>${esc(e.to||'')}</td><td>${money(e.amount)}</td></tr>`).join('')||'<tr><td colspan="4">No transfers yet</td></tr>'}</tbody></table></div>`)}
+ if(full)html+=card('Committee Member Balances',`<div class="scroll"><table><thead><tr><th>Collector</th><th>Net held</th></tr></thead><tbody>${collectorSummary().map(([n,v])=>`<tr><td>${esc(n)}</td><td>${money(v)}</td></tr>`).join('')||'<tr><td colspan="2">No records</td></tr>'}</tbody></table></div>`);
+ return html;
+};
+const mba372OldFinanceSubmit=financeSubmit;
+financeSubmit=async function(kind,data){
+ if(kind!=='fin-receipt'||!data.has('chargeId'))return mba372OldFinanceSubmit(kind,data);
+ const t=active();if(!can('paymentsWrite')||!editScope(t?.id))throw Error('Payment writer + Tournament Edit required.');
+ const chargeId=String(data.get('chargeId')||''),row=mba372FeeRows(t).find(x=>x.id===chargeId);
+ if(!row)throw Error('Registration not found or changed. Refresh.');
+ const amount=safeAmount(data.get('amount')),paymentKind=String(data.get('kind'));
+ if(!['payment','refund'].includes(paymentKind))throw Error('Unknown payment kind');
+ const collector=mba372ResolveCollector(data),method=String(data.get('mode')||'Cash');
+ if(!payModes.includes(method))throw Error('Invalid payment method');
+ if(paymentKind==='refund'&&amount>row.paid+.0001)throw Error('Refund cannot exceed net payments for this charge.');
+ const record={playerId:row.primary,chargeId:row.id,entryId:row.entryId||'',categoryId:row.categoryId||'',kind:paymentKind,
+  amount,mode:method,receivedBy:collector,date:String(data.get('date')||today()),reference:String(data.get('reference')||'').slice(0,120),notes:String(data.get('notes')||'').slice(0,160)};
+ if(!confirm((paymentKind==='refund'?'Refund ':'Record ')+money(amount)+' for '+row.name+'?'))return;
+ await createFinanceEvent('receipt',record);
+};
+async function mba372QuickPayment(chargeId,partial){
+ const t=active();if(!t||!can('paymentsWrite')||!canSeePayments()||!editScope(t.id))throw Error('Payment + read + tournament-edit permission needed.');
+ const row=mba372FeeRows(t).find(r=>r.id===chargeId);
+ if(!row||row.fee===null||row.ambiguous||row.due<=0)throw Error('Payment already complete, fee unset, or legacy receipts need reconciliation.');
+ const control=mbaV373LiveChargeInput('data-mba372-amount',chargeId),amount=safeAmount(control?.value);
+ if(amount>row.due+.00001)throw Error('Amount exceeds the outstanding balance. Use Manual Receipt for an intentional overpayment.');
+ if(!partial&&Math.abs(amount-row.due)>.001)throw Error('To record a partial amount, tap Partial.');
+ const data=new FormData(),select=document.querySelector('[name="mba372QuickWho"]'),other=document.querySelector('[name="mba372QuickWhoOther"]');
+ data.set('receivedBy',select?.value||'');data.set('receivedByOther',other?.value||'');const who=mba372ResolveCollector(data);
+ const mode=document.getElementById('mba372-quick-mode')?.value||'Cash';if(!payModes.includes(mode))throw Error('Invalid payment method');
+ if(!confirm('Collect '+money(amount)+' from '+row.name+'?\nReceived by: '+who+' · '+mode))return;
+ // Fresh-read catches stale tabs before adding a new immutable receipt.
+ const snapshot=await get(ref(db,'v3/finance/'+t.id+'/payments'));
+ const remote=Object.entries(snapshot.val()||{}).map(([id,value])=>({...value,id}));
+ const fresh=remote.reduce((sum,r)=>{
+  if(r.chargeId)return sum+(r.chargeId===chargeId?mba372Signed(r):0);
+  if(r.entryId)return sum+(r.entryId===row.entryId?mba372Signed(r):0);
+  if(!row.playerIds.includes(r.playerId))return sum;
+  const matches=mba372FeeRows(t).filter(x=>x.playerIds.includes(r.playerId));
+  return sum+(matches.length===1?mba372Signed(r):0);
+ },0);
+ if(Math.abs(fresh-row.paid)>.001)throw Error('Payment changed on another device. Refresh and verify balance before recording.');
+ await createFinanceEvent('receipt',{playerId:row.primary,chargeId:row.id,entryId:row.entryId||'',categoryId:row.categoryId||'',kind:'payment',amount,
+  mode,receivedBy:who,date:today(),reference:'',notes:partial?'Quick Partial':'Quick Paid Tick'});
+}
+async function mba372FeeOverride(chargeId){
+ if(!can('feesWrite')||!editScope(active()?.id))throw Error('Fee settings permission required.');
+ const row=mba372FeeRows(active()).find(r=>r.id===chargeId),input=mbaV373LiveChargeInput('data-mba372-fee',chargeId);
+ if(!row||!input)throw Error('Fee row changed. Refresh.');
+ const amount=safeAmount(input.value,true);
+ if(!confirm('Change '+row.name+' fee to '+money(amount)+'? Existing receipts will remain.'))return;
+ await set(ref(db,'v3/finance/'+active().id+'/overrides/'+chargeId),{fee:amount,reason:'Admin fee override',updatedBy:authUser.uid,updatedAt:Date.now()});
+}
+async function mba372SaveCommittee(form){
+ if(!can('feesWrite')||!editScope(active()?.id))throw Error('Fee manager + tournament-edit permission required.');
+ const arr=[...new Set(String(new FormData(form).get('names')||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean))];
+ if(arr.length>75||arr.some(x=>x.length>100))throw Error('Maximum 75 committee names, each up to 100 characters.');
+ const fee=finance.config?.feePerPlayer??active()?.registrationFeePerPlayer;
+ if(fee==null)throw Error('Save the default tournament fee first (including ₹0 for a free tournament).');
+ await update(ref(db,'v3/finance/'+active().id+'/config'),{feePerPlayer:Number(fee),committeeMembers:arr,updatedAt:Date.now(),updatedBy:authUser.uid});
+ notice='Committee names saved.';render();
+}
+async function mba372CorrectExpense(id,remove=false,fields=null){
+ if(!can('financeWrite')||!editScope(active()?.id))throw Error('Finance Write + tournament-edit permission required.');
+ const old=expenseEvents().find(e=>e.id===id),activeIds=new Set(mba372EffectiveExpenses().map(e=>e.id));
+ if(!old||!activeIds.has(id))throw Error('Expense already reversed or unavailable.');
+ if(old.status==='due'&&mba372EffectiveExpenses().some(e=>e.status==='paid'&&e.settledDueId===id))throw Error('Reverse the linked settlement first; this due bill has been paid.');
+ let replacement=null;
+ if(!remove){
+  if(!fields)throw Error('Open the Edit Expense form first.');
+  const get=k=>String(fields.get(k)||'').trim(),category=get('category'),status=get('status'),mode=get('mode'),reason=get('reason');
+  if(!expenseCategories.includes(category)||!['paid','due'].includes(status)||!payModes.includes(mode))throw Error('Invalid expense category, payment method or status.');
+  if(!get('paidBy')||reason.length<3)throw Error('Enter collector and correction reason (at least 3 characters).');
+  const amount=safeAmount(get('amount'));
+  replacement={...old,category,description:get('description').slice(0,160),amount,status,mode,paidBy:get('paidBy').slice(0,100),vendor:get('vendor').slice(0,100),date:get('date'),correctionReason:reason.slice(0,160)};
+  delete replacement.id;delete replacement.createdAt;delete replacement.createdBy;delete replacement.createdByEmail;
+  replacement.corrects=id;
+ }
+ if(!confirm(remove?'VOID / delete this expense from ACTIVE totals? Original stays in the audit history.':'Reverse the old expense and save this corrected expense?'))return;
+ const base='v3/finance/'+active().id+'/expenses/',stamp=Date.now();
+ const common={createdAt:stamp,createdBy:authUser.uid,createdByEmail:authUser.email||''},reversal=uid('fin'),patch={};
+ patch[base+reversal]={category:old.category,description:'Audit reversal of '+id,amount:Number(old.amount),status:old.status,
+  mode:old.mode||'Cash',paidBy:old.paidBy||'Not specified',vendor:old.vendor||'',date:today(),reversalOf:id,...common};
+ if(replacement)patch[base+uid('fin')]={...replacement,...common};
+ await update(ref(db),patch);mba372ExpenseEditing=null;notice=remove?'Expense voided with audit trail.':'Expense corrected with audit trail.';render();
+}
+const mba372AgeMinimum=(c)=>Number(c?.ageMinimum||0);
+function mba372AgeCheck(c,yearA,yearB,eventYear,override,reason){
+ const a=Number(yearA),b=Number(yearB),y=Number(eventYear),minimum=mba372AgeMinimum(c);
+ if(!minimum)return {ok:true,sum:null};
+ if(c.playType!=='doubles')throw Error('Age categories support DOUBLES only.');
+ if(!Number.isInteger(a)||!Number.isInteger(b)||a<1900||b<1900||a>y||b>y)throw Error('Enter valid birth years for BOTH doubles players.');
+ const sum=(y-a)+(y-b);
+ if(sum<minimum&&!(override&&isSuper()&&String(reason||'').trim().length>=5))throw Error('Combined age '+sum+' is below '+minimum+'+. Only Super Admin can override with a reason.');
+ return {ok:true,sum,overridden:sum<minimum};
+}
+const mba372EventYear=t=>/^\d{4}/.test(t.date||'')?Number(t.date.slice(0,4)):new Date().getFullYear();
+const mba372RegBase=mba37RegistrationView;
+mba37RegistrationView=function(t){
+ const original=mba372RegBase(t),canReg=mba37CanRegister(),privateAllowed=isSuper()||canSeePayments()||mba37CanTakePayment();
+ const rows=t.categories.flatMap(c=>c.entrants.map(e=>{
+  const names=e.playerIds.map(pid=>t.teams.find(tm=>tm.id===e.teamId)?.players.find(p=>p.id===pid)?.name||'?');
+  const record=mba37PrivateItems[e.id]||{},status=mba372RegStatus(e),age=mba372AgeMinimum(c),years=record.birthYears||[];
+  return `<details class="mba372-reg-row"><summary><b>${esc(names.join(' & '))}</b> · ${esc(c.name)} <span class="mba372-status mba372-${status}">${status.toUpperCase()}</span></summary>
+    <p class="helper">Category: ${esc(c.name)}${age?' · Doubles '+age+'+ age sum':''}. Registrations with saved scores stay in match history.</p>
+    ${privateAllowed?`<small>Contact: ${esc(record.contactName||'—')} · Mobile: ${esc(record.mobile||'—')}</small>`:''}
+    ${canReg?`<form data-mba372-reg-edit="${esc(c.id)}:${esc(e.id)}" class="sub-form"><div class="form-grid">${names.map((name,i)=>field('Player '+(i+1),'p'+i,name,'text','required maxlength="80"')).join('')}
+      ${field('Club','club',e.clubName||'','text','maxlength="80"')}
+      ${privateAllowed?`${field('Contact person','contactName',record.contactName||names[0]||'','text','maxlength="100"')}${field('Private mobile','mobile',record.mobile||'','tel','maxlength="20"')}`:''}
+      ${age?`${field('Player 1 Birth Year','year1',years[0]||'','number','required min="1900" max="2100"')}${field('Player 2 Birth Year','year2',years[1]||'','number','required min="1900" max="2100"')}`:''}
+      ${age&&isSuper()?`<label class="choice"><input type="checkbox" name="ageOverride" ${record.ageOverride?'checked':''}> Super Admin age override</label>${field('Override reason','overrideReason',record.ageOverrideReason||'','text','maxlength="160"')}`:''}
+      </div><button type="submit" class="btn primary">Save registration changes</button></form>
+    <div class="actions">${['active','hold','cancelled','deleted'].filter(x=>x!==status).map(s=>`<button type="button" class="btn ${s==='deleted'?'danger-outline':''}" data-mba372-status="${esc(c.id)}:${esc(e.id)}:${s}">${s==='active'?'Restore':s==='hold'?'Hold / Pending':s==='cancelled'?'Cancel':'Delete / Archive'}</button>`).join('')}</div>`:''}
+   </details>`;
+ })).join('');
+ const ageForm=canReg?`<details class="mba37-manual-seeds"><summary>＋ Create custom Doubles Age Category (80+, 90+, 100+...)</summary><form class="sub-form" data-mba372-age-create><label class="field">Minimum combined age of 2 doubles players<input type="number" name="minimum" min="1" max="220" required value="80"></label><button class="btn primary" type="submit">Create Doubles Age Category</button><p class="helper">Age = tournament year − birth year. This is year-based eligibility, not exact birthday validation.</p></form></details>`:'';
+ const showAge=canReg?`<div class="mba372-age-extra" id="mba372-age-fields"><h4>Age-qualified Doubles (when selected)</h4><div class="form-grid">
+  ${field('Player 1 birth year','birthYear1','','number','min="1900" max="2100"')}${field('Player 2 birth year','birthYear2','','number','min="1900" max="2100"')}
+  ${isSuper()?`<label class="choice"><input type="checkbox" name="ageOverride">Super Admin age exception</label>${field('Override reason','ageOverrideReason','','text','maxlength="160"')}`:''}
+  </div><p class="helper">For an age category, register one doubles pair per submission. Both birth years are required; contact stays private.</p></div>`:'';
+ const patched=original.replace('</textarea></label>\n  <div class="mba37-name-quick">',`</textarea></label>\n  <label class="field">Contact person (Singles or Doubles)<input name="contactName" maxlength="100" placeholder="Person to contact"></label>\n  `+showAge+'\n  <div class="mba37-name-quick">');
+ return ageForm+card('Registration Management · Edit / Hold / Cancel / Restore / Delete',`<p class="helper">Deleting archives a registration instead of erasing scores or payment receipts. Held / cancelled / archived entries are excluded when creating NEW fixtures, but existing fixtures are never silently rewritten.</p>${rows||'<p>No registrations yet.</p>'}`)+patched;
+};
+const mba372RegisterBase=mba37Register;
+mba37Register=async function(form){
+ const fd=new FormData(form),t=active(),c=t?.categories.find(x=>x.id===String(fd.get('categoryId')||''));
+ const age=c?mba372AgeMinimum(c):0;
+ if(age){
+   if(fd.get('eventType')!=='doubles')throw Error('This age category is DOUBLES only. Select Doubles event type.');
+   const parsed=mba37ParseEntries(fd.get('players'),'doubles',2);
+   if(parsed.length!==1)throw Error('Register one doubles age-category pair at a time.');
+   mba372AgeCheck(c,fd.get('birthYear1'),fd.get('birthYear2'),mba372EventYear(t),fd.has('ageOverride'),fd.get('ageOverrideReason'));
+ }
+ return mba372RegisterBase(form);
+};
+function mba372RegistrationDraft(catId,entryId,fd){
+ const t=active(),c=t?.categories.find(x=>x.id===catId),entry=c?.entrants.find(x=>x.id===entryId),team=t?.teams.find(x=>x.id===entry?.teamId);
+ if(!t||!c||!entry||!team)throw Error('Registration no longer exists. Refresh.');
+ const after=deep(store),dt=after.tournaments.find(x=>x.id===t.id),dc=dt.categories.find(x=>x.id===catId),de=dc.entrants.find(x=>x.id===entryId),dteam=dt.teams.find(x=>x.id===entry.teamId);
+ const next=entry.playerIds.map((id,i)=>String(fd.get('p'+i)||'').trim());
+ if(next.some(x=>!x||x.length>80))throw Error('Player names must be 1–80 characters.');
+ if(new Set(next.map(x=>x.toLocaleLowerCase())).size!==next.length)throw Error('Player repeated in doubles registration.');
+ for(let i=0;i<next.length;i++)dteam.players.find(p=>p.id===entry.playerIds[i]).name=next[i];
+ de.clubName=String(fd.get('club')||'').slice(0,80);
+ const current=mba37PrivateItems[entryId]||{},privateValue={...current,categoryId:catId,club:de.clubName,
+  mobile:String(fd.get('mobile')||current.mobile||'').trim(),contactName:String(fd.get('contactName')||current.contactName||'').trim(),
+  createdBy:authUser.uid,createdAt:Date.now()};
+ if(privateValue.mobile&&!/^[0-9+()\s-]{6,20}$/.test(privateValue.mobile))throw Error('Invalid private contact mobile.');
+ if(mba372AgeMinimum(c)){
+  const info=mba372AgeCheck(c,fd.get('year1'),fd.get('year2'),mba372EventYear(t),fd.has('ageOverride'),fd.get('overrideReason'));
+  privateValue.birthYears=[Number(fd.get('year1')),Number(fd.get('year2'))];privateValue.ageOverride=!!info.overridden;
+  privateValue.ageOverrideReason=info.overridden?String(fd.get('overrideReason')||'').slice(0,160):'';
+  privateValue.ageOverrideBy=info.overridden?authUser.uid:'';
+ }
+ privateValue.editAudit=[...(Array.isArray(current.editAudit)?current.editAudit:[]).slice(-24),{by:authUser.uid,at:Date.now(),action:'edit'}];
+ return {after,privateValue,entry};
+}
+async function mba372SaveRegistration(catId,entryId,fd){
+ if(!mba37CanRegister())throw Error('Registration Edit permission required.');
+ const {after,privateValue}=mba372RegistrationDraft(catId,entryId,fd),patch=patchesForMutation(store,after);
+ if(Object.keys(patch).length===0&&!(mba37PrivateItems[entryId]))throw Error('No changes.');
+ if(isSuper()||canSeePayments()||mba37CanTakePayment())patch['v3/privateRegistrations/'+active().id+'/'+entryId]=privateValue;
+ if(!confirm('Save changes to this registration? Existing match results and payments remain.'))return;
+ await update(ref(db),patch);notice='Registration edited. Existing receipts/results remain unchanged.';render();
+}
+async function mba372SetRegistrationStatus(catId,entryId,status){
+ if(!mba37CanRegister())throw Error('Registration Edit permission required.');
+ if(!['active','hold','cancelled','deleted'].includes(status))throw Error('Invalid status.');
+ const t=active(),c=t?.categories.find(x=>x.id===catId),e=c?.entrants.find(x=>x.id===entryId);
+ if(!e)throw Error('Registration not found.');
+ const label=entryLabel(t,c,e.id),savedScores=t.fixtures.some(m=>m.categoryId===catId&&(m.a===entryId||m.b===entryId)&&t.results[m.id]);
+ if(!confirm((status==='deleted'?'Archive (soft delete) ':status==='active'?'Restore ':'Set '+status+' for ')+label+'?'+(savedScores?'\nSaved scores will remain; fixtures are NOT regenerated.':'')))return;
+ await op(()=>{const target=active().categories.find(c=>c.id===catId).entrants.find(e=>e.id===entryId);target.registrationStatus=status;
+  target.statusChangedAt=Date.now();target.statusChangedBy=authUser.uid;notice='Registration status updated. Past scores and receipts preserved.'});
+}
+const mba372BracketPanelBase=mba37ManualSeedPanel;
+mba37ManualSeedPanel=function(t,c){
+ if(!can('fixturesWrite')||!editScope(t.id)||effectiveFormat(t,c)!=='knockout')return '';
+ const entries=c.entrants.filter(mba372EntryActive),size=mba37Power2(entries.length||2),existing=t.fixtures.some(m=>m.categoryId===c.id&&m.stage==='knockout');
+ if(size>1024)return '<p>Too many entries (max 1024).</p>';
+ const positions=seedOrder(size),opts=entries.map(e=>`<option value="${esc(e.id)}">${esc(entryLabel(t,c,e.id))}</option>`).join('');
+ const slots=positions.map((s,i)=>{const selected=entries[s-1]?.id||'';return `<label class="field"><span>Position ${i+1} · ${i%2===0?'Side A':'Side B'}</span><select name="seed">
+  <option value="" ${!selected?'selected':''}>BYE / Empty</option>${entries.map(e=>`<option value="${esc(e.id)}" ${selected===e.id?'selected':''}>${esc(entryLabel(t,c,e.id))}</option>`).join('')}</select></label>`}).join('');
+ return `<details class="mba37-manual-seeds"><summary>✍️ Manual Knockout Fixture · ${esc(c.name)} (${entries.length} active entries)</summary>
+  ${existing?'<p class="helper">A bracket already exists. Clear it FIRST (only possible before saved scores), then rebuild.</p>':''}
+  <form data-mba37-manual-bracket="${esc(c.id)}"><p class="helper">Entries are prefilled automatically. Change any positions manually. Adjacent positions play each other; empty positions mean BYE. Every active entry must appear exactly once.</p>
+  <div class="mba37-seed-grid">${slots}</div><button class="btn primary" type="submit" ${entries.length<2||existing?'disabled':''}>✅ Build Manual Knockout Fixture</button></form></details>`;
+};
+// The main tournament's original entrants remain readable. Only ACTIVE entrants
+// are eligible for a newly GENERATED bracket/league fixture. No saved match is altered.
+const mba372KnockoutGenerator=generateKnockout;
+generateKnockout=function(t,id,options={}){
+ const cat=t.categories.find(c=>c.id===id);if(!cat)return mba372KnockoutGenerator(t,id,options);
+ const prev=cat.entrants;cat.entrants=prev.filter(mba372EntryActive);
+ try{return mba372KnockoutGenerator(t,id,options)}finally{cat.entrants=prev}
+};
+// Payment badges on fixtures use the same fee unit as Finance (not two pills for a KO pair).
+fixtureEntryPaymentStatus=function(t,cat,entryId){
+ if(!showFixturePaymentStatus||!canSeePayments()||mba372FeeDefault(t)===null)return '';
+ const entry=cat?.entrants.find(e=>e.id===entryId);if(!entry)return '';
+ const charges=mba372FeeRows(t),selected=mba372EventFmt(t,cat)==='knockout'?charges.filter(r=>r.entryId===entryId):charges.filter(r=>r.kind==='player'&&entry.playerIds.includes(r.primary));
+ const chips=selected.map(r=>`<span class="fixture-pay-pill ${esc(r.cls)}">${esc(r.name)}: ${esc(r.text)}</span>`).join('');
+ return chips?`<div class="fixture-payment-status">${chips}</div>`:'';
+};
+const mba372LegacyRoundRobin=makeRoundRobin;
+makeRoundRobin=function(c){
+ const previous=c.entrants;c.entrants=previous.filter(mba372EntryActive);
+ try{return mba372LegacyRoundRobin(c)}finally{c.entrants=previous}
+};
+// Existing manually-entered labels, age and body are not altered by the display patch.
+const mba372OriginalFixtureView=fixtureView;
+fixtureView=function(t){
+ let body=mba372OriginalFixtureView(t);
+ const hasLeague=t.fixtures.some(m=>m.stage==='league');
+ const ko=t.fixtures.some(m=>m.stage==='knockout');
+ if(!hasLeague&&ko)body=body.replace('<p class="helper">No fixtures generated yet.</p>','<p class="helper">No LEAGUE fixtures. Knockout matches appear below.</p>');
+ return body;
+};
+const mba372OriginalReportData=reportData;
+reportData=function(t,kind,c,g){
+ if(kind==='expenses'&&canSeeExpenses())return {head:['Date','Category','Description','Amount','Status'],rows:mba372EffectiveExpenses().map(e=>[e.date||'',e.category||'',e.description||'',money(e.amount),e.status||''])};
+ if(kind==='payments'&&canSeePayments())return {head:['Category','Charge / Entry','Fee','Received','Due','Status'],rows:mba372FeeRows(t).map(r=>[r.category,r.name,r.fee===null?'Not set':money(r.fee),money(r.paid),r.due===null?'—':money(r.due),r.text])};
+ return mba372OriginalReportData(t,kind,c,g);
+};
+function mba372HeaderSetup(){
+ const el=document.querySelector('.mba-header-controls');if(!el)return;
+ if(!document.getElementById('mba-global-share-link')){
+  const b=document.createElement('button');b.id='mba-global-share-link';b.type='button';b.className='btn mba-global-share-link';b.textContent='↗ Share App Link';el.appendChild(b);
+ }
+ if(!document.getElementById('mba372-zoom-in')){
+  const b=document.createElement('button');b.id='mba372-zoom-in';b.className='btn mba372-zoom';b.type='button';b.textContent='🔍 +';b.title='Zoom in (no Zoom Out button)';el.insertBefore(b,document.getElementById('mba-global-share-link'));
+ }
+ let actions=el.querySelector('.mba372-right-actions');if(!actions){actions=document.createElement('div');actions.className='mba372-right-actions';el.appendChild(actions)}
+ for(const id of ['mba372-zoom-in','mba-global-share-link']){const node=document.getElementById(id);if(node&&node.parentElement!==actions)actions.appendChild(node)}
+}
+const mba372OldRender=render;
+render=function(){mba372OldRender();
+ const field=document.getElementById('mba372-age-fields'),selector=document.getElementById('mba37-reg-category'),reg=document.getElementById('mba37-register-form');
+ if(field&&selector&&reg){const c=active()?.categories.find(x=>x.id===selector.value),isAge=mba372AgeMinimum(c)>0;
+  field.hidden=!isAge;for(const x of field.querySelectorAll('[name=birthYear1],[name=birthYear2]'))x.required=isAge;
+  if(isAge){const type=reg.querySelector('[name=eventType]');if(type)type.value='doubles'}
+ }
+};
+async function mba372CreateAgeCategory(form){
+ if(!mba37CanRegister())throw Error('Team + Category Edit required.');
+ const min=Number(new FormData(form).get('minimum')),t=active();if(!Number.isInteger(min)||min<1||min>220)throw Error('Minimum combined age must be 1–220.');
+ const name=min+'+ Doubles';if(t.categories.some(c=>c.name.toLowerCase()===name.toLowerCase()))throw Error('This age category already exists.');
+ await op(()=>{const c=addCategory(active(),name,{format:'knockout'});c.playType='doubles';c.playersPerSide=2;c.ageMinimum=min;notice=name+' age category created.'});
+}
+// Capture handlers run before legacy handlers, so financial corrections and
+// registration management never fall through to unrelated legacy actions.
+document.addEventListener('click',async event=>{
+ const btn=event.target.closest('button');if(!btn)return;
+ if(btn.dataset.mba372Paid||btn.dataset.mba372Partial||btn.dataset.mba372FeeSave||btn.dataset.mba372Status||btn.dataset.mba372ExpenseEdit||btn.dataset.mba372ExpenseVoid||btn.dataset.mba372ExpenseCancel||btn.id==='mba372-zoom-in'){
+  event.preventDefault();event.stopImmediatePropagation();
+  try{
+   if(btn.id==='mba372-zoom-in'){const n=Number(document.body.dataset.mba372Zoom||100);if(n>=150)return;const next=n+10;
+     document.body.dataset.mba372Zoom=String(next);document.body.style.zoom=(next/100);btn.title='Zoom '+next+'%; returns to normal after 150%';return;}
+   if(btn.dataset.mba372Paid)await mba372QuickPayment(btn.dataset.mba372Paid,false);
+   if(btn.dataset.mba372Partial)await mba372QuickPayment(btn.dataset.mba372Partial,true);
+   if(btn.dataset.mba372FeeSave)await mba372FeeOverride(btn.dataset.mba372FeeSave);
+   if(btn.dataset.mba372Status){const [cat,id,status]=btn.dataset.mba372Status.split(':');await mba372SetRegistrationStatus(cat,id,status)}
+   if(btn.dataset.mba372ExpenseEdit){mba372ExpenseEditing=btn.dataset.mba372ExpenseEdit;render();}
+   if(btn.dataset.mba372ExpenseVoid)await mba372CorrectExpense(btn.dataset.mba372ExpenseVoid,true);
+   if(btn.dataset.mba372ExpenseCancel){mba372ExpenseEditing=null;render();}
+  }catch(e){alert('V3.7.2: '+errText(e));render()}
+ }
+},true);
+document.addEventListener('change',event=>{
+ if(event.target.matches('.mba372-collector-select')){try{if(event.target.value!=='__other')localStorage.setItem('mba372-collector-'+authUser?.uid,event.target.value)}catch{}}
+ if(event.target.id==='mba37-reg-category'){
+  const c=active()?.categories.find(x=>x.id===event.target.value),fields=document.getElementById('mba372-age-fields');
+  if(fields){fields.hidden=!mba372AgeMinimum(c);for(const x of fields.querySelectorAll('[name=birthYear1],[name=birthYear2]'))x.required=!!mba372AgeMinimum(c)}
+  if(mba372AgeMinimum(c)){const type=document.getElementById('mba37-reg-type');if(type)type.value='doubles'}
+ }
+});
+document.addEventListener('submit',event=>{
+ const form=event.target.closest('form[data-mba372-reg-edit],form[data-mba372-age-create],form[data-mba372-committee],form[data-mba372-expense-update]');if(!form)return;
+ event.preventDefault();event.stopImmediatePropagation();
+ const button=form.querySelector('button[type=submit]');if(button)button.disabled=true;
+ const runner=async()=>{
+  if(form.dataset.mba372ExpenseUpdate)await mba372CorrectExpense(form.dataset.mba372ExpenseUpdate,false,new FormData(form));
+  else if(form.dataset.mba372RegEdit){const [cat,id]=form.dataset.mba372RegEdit.split(':');await mba372SaveRegistration(cat,id,new FormData(form))}
+  else if(form.hasAttribute('data-mba372-age-create'))await mba372CreateAgeCategory(form);
+  else await mba372SaveCommittee(form);
+ };
+ runner().catch(x=>alert('V3.7.2: '+errText(x))).finally(()=>{if(button?.isConnected)button.disabled=false});
+},true);
+document.addEventListener('change',e=>{
+ const input=e.target.closest('input[data-mba372-paid]');if(!input)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const id=input.dataset.mba372Paid;
+ if(!input.checked){input.checked=true;alert('Saved payments cannot be unchecked. Use Manual Receipt → Refund to reverse a payment.');return;}
+ input.disabled=true;
+ mba372QuickPayment(id,false).catch(error=>alert('Quick Paid: '+errText(error))).finally(()=>render());
+},true);
+
+const mbaV373PriorSetStatus=mba372SetRegistrationStatus;
+mba372SetRegistrationStatus=async function(catId,entryId,status){
+ const c=active()?.categories.find(x=>x.id===catId),e=c?.entrants.find(x=>x.id===entryId);
+ if(e?.reentryPending&&status==='active')throw Error('Use Assign Safe Re-entry Qualifier first; cannot restore directly into a live bracket.');
+ return mbaV373PriorSetStatus(catId,entryId,status);
+};
+
+/* MBA_V373_ALL_IN_ONE: test-only enhancements to existing V3.7.2 controls.
+   No database change runs at startup; every data write requires a user action. */
+const mbaV373OriginalSettingsRead = mba37ReadSettings;
+mba37ReadSettings=function(fd,t){
+ mbaV373OriginalSettingsRead(fd,t);
+ const custom=String(fd.get('mba-v373-custom-ages')||'').split(',').map(s=>s.trim()).filter(Boolean);
+ const minimums=[...new Set([...fd.getAll('mba-v373-age'),...custom].map(Number))];
+ if(minimums.some(x=>!Number.isInteger(x)||x<1||x>220))throw Error('Age limits must be whole years from 1 to 220.');
+ for(const min of minimums){const name=min+'+ Doubles';
+  if(!(t.categories||[]).some(x=>x.name.toLocaleLowerCase()===name.toLocaleLowerCase())){
+   const c=addCategory(t,name,{format:'knockout'});c.playType='doubles';c.playersPerSide=2;c.ageMinimum=min;
+  }
+ }
+ const pairFee=String(fd.get('mba-v373-pair-fee')||'').trim();
+ if(pairFee){if(!mba37Money(pairFee))throw Error('Invalid doubles entry fee.');t.registrationFeePerPair=Number(pairFee)}
+};
+const mbaV373OriginalTournamentView=tournamentView;
+tournamentView=function(t){let html=mbaV373OriginalTournamentView(t);
+ if(editor?.kind!=='create'&&editor?.kind!=='tournament')return html;
+ const values=new Set((t?.categories||[]).map(x=>Number(x.ageMinimum||0)));
+ const markup=`<fieldset class="full mba-v373-age-setup"><legend>🏸 Doubles combined-age categories (optional)</legend>
+  <p class="helper">Two players' tournament-year ages must add up to the selected minimum. Adding a category never deletes a past category.</p>
+  <div class="checklist">${[80,90,100].map(n=>`<label class="choice"><input name="mba-v373-age" type="checkbox" value="${n}" ${values.has(n)?'checked':''}> ${n}+ Doubles</label>`).join('')}</div>
+  <label class="field"><span>Extra minimum ages (comma separated)</span><input name="mba-v373-custom-ages" placeholder="75,85,110" inputmode="numeric"></label>
+  <label class="field"><span>Optional fee per knockout doubles PAIR (₹)</span><input name="mba-v373-pair-fee" type="number" min="0" step="0.01" value="${esc(t?.registrationFeePerPair??'')}" placeholder="e.g. 500"></label></fieldset>`;
+ const anchor='<div class="full actions"> <button class="btn primary" type="submit">Save Tournament</button>';
+ return html.includes(anchor)?html.replace(anchor,markup+anchor):html;
+};
+const mbaV373OriginalSettingsView=settingsView;
+settingsView=function(t){let html=mbaV373OriginalSettingsView(t);
+ if(!isSuper())return html;
+ const current=(t.categories||[]).filter(c=>mba372AgeMinimum(c)).map(c=>`${esc(c.name)} (${c.ageMinimum}+)`).join(', ')||'None yet';
+ return html+card('Combined-Age Doubles Categories',`<p class="helper">Currently: ${current}. New categories can be created while preserving old results; registrations for a category with already-played fixtures must use Re-entry when eligible.</p>
+ <form class="sub-form" data-mba372-age-create><label class="field"><span>Minimum combined age</span><input type="number" name="minimum" min="1" max="220" value="80" required></label><button type="submit" class="btn primary">Create age category</button></form>`);
+};
+
+/* Re-entry eligibility: a genuine first-round loser, a DIFFERENT doubles partner,
+   at least one pending round-one fixture, no saved later-round results. */
+const mbaV373NamesForEntry=(t,c,id)=>{
+ const e=c?.entrants?.find(x=>x.id===id),tm=t?.teams?.find(x=>x.id===e?.teamId);
+ return (e?.playerIds||[]).map(pid=>tm?.players?.find(p=>p.id===pid)?.name||'').filter(Boolean);
+};
+const mbaV373Norm=s=>String(s||'').normalize('NFKC').trim().toLocaleLowerCase().replace(/\s+/g,' ');
+function mbaV373RoundOneStatus(t,c){
+ const matches=t.fixtures.filter(m=>m.categoryId===c.id&&m.stage==='knockout'&&m.round===1&&m.sourceA&&m.sourceB);
+ const completed=matches.filter(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c)));
+ const unplayed=matches.filter(m=>!t.results[m.id]&&m.sourceA?.type==='entry'&&m.sourceB?.type==='entry');
+ const laterPlayed=t.fixtures.some(m=>m.categoryId===c.id&&m.stage==='knockout'&&m.round>1&&!!scoreWinner(t.results[m.id],effectiveRules(t,c)));
+ return {matches,completed,unplayed,laterPlayed};
+}
+function mbaV373EligibleReentry(t,c,fd){
+ if(!t||!c||effectiveFormat(t,c)!=='knockout'||mba37RegType(c)!=='doubles')throw Error('Paid re-entry is for knockout DOUBLES only.');
+ const state=mbaV373RoundOneStatus(t,c);
+ if(!state.completed.length||!state.unplayed.length||state.laterPlayed)throw Error('Re-entry window is closed: require a first-round loss, an unfinished first-round match and no scored later rounds.');
+ if(fd.get('eventType')!=='doubles'||String(fd.get('categoryId'))!==c.id)throw Error('Choose this knockout doubles category.');
+ const request=mba37ParseEntries(fd.get('players'),'doubles',2);
+ if(request.length!==1)throw Error('Register exactly ONE re-entry doubles pair at a time.');
+ const pair=request[0].players.map(mbaV373Norm);
+ const losers=state.completed.map(m=>{
+  const w=scoreWinner(t.results[m.id],effectiveRules(t,c));
+  return mbaV373NamesForEntry(t,c,m[w==='a'?'b':'a']).map(mbaV373Norm);
+ }).filter(arr=>arr.length===2);
+ if(!losers.some(old=>pair.some(p=>old.includes(p))&&pair.some(p=>!old.includes(p)))){
+  throw Error('Re-entry must contain a player from a completed first-round LOSING pair and a DIFFERENT partner.');
+ }
+ const expected=Number(finance.config?.feePerEntry??t.registrationFeePerPair??mba372FeeDefault(t));
+ if(!Number.isFinite(expected)||expected<0)throw Error('Set an entry fee before collecting a paid re-entry.');
+ const received=Number(fd.get('received')||0);
+ if(expected>0&&Math.abs(received-expected)>.001)throw Error('Re-entry requires the FULL new fee of '+money(expected)+'; received '+money(received)+'.');
+ if(expected>0&&!mba37CanTakePayment())throw Error('Permission to collect payment is required.');
+ return true;
+}
+function mbaV373CanLateReentry(t,c,fd){
+ if(!fd.has('mba-v373-reentry'))return false;
+ return mbaV373EligibleReentry(t,c,fd);
+}
+// Auto-fill the configured re-entry fee without recording any payment until Save.
+document.addEventListener('change',event=>{
+ if(event.target?.name!=='mba-v373-reentry'||!event.target.checked)return;
+ const form=event.target.closest('#mba37-register-form');if(!form)return;
+ const amount=form.querySelector('[name="received"]'),t=active();
+ if(!amount||!t)return;
+ const c=t.categories.find(x=>x.id===form.querySelector('[name="categoryId"]')?.value);
+ const fee=Number(finance.config?.feePerEntry??t.registrationFeePerPair??mba372FeeDefault(t));
+ if(c&&Number.isFinite(fee)&&fee>=0)amount.value=String(fee);
+});
+const mbaV373OldRegistrationView=mba37RegistrationView;
+mba37RegistrationView=function(t){
+ let html=mbaV373OldRegistrationView(t);
+ const reentryLabel=`<div class="mba-v373-reentry-help"><label class="choice"><input type="checkbox" name="mba-v373-reentry" value="1"><b>♻ Paid Re-entry (after losing in Round 1)</b></label><p class="helper">Only before Round 1 finishes: a losing player + different partner, full NEW entry fee. Starts as PENDING; Super Admin must safely assign a preliminary match before entry can play. Saved results are never reset.</p></div>`;
+ const registrationAnchor='<label class="field">Player(s) / Pair(s), one entry per line';
+ if(mba37CanRegister()&&html.includes(registrationAnchor))html=html.replace(registrationAnchor,reentryLabel+registrationAnchor);
+ const pending=t.categories.flatMap(c=>c.entrants.filter(e=>e.paidReentry&&e.reentryPending).map(e=>({c,e}))).map(({c,e})=>{
+  const state=mbaV373RoundOneStatus(t,c);
+  const options=state.unplayed.flatMap(m=>['A','B'].filter(side=>m['source'+side]?.type==='entry').map(side=>`<option value="${esc(m.id+'|'+side)}">Round 1 match ${esc(m.id)} · side ${side} (play-in challenger)</option>`)).join('');
+  return `<form data-mba-v373-seed="${esc(c.id)}|${esc(e.id)}" class="sub-form"><b>${esc(entryLabel(t,c,e.id))}</b><small>${esc(c.name)} · fee recorded separately · pending qualifier</small>
+   <label class="field"><span>Unplayed first-round slot to insert qualifier BEFORE</span><select name="target" required>${options||'<option value="">No safe place is currently available</option>'}</select></label><button class="btn primary" type="submit" ${options?'':'disabled'}>Assign re-entry qualifier (Super Admin)</button></form>`;
+ }).join('');
+ if(isSuper()&&pending)html+=card('♻ Paid Re-entry — Assign Safe Qualifier',`<p class="helper">Choose an UNPLAYED Round 1 match. A preliminary qualifier will determine one of its sides. Existing scores stay untouched. Affected future matches depend on that qualifier.</p>${pending}`);
+ if(can('paymentsWrite')&&canSeePayments()&&editScope(t.id))html+=`<details class="mba-v373-registration-payment"><summary>💰 Quick Paid · Registration (tap to expand)</summary>${mba372FeeCard(t)}</details>`;
+ return html;
+};
+
+/* Base mba37Register has been patched to add a pending re-entry instead of
+   rejecting registration solely because an earlier first-round result exists. */
+const mbaV373OldRegister=mba37Register;
+mba37Register=async function(form){
+ const fd=new FormData(form),t=active(),cat=t?.categories.find(c=>c.id===String(fd.get('categoryId')||''));
+ if(fd.has('mba-v373-reentry'))mbaV373EligibleReentry(t,cat,fd);
+ return mbaV373OldRegister(form);
+};
+async function mbaV373AssignReentry(form){
+ if(!isSuper())throw Error('Only Super Admin can assign live re-entry qualifiers.');
+ const [catId,entryId]=form.dataset.mbaV373Seed.split('|');const [matchId,side]=String(new FormData(form).get('target')||'').split('|');
+ if(!['A','B'].includes(side))throw Error('Choose a valid target side.');
+ const t=active(),c=t?.categories.find(x=>x.id===catId),e=c?.entrants.find(x=>x.id===entryId);
+ if(!e||!e.paidReentry||!e.reentryPending||mba372RegStatus(e)!=='hold')throw Error('Pending paid re-entry was not found.');
+ const state=mbaV373RoundOneStatus(t,c);
+ const target=state.unplayed.find(m=>m.id===matchId),old=target?.['source'+side];
+ if(!target||old?.type!=='entry'||!state.completed.length||state.laterPlayed)throw Error('Chosen first-round slot is no longer safe. Refresh.');
+ if(!confirm('Insert a PRELIMINARY RE-ENTRY QUALIFIER before match '+target.id+'? The original opponent '+entryLabel(t,c,old.id)+' must play the paid re-entry pair. This does NOT change any saved score.'))return;
+ await op(()=>{
+  const live=active(),cat=live.categories.find(x=>x.id===catId),entry=cat.entrants.find(x=>x.id===entryId),m=live.fixtures.find(x=>x.id===matchId);
+  if(!entry?.reentryPending||!m||live.results[m.id])throw Error('Bracket changed; refresh.');
+  if(live.fixtures.some(x=>x.categoryId===catId&&x.stage==='knockout'&&x.round>1&&live.results[x.id]))throw Error('Next round started; unsafe.');
+  const replaced=m['source'+side];if(replaced?.type!=='entry')throw Error('Selected slot has changed.');
+  const oldEntry=cat.entrants.find(x=>x.id===replaced.id);if(!oldEntry)throw Error('Original entrant missing.');
+  const id=uid('ko_paid_reentry');
+  const q={id,categoryId:catId,stage:'knockout',round:0,bracketIndex:live.fixtures.filter(x=>x.categoryId===catId&&x.round===0).length,
+   sourceA:{type:'entry',id:oldEntry.id},sourceB:{type:'entry',id:entry.id},a:oldEntry.id,b:entry.id,
+   paidReentryQualifier:true,slot:Math.max(0,...live.fixtures.map(x=>Number(x.slot)||0))+1,court:1};
+  m['source'+side]={type:'match',id};m[side.toLowerCase()]=null;
+  m.slot=q.slot+1+(Number(live.settings?.minRestSlots)||0);
+  // No result-bearing match is rescheduled. Unplayed later rounds move after this new qualifier.
+  for(const after of live.fixtures){if(after.categoryId===catId&&after.stage==='knockout'&&after.round>1&&!live.results[after.id]&&Number(after.slot||0)<=m.slot)after.slot=m.slot+after.round;}
+  live.fixtures.push(q);entry.registrationStatus='active';entry.reentryPending=false;entry.reentryQualifierId=id;
+  entry.reentryAssignedAt=Date.now();entry.reentryAssignedBy=authUser.uid;
+  advanceKnockout(live,catId);
+  notice='Paid re-entry assigned to qualifier. Existing scored matches unchanged.';
+ });
+}
+const mbaV373OldRoundLabel=koRoundLabel;
+koRoundLabel=function(t,m){return m.paidReentryQualifier?'Paid Re-entry Qualifier':mbaV373OldRoundLabel(t,m)};
+
+/* Accessible mobile fee cards use EXACTLY the same computed fee rows and
+   existing receipt event handlers; no duplicate finance dataset is created. */
+const mbaV373OldFeeCard=mba372FeeCard;
+mba372FeeCard=function(t){
+ let desktop=mbaV373OldFeeCard(t);
+ const canPay=can('paymentsWrite')&&canSeePayments(),canFees=can('feesWrite');
+ const cards=mba372FeeRows(t).map(r=>`<article class="mba-v373-payment-card"><div class="mba-v373-payment-head"><b>${esc(r.name)}</b><span class="${r.cls}">${esc(r.text)}</span></div>
+  <small>${esc(r.category)} · ${r.kind==='entry'?'Per pair/entry':'Per player'}</small>
+  <div class="mba-v373-payment-metrics"><div><small>Fee</small><b>${r.fee==null?'—':money(r.fee)}</b></div><div><small>Received</small><b>${money(r.paid)}</b></div><div><small>Balance</small><b>${r.due==null?'—':money(r.due)}</b></div></div>
+  ${r.ambiguous?`<p class="helper">⚠ Legacy receipts require reconciliation (${money(r.ambiguous)}).</p>`:''}
+  ${canPay&&r.fee!==null&&r.fee>0?`<div class="mba-v373-payment-actions"><label class="choice"><input type="checkbox" data-mba372-paid="${esc(r.id)}" ${r.due===0?'checked disabled':r.ambiguous?'disabled':''}> Paid</label>
+    <input aria-label="Amount for ${esc(r.name)}" data-mba372-amount="${esc(r.id)}" type="number" min="0.01" step="0.01" value="${esc(r.due)}" ${r.due===0?'disabled':''}><button class="btn" type="button" data-mba372-partial="${esc(r.id)}" ${r.due===0||r.ambiguous?'disabled':''}>Partial</button></div>`:''}
+  ${canFees?`<details><summary>Fee override</summary><div class="actions"><input type="number" data-mba372-fee="${esc(r.id)}" value="${r.fee??''}" min="0" step="0.01"><button class="btn" data-mba372-fee-save="${esc(r.id)}">Save</button></div></details>`:''}</article>`).join('');
+ const header='<div class="scroll"><table class="fin-table">';
+ if(desktop.includes(header))desktop=desktop.replace(header,`<div class="mba-v373-mobile-payment-list">${cards||'<p>No player registrations yet.</p>'}</div><div class="scroll mba-v373-desktop-fee-table"><table class="fin-table">`);
+ return desktop;
+};
+
+/* Selection must come from the VISIBLY ACTIVE control in mobile/desktop,
+   rather than silently using a hidden table input with the same charge ID. */
+function mbaV373LiveChargeInput(attribute,chargeId){
+ const mobile=window.matchMedia('(max-width:680px)').matches;
+ const root=document.querySelector(mobile?'.mba-v373-mobile-payment-list':'.mba-v373-desktop-fee-table');
+ return root?.querySelector(`[${attribute}="${CSS.escape(chargeId)}"]`)||document.querySelector(`[${attribute}="${CSS.escape(chargeId)}"]`);
+}
+
+const mbaV373OldCategoryView=categoryView;
+categoryView=function(t){let html=mbaV373OldCategoryView(t);
+ if(editor?.kind==='new-category'){
+  const anchor='<form data-form="new-category" class="team-box">';
+  if(html.includes(anchor))html=html.replace(anchor,anchor+`<label class="field"><span>Category play type</span><select name="mba-v373-play-type"><option value="doubles">Doubles (2 players)</option><option value="singles">Singles (1 player)</option><option value="other">Custom (select entries)</option></select></label>`);
+ }
+ if(editor?.kind==='category'){
+  const anchor='<form data-form="category"';
+  if(html.includes(anchor))html=html.replace(/(<form data-form="category"[^>]*>)/,`$1<label class="field"><span>Play type (changing existing entries may be restricted)</span><select name="mba-v373-play-type"><option value="doubles">Doubles</option><option value="singles">Singles</option><option value="other">Other</option></select></label>`);
+ }
+ return html;
+};
+/* Selects in category editor are set from the category model after render. */
+const mbaV373OldRender=render;
+render=function(){mbaV373OldRender();
+ const form=document.querySelector('form[data-form="category"]');if(form){const c=active()?.categories.find(x=>x.id===form.dataset.id),sel=form.querySelector('[name="mba-v373-play-type"]');
+  if(sel)sel.value=c?.playType||mba37RegType(c)||'other';
+ }
+};
+
+/* Change test-only references and create a genuinely functional per-environment link. */
+const mbaV373TestLink='https://laylaaflaj-lang.github.io/mba-tournaments-v2-test/v372/';
+const shareButton=document.getElementById('mba-global-share-link');
+if(shareButton){shareButton.title='Copy V3.7.2 TEST app link';shareButton.textContent='↗ Share TEST App Link';}
+
+/* Action handler fires early to avoid legacy form fallthrough; transactions
+   can only be saved after the explicit confirmation in mbaV373AssignReentry. */
+document.addEventListener('submit',event=>{
+ const form=event.target.closest('form[data-mba-v373-seed]');if(!form)return;
+ event.preventDefault();event.stopImmediatePropagation();const btn=form.querySelector('button[type=submit]');if(btn)btn.disabled=true;
+ mbaV373AssignReentry(form).catch(e=>alert('Re-entry: '+errText(e))).finally(()=>{if(btn?.isConnected)btn.disabled=false});
+},true);
+
+const mbaV373PriorFinanceView=financeView;
+financeView=function(t){const html=mbaV373PriorFinanceView(t);
+ if(!isSuper())return html;
+ return html+card('Knockout Doubles Entry Fee',`<form class="sub-form" data-mba-v373-pair-fee><label class="field"><span>Fee per knockout PAIR / entry (₹)</span><input name="fee" type="number" required min="0" step="0.01" value="${esc(finance.config?.feePerEntry??t.registrationFeePerPair??'')}"></label><button type="submit" class="btn primary">Save Pair Fee</button><p class="helper">The pair is charged ONCE, even when the pair has two players.</p></form>`);
+};
+document.addEventListener('submit',event=>{
+ const form=event.target.closest('form[data-mba-v373-pair-fee]');if(!form)return;
+ event.preventDefault();event.stopImmediatePropagation();
+ (async()=>{if(!isSuper()||!editScope(active()?.id))throw Error('Super Admin only.');
+  const amount=safeAmount(new FormData(form).get('fee'),true);
+  if(!confirm('Set knockout doubles PAIR fee to '+money(amount)+'? Existing receipts remain.'))return;
+  const t=active();await update(ref(db,'v3/finance/'+t.id+'/config'),{feePerEntry:amount,updatedBy:authUser.uid,updatedAt:Date.now()});
+  notice='Knockout pair fee updated.';render();
+ })().catch(e=>alert('Fee update: '+errText(e)));
+},true);
+
+/* MBA_V374_NUMBERED_FINISHING — code-only follow-up for consolidated V3.7.2 TEST.
+   No Firebase writes at app startup. All payouts/registration changes remain explicit user actions. */
+
+/* Paid re-entry is one fresh, charged second opportunity. Prior participant must
+   have actually lost Round 1; no free/duplicate re-entry and no Round 2 scores. */
+const mbaV374ReentryEligibilityOriginal=mbaV373EligibleReentry;
+mbaV373EligibleReentry=function(t,c,fd){
+ const ok=mbaV374ReentryEligibilityOriginal(t,c,fd);
+ const configured=finance.config?.feePerEntry??t?.registrationFeePerPair??mba372FeeDefault(t);
+ if(configured===null||configured===undefined||!(Number(configured)>0)){
+  throw Error('Paid re-entry requires a positive tournament / knockout pair fee.');
+ }
+ const entry=mba37ParseEntries(fd.get('players'),'doubles',2)[0];
+ const wanted=entry.players.map(mbaV373Norm);
+ const previouslyReentered=c.entrants.filter(e=>e.paidReentry).flatMap(e=>mbaV373NamesForEntry(t,c,e.id).map(mbaV373Norm));
+ if(wanted.some(name=>previouslyReentered.includes(name))){
+  throw Error('A player in this pair has already been registered for paid re-entry in this category.');
+ }
+ return ok;
+};
+
+/* The original bracket must remain the source of truth. A pending paid re-entry
+   must be assigned by the Super Admin to a fresh qualifier, not silently restored. */
+const mbaV374ReentryAssignOriginal=mbaV373AssignReentry;
+mbaV373AssignReentry=async function(form){
+ const t=active();if(!t||!isSuper())throw Error('Super Admin only.');
+ const [catId,entryId]=String(form.dataset.mbaV373Seed||'').split('|');
+ const c=t.categories.find(x=>x.id===catId),e=c?.entrants.find(x=>x.id===entryId);
+ if(!e||!e.paidReentry||!e.reentryPending)throw Error('Re-entry assignment is no longer pending. Refresh.');
+ const s=mbaV373RoundOneStatus(t,c);
+ if(!s.completed.length||!s.unplayed.length||s.laterPlayed)throw Error('First-round re-entry window is closed.');
+ return mbaV374ReentryAssignOriginal(form);
+};
+
+/* Multiple A4 PNGs must download as ONE archive, rather than multiple mobile
+   browser download prompts. Uses the ZIP STORE format: PNG data is compressed. */
+async function mbaV374PngZip(files){
+ const enc=new TextEncoder(),parts=[],central=[];let offset=0;
+ const b16=x=>[x&255,(x>>>8)&255],b32=x=>[x&255,(x>>>8)&255,(x>>>16)&255,(x>>>24)&255];
+ const crcTable=new Uint32Array(256);
+ for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;crcTable[n]=c>>>0}
+ const crc32=bytes=>{let c=0xffffffff;for(const v of bytes)c=crcTable[(c^v)&255]^(c>>>8);return(c^0xffffffff)>>>0};
+ for(const file of files){
+  const name=enc.encode(file.name),data=new Uint8Array(await file.arrayBuffer());
+  if(name.length>65535||data.length>0xffffffff)throw Error('File too large for ZIP.');
+  const crc=crc32(data),size=data.length;
+  const header=new Uint8Array([0x50,0x4b,3,4,...b16(20),...b16(0x800),...b16(0),...b16(0),...b16(0),...b32(crc),...b32(size),...b32(size),...b16(name.length),...b16(0)]);
+  parts.push(header,name,data);
+  central.push(new Uint8Array([0x50,0x4b,1,2,...b16(20),...b16(20),...b16(0x800),...b16(0),...b16(0),...b16(0),...b32(crc),...b32(size),...b32(size),...b16(name.length),...b16(0),...b16(0),...b16(0),...b16(0),...b32(0),...b32(offset)]),name);
+  offset+=header.length+name.length+data.length;
+ }
+ let cLen=0;for(const p of central)cLen+=p.length;
+ if(offset>0xffffffff||cLen>0xffffffff||files.length>65535)throw Error('ZIP too large. Export a smaller category.');
+ const end=new Uint8Array([0x50,0x4b,5,6,...b16(0),...b16(0),...b16(files.length),...b16(files.length),...b32(cLen),...b32(offset),...b16(0)]);
+ return new Blob([...parts,...central,end],{type:'application/zip'});
+}
+async function mbaV374DownloadFiles(files){
+ if(files.length===1)return mbaDownloadBlob(files[0],files[0].name);
+ if(!files.every(f=>f.type==='image/png'))throw Error('Only PNG page groups can be archived here.');
+ const zip=await mbaV374PngZip(files);
+ return mbaDownloadBlob(zip,mbaFileStem(active()?.name)+'-A4-PNG-Pages.zip');
+}
+
+/* Test-only environment warning; make it easy to verify which database is active. */
+(function(){
+ const label=document.querySelector('.brand-head .mba-maker-credit');
+ if(label)label.title='MBA V3.7.2 Test release — production remains unchanged';
+})();
 
 mbaInitUi();
 wireAuth();
