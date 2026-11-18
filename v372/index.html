@@ -589,6 +589,47 @@ nav[aria-label="Tournament management"] button{min-height:64px!important;min-wid
 @media(max-width:360px){
  .mba-header-controls>.mba-clock,.mba-header-controls>#mba-global-share-link{flex-basis:100%!important}
 }
+
+/* MBA_V372_COMPACT_MOBILE_HEADER_3 — mobile presentation only. */
+.mba-mobile-options{display:none}
+.mba-mobile-options .mba-mobile-options-inner{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.mba-mobile-options .mba-ui-control{color:inherit;min-width:0;font-size:12px}
+.mba-mobile-options .mba-ui-control select{min-width:0;width:100%;min-height:42px;background:#fff;color:#183451}
+.mba-mobile-options #mba-global-share-link{grid-column:1/-1;width:100%;margin:0!important;max-width:none;min-height:42px}
+.mba-mobile-options>summary{cursor:pointer;font-size:13px;font-weight:750;padding:10px 12px;min-height:40px}
+.mba-mobile-options[open] .mba-mobile-options-inner{padding:7px 12px 12px}
+@media(max-width:650px){
+ header{padding:2px 0 3px!important}
+ header .header-top{padding:5px 12px 1px!important}
+ header .brand-head{column-gap:5px!important}
+ header .brand-head .brand-mark{font-size:22px!important}
+ header .brand-head h1{font-size:clamp(19px,5.1vw,23px)!important;line-height:1.1!important}
+ header .brand-head p{font-size:11px!important;line-height:1.2!important}
+ header .brand-head .mba-maker-credit{font-size:10px!important;margin:0 0 2px!important;line-height:1.2!important}
+ .mba-header-controls{display:flex!important;align-items:center!important;justify-content:center!important;min-height:0!important;padding:0 12px 3px!important;margin:0 auto!important;gap:0!important}
+ .mba-header-controls>.mba-clock{flex:0 1 auto!important;min-width:0!important;min-height:28px!important;max-width:100%;padding:2px 8px!important;gap:5px!important;border:0!important;background:transparent!important}
+ .mba-header-controls>.mba-clock strong{font-size:14px!important;letter-spacing:0!important}
+ .mba-header-controls .mba-clock-label{font-size:11px!important}
+ .mba-mobile-options{display:block!important;order:8!important;margin:6px 0 0!important;border:1px solid #d6e2ee;border-radius:10px;background:#fff;color:#254267;overflow:hidden}
+ main.container>#v2-auth-panel{order:0;margin-bottom:7px!important;padding:9px 11px!important}
+ main.container>#v2-auth-panel .helper{margin:3px 0!important}
+ main.container>#global-tour-control{order:1;margin-bottom:7px!important;padding:8px 10px!important;gap:6px!important}
+ main.container>#global-tour-control select{padding:8px!important}
+ main.container>nav[aria-label="Tournament management"]{order:2}
+ main.container>#mba-important-notices{order:3}
+ main.container>.toolbar{order:4}
+ main.container>#connection-status{order:5}
+ main.container>#venue-public{order:6}
+ main.container>#notice{order:7}
+ main.container>#view{order:9}
+ .scroll:has(>.fin-table){max-width:100%;overflow-x:auto!important;-webkit-overflow-scrolling:touch}
+ .scroll:has(>.fin-table)::before{content:"Swipe sideways to view the payment columns →";display:block;font-size:11px;color:#58708d;padding:0 0 6px}
+ .scroll>.fin-table{width:100%;min-width:570px!important;table-layout:auto!important}
+ .scroll>.fin-table th,.scroll>.fin-table td{padding:10px 9px!important;white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important}
+ .scroll>.fin-table td:first-child{min-width:135px!important;white-space:normal!important;overflow-wrap:break-word!important}
+ .scroll>.fin-table .payment-unpaid,.scroll>.fin-table .payment-paid,.scroll>.fin-table .payment-partial{white-space:nowrap!important;overflow-wrap:normal!important;word-break:normal!important}
+}
+:root[data-mba-theme="dark"] .mba-mobile-options{background:#17263e;color:#e8f1ff;border-color:#455d7b}
 </style><style id="print-rule"></style></head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
@@ -602,10 +643,39 @@ nav[aria-label="Tournament management"] button{min-height:64px!important;min-wid
 <section id="global-tour-control" class="global-tournament-switcher noprint" hidden aria-label="Active tournament switcher"></section><section id="mba-important-notices" class="noprint" aria-label="Important tournament notices" hidden></section>
 <div class="toolbar noprint" style="justify-content:flex-end"><span class="actions"><button id="print-page" class="btn">🖨 Print A4</button></span></div>
 <nav class="noprint" aria-label="Tournament management"><button data-page="tournaments" class="selected">🏆<span class="mba-nav-text" data-short-en="Events" data-short-ml="ടൂർണി">Tournaments</span></button><button data-page="registration">📝<span class="mba-nav-text" data-short-en="Register" data-short-ml="രജിസ്ട്രേഷൻ">Registration</span></button><button data-page="teams">👥<span class="mba-nav-text" data-short-en="Teams" data-short-ml="ടീം">Teams</span></button><button data-page="categories">🗂<span class="mba-nav-text" data-short-en="Cats" data-short-ml="വിഭാഗം">Categories</span></button><button data-page="groups">🧩<span class="mba-nav-text" data-short-en="Groups" data-short-ml="ഗ്രൂപ്പ്">Groups</span></button><button data-page="fixtures">🔀<span class="mba-nav-text" data-short-en="Fixtures" data-short-ml="ക്രമം">Fixtures</span></button><button data-page="results">✅<span class="mba-nav-text" data-short-en="Results" data-short-ml="ഫലം">Results</span></button><button data-page="standings">📊<span class="mba-nav-text" data-short-en="Table" data-short-ml="പട്ടിക">Standings</span></button><button data-page="settings">⚙<span class="mba-nav-text" data-short-en="Settings" data-short-ml="സെറ്റിംഗ്">Settings</span></button><button data-page="finance">💰<span class="mba-nav-text" data-short-en="Finance" data-short-ml="ഫിനാൻസ്">Finance</span></button><button data-page="access">🛡<span class="mba-nav-text" data-short-en="Roles" data-short-ml="റോളുകൾ">User Roles</span></button><button data-page="print">🖨<span class="mba-nav-text" data-short-en="Print" data-short-ml="പ്രിന്റ്">Print Center</span></button><button data-page="gallery">📷<span class="mba-nav-text" data-short-en="Photos" data-short-ml="ഫോട്ടോ">Gallery</span></button></nav>
+<details id="mba-mobile-options" class="mba-mobile-options noprint"><summary>⚙ Theme, Language &amp; Share Link</summary><div class="mba-mobile-options-inner"></div></details>
 <div id="connection-status" class="banner noprint" hidden>📡 Internet connection lost. Live scores, payments, permissions and changes require internet. Please reconnect before editing.</div><div id="venue-public" class="venue-strip noprint"></div><div id="notice"></div><div id="view"></div></main>
 <section class="container noprint" aria-label="Access information"><details class="mba-permission-details"><summary>ℹ️ Access information</summary><div class="mba-permission-inside"><p class="helper">Only Super Admin-published tournaments appear to viewers. The Super Admin assigns separate View / Edit access per tournament. Finance remains private.</p></div></details></section>
 <div id="profile-layer"></div><div id="mba-umpire-overlay" hidden></div><footer>MBA Tournaments • Tournament Management</footer>
 <button id="pwa-install" class="btn mba-install-float noprint" type="button" aria-label="Install MBA Tournaments app">📲 Install App</button>
+
+<script>
+/* MBA_V372_COMPACT_MOBILE_HEADER_3 — physically move controls on mobile without cloning. */
+(function(){
+ const destination=document.querySelector('#mba-mobile-options .mba-mobile-options-inner');
+ const controls=[
+  document.querySelector('#mba-theme-select')?.closest('label'),
+  document.querySelector('#mba-lang-select')?.closest('label'),
+  document.getElementById('mba-global-share-link')
+ ];
+ if(!destination||controls.some(node=>!node))return;
+ const markers=controls.map((node,index)=>{
+  const marker=document.createComment('MBA original controls position '+index);
+  node.before(marker);
+  return marker;
+ });
+ const media=window.matchMedia('(max-width:650px)');
+ function synchronize(){
+  controls.forEach((node,index)=>{
+   if(media.matches)destination.append(node);
+   else markers[index].after(node);
+  });
+ }
+ synchronize();
+ if(media.addEventListener)media.addEventListener('change',synchronize);
+ else if(media.addListener)media.addListener(synchronize);
+})();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
