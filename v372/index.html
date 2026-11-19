@@ -4902,6 +4902,195 @@ async function mbaKSaveEntry(form){
 }
 
 
+/* MBA_KERALA_LATE_ENTRY_V3 — append-only hotfix, no writes on app startup. */
+// The original registration and scoring modules remain in place. We only extend
+// the Keralaotsavam quick form and provide a deliberate safe qualifier workflow.
+const mbaKOriginalQuickV3=mbaKQuickEntryView;
+mbaKQuickEntryView=function(t){
+ const old=mbaKOriginalQuickV3(t);
+ if(!t?.keralaotsavam)return old;
+ const pending=t.categories.filter(c=>c.entrants.some(e=>e.latePending===true));
+ const board=pending.length?`<section class="mba-k-late-panel" aria-label="Late entries waiting for fixtures"><h3>⏳ Late Entries · Awaiting Draw</h3>
+ <p class="helper">Players are SAVED. They are not in the existing knockout draw until Super Admin places them. Completed matches and scores stay untouched.</p>
+ ${pending.map(c=>{const p=c.entrants.filter(e=>e.latePending===true);return `<div class="mba-k-late-cat"><strong>${esc(c.name)} · ${p.length} pending</strong><div>${p.map(e=>`<div>• ${esc(entryLabel(t,c,e.id))}${e.clubName?' · '+esc(e.clubName):''}</div>`).join('')}</div>
+ ${isSuper()?`<button type="button" class="btn primary" data-mba-k-place="${esc(c.id)}">⚡ Place ${p.length} Late Entry/Entries into Draw</button>`:'<small>Ask Super Admin to place the pending entries.</small>'}</div>`}).join('')}</section>`:'';
+ const target='<h3>Saved Entries</h3>';
+ return old.includes(target)?old.replace(target,board+target):board+old;
+};
+
+function mbaKLateRoundMatches(t,catId){return t.fixtures.filter(m=>m.categoryId===catId&&m.stage==='knockout')}
+function mbaKLateCandidates(t,catId){
+ // Direct entry spots in UNSCORED fixtures are the only safe places for a qualifier.
+ // Never change a result-bearing fixture or a player already on court.
+ return mbaKLateRoundMatches(t,catId).filter(m=>(m.round||0)>=1&&!t.results?.[m.id]&&
+  (m.sourceA?.type==='entry'||m.sourceB?.type==='entry'))
+ .sort((a,b)=>(b.round||0)-(a.round||0)||(a.slot||0)-(b.slot||0));
+}
+function mbaKLatePlacementPreview(t,catId){
+ const c=t.categories.find(x=>x.id===catId);if(!c)throw Error('Category not found.');
+ const pending=c.entrants.filter(e=>e.latePending===true);
+ const matches=mbaKLateRoundMatches(t,catId);
+ const scored=matches.filter(m=>!!t.results?.[m.id]);
+ const spots=mbaKLateCandidates(t,catId);
+ return {pending:pending.length,fixtures:matches.length,scored:scored.length,spots:spots.length};
+}
+function mbaKLateApply(t,catId){
+ const c=t.categories.find(x=>x.id===catId);if(!c)throw Error('Category missing.');
+ const items=c.entrants.filter(e=>e.latePending===true);
+ if(!items.length)throw Error('No late entries awaiting draw.');
+ if(items.length>64)throw Error('Place at most 64 late entries at a time.');
+ const matches=mbaKLateRoundMatches(t,catId);
+ if(!matches.length)throw Error('No bracket yet. Generate a regular draw from Fixtures.');
+ const scored=matches.some(m=>!!t.results?.[m.id]);
+ if(!scored){
+  // Only unplayed fixtures in this CATEGORY are rebuilt. No result is cleared.
+  for(const e of items)delete e.latePending;
+  generateKnockout(t,catId);
+  return {method:'fresh draw',count:items.length};
+ }
+ const candidates=mbaKLateCandidates(t,catId);
+ // One unique unplayed incumbent per qualifier. Never silently place only some.
+ if(candidates.length<items.length)throw Error('Not enough untouched draw positions ('+candidates.length+' for '+items.length+'). Entries remain saved as PENDING; arrange matches manually before proceeding.');
+ const inserted=[];
+ items.forEach((entrant,index)=>{
+  const match=candidates[index];
+  if(!match||t.results?.[match.id])throw Error('Fixture became scored. Refresh before placing entries.');
+  const side=match.sourceA?.type==='entry'?'A':match.sourceB?.type==='entry'?'B':null;
+  if(!side)throw Error('No safe direct entrant in selected match.');
+  const first=match['source'+side].id;
+  if(first===entrant.id)throw Error('Cannot pair entry against itself.');
+  const qualifierId='ko__'+catId+'__late__'+uid('q');
+  const qualifier={id:qualifierId,categoryId:catId,stage:'knockout',round:0,
+   bracketIndex:t.fixtures.filter(m=>m.categoryId===catId&&m.stage==='knockout'&&(m.round||0)===0).length+index,
+   sourceA:{type:'entry',id:first},sourceB:{type:'entry',id:entrant.id},a:first,b:entrant.id,
+   court:match.court||1,slot:match.slot||1,lateQualifier:true};
+  match['source'+side]={type:'match',id:qualifierId};
+  match[side.toLowerCase()]=null; // Must wait for qualifier winner.
+  inserted.push(qualifier);
+  delete entrant.latePending;
+ });
+ t.fixtures.push(...inserted);
+ // Any dependency collision raises before an op() write, preserving the original state.
+ advanceKnockout(t,catId);
+ // Reschedule ONLY unplayed matches of this category, ordered by dependency.
+ // Existing completed / currently-live results and ALL other categories are untouched.
+ const untouched=t.fixtures.filter(m=>m.categoryId===catId&&!t.results?.[m.id]);
+ untouched.sort((a,b)=>(a.round||0)-(b.round||0)||(a.bracketIndex||0)-(b.bracketIndex||0));
+ const maxExisting=Math.max(0,...t.fixtures.map(m=>Number(m.slot)||0));
+ const courts=Math.max(1,Number(t.courts)||1);
+ let slot=maxExisting+1,prev=null,roundIndex=0;
+ for(let k=0;k<untouched.length;k++){
+  const m=untouched[k],rnd=m.round||0;
+  if(prev!==null&&rnd!==prev){slot+=Math.max(1,Number(t.settings?.minRestSlots||0)+1);roundIndex=0}
+  m.slot=slot+Math.floor(roundIndex/courts);
+  m.court=1+(roundIndex%courts);
+  roundIndex++;prev=rnd;
+  // Advance the base only when starting another round (below).
+  const next=untouched[k+1];
+  if(!next||(next.round||0)!==rnd)slot+=Math.ceil(roundIndex/courts);
+ }
+ return {method:'preliminary qualifier',count:items.length};
+}
+async function mbaKPlaceLate(catId){
+ const t=active();if(!t?.keralaotsavam||!isSuper())throw Error('Super Admin and Keralaotsavam tournament required.');
+ if(writePending)throw Error('Save in progress; try again after syncing.');
+ const prior=mbaKLatePlacementPreview(t,catId);
+ if(!prior.pending)throw Error('No pending late entries.');
+ if(!prior.fixtures)throw Error('Generate a fixture first.');
+ // Check the plan with a deep CLONE before asking the user to confirm.
+ const clone=deep(t);const plan=mbaKLateApply(clone,catId);
+ const msg=prior.scored===0?
+  `Rebuild ONLY the unplayed ${t.categories.find(x=>x.id===catId)?.name} knockout draw including ${prior.pending} new entries? Old unplayed draw positions will change. Other categories are untouched.`:
+  `Create ${prior.pending} preliminary qualifier(s), keep ${prior.scored} saved/live score record(s), and reschedule ONLY unplayed fixtures in this category? Opponents in affected matches will have to wait for qualifier winners. This is a structural draw change.`;
+ if(!confirm(msg))return;
+ // Revalidate the remote branch before committing; the normal app op() uses atomic multi-path writes.
+ const snap=await get(ref(db,'v3/tournaments/'+t.id));
+ if(!snap.exists())throw Error('Tournament is missing online.');
+ const remote=dbToTournament(snap.val(),t.id);
+ const remoteCat=remote.categories.find(c=>c.id===catId),localCat=t.categories.find(c=>c.id===catId);
+ if(JSON.stringify(remoteCat?.entrants)!==JSON.stringify(localCat?.entrants)||
+    JSON.stringify(remote.fixtures.filter(m=>m.categoryId===catId))!==JSON.stringify(t.fixtures.filter(m=>m.categoryId===catId))||
+    JSON.stringify(remote.results)!==JSON.stringify(t.results))throw Error('Matches/entries changed online. Refresh and retry. No draw was changed.');
+ await op(()=>{
+  const current=active();if(current?.id!==t.id)throw Error('Tournament switched.');
+  mbaKLateApply(current,catId);
+  notice='Placed '+plan.count+' late entries through '+plan.method+'. Saved results are unchanged.';
+ });
+}
+
+// Replace ONLY the Keralaotsavam quick-entry submit. A new name may be added
+// after fixtures exist, but it is marked PENDING rather than silently changing a bracket.
+mbaKSaveEntry=async function(form){
+ const t=active();if(!t?.keralaotsavam)throw Error('This is not a Keralaotsavam tournament.');
+ if(!(isSuper()||(can('teamsWrite')&&can('categoriesWrite')&&editScope(t.id))))throw Error('Team + Category Edit permission required.');
+ if(writePending)throw Error('Previous save still pending.');
+ mbaKSyncQuickEntry(form);
+ const fd=new FormData(form),cat=t.categories.find(c=>c.id===String(fd.get('categoryId')));
+ if(!cat)throw Error('Select a valid category.');
+ const type=mba37RegType(cat);if(!['singles','doubles'].includes(type))throw Error('Only Singles/Doubles supported.');
+ const text=String(fd.get('bulk')||'').trim()||(
+  type==='singles'?String(fd.get('player1')||'').trim()+' | '+String(fd.get('club')||'').trim():
+  String(fd.get('player1')||'').trim()+' & '+String(fd.get('player2')||'').trim()+' | '+String(fd.get('club')||'').trim());
+ const entries=mba36ParseRegistrations(text,type);if(entries.length>100)throw Error('Maximum 100 entries per save.');
+ const current=await get(ref(db,'v3/tournaments/'+t.id));
+ if(!current.exists())throw Error('Tournament missing online.');
+ const remote=dbToTournament(current.val(),t.id),online=remote.categories.find(c=>c.id===cat.id);
+ if(!online||JSON.stringify(online.entrants)!==JSON.stringify(cat.entrants))throw Error('Entries changed online. Refresh before saving; no entry was overwritten.');
+ if(online.entrants.length+entries.length>256)throw Error('Category limit is 256 entries.');
+ const seen=new Set(online.entrants.map(e=>mbaKFormatEntryKey(entryLabel(remote,online,e.id).split(' & '))));
+ for(const e of entries){const key=mbaKFormatEntryKey(e.players);if(seen.has(key))throw Error('Duplicate player/pair: '+e.players.join(' & '));seen.add(key)}
+ const hasDraw=remote.fixtures.some(m=>m.categoryId===cat.id);
+ mbaKRememberCat(t.id,cat.id);
+ const rawTeam=entries.length===1?String(fd.get('team')||'').trim():'';
+ const promptText='Save '+entries.length+' '+type+' entry/entries to '+cat.name+'?'+(hasDraw?'\nThe existing draw and results stay unchanged. New entries will be PENDING until Super Admin places them.':'');
+ if(!confirm(promptText))return;
+ const patch={},changed={...online,entrants:[...online.entrants]};
+ for(const e of entries){
+  const players=e.players.map(name=>({id:uid('player'),name})),teamId=uid('team'),entryId=uid('entry');
+  patch['v3/tournaments/'+t.id+'/teams/'+teamId]={id:teamId,name:rawTeam||e.players.join(' & '),players,isDirectRegistration:true};
+  changed.entrants.push({id:entryId,teamId,playerIds:players.map(p=>p.id),groupId:null,clubName:e.club,directRegistration:true,...(hasDraw?{latePending:true,lateAddedAt:Date.now()}: {})});
+ }
+ patch['v3/tournaments/'+t.id+'/categories/'+cat.id]=changed;
+ writePending=true;try{await update(ref(db),patch)}finally{writePending=false}
+ notice=entries.length+(hasDraw?' PENDING late':'')+' entry/entries saved to TEST Firebase.';
+ if(isSuper()){try{const s=await get(ref(db,'v3/tournaments'));setCloud(s.val())}catch{render()}}
+ else {const s=await get(ref(db,'v3/tournaments/'+t.id));rawTournamentData[t.id]=s.val();setCloud(rawTournamentData)}
+};
+
+// Separate settings submission: Umpire scoring display is NOT a match scoring rule.
+// It must remain editable even if match results have been recorded.
+const mbaKOriginalSettingsV3=settingsView;
+settingsView=function(t){
+ const main=mbaKOriginalSettingsV3(t);
+ if(!t?.keralaotsavam||!isSuper())return main;
+ return `<section class="card mba-k-umpire-quick"><h2>🏸 Change Umpire Grid Anytime · Super Admin</h2>
+ <p class="helper">Switch input controls without modifying a single completed match, fixture, score or scoring rule. Works after a tournament starts.</p>
+ <form id="mba-k-v3-umpire-only"><label class="field">Umpire Input Mode<select name="umpireInputMode">
+ ${[['both','Both: Tick Grid + Point'],['tick','Tick Grid only'],['plus','+ Point only']].map(([mode,label])=>`<option value="${mode}" ${mode===(t.umpireInputMode||'plus')?'selected':''}>${label}</option>`).join('')}
+ </select></label><button type="submit" class="btn primary">Save Umpire Grid Mode (no score changes)</button></form></section>`+main;
+};
+async function mbaKV3SaveUmpireMode(form){
+ const t=active();if(!t?.keralaotsavam||!isSuper())throw Error('Super Admin required.');
+ const mode=String(new FormData(form).get('umpireInputMode'));
+ if(!['plus','tick','both'].includes(mode))throw Error('Invalid umpire mode.');
+ if(!confirm('Change Umpire Grid to '+mode.toUpperCase()+'? All saved scores and fixtures remain untouched.'))return;
+ await set(ref(db,'v3/tournaments/'+t.id+'/meta/umpireInputMode'),mode);
+ notice='Umpire Grid set to '+mode.toUpperCase()+'. Scores were not changed.';render();
+}
+document.addEventListener('submit',e=>{
+ const form=e.target.closest('#mba-k-v3-umpire-only');if(!form)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const b=form.querySelector('button[type="submit"]');if(b)b.disabled=true;
+ mbaKV3SaveUmpireMode(form).catch(err=>alert('Umpire Mode: '+errText(err))).finally(()=>{if(b?.isConnected)b.disabled=false});
+},true);
+document.addEventListener('click',e=>{
+ const btn=e.target.closest('[data-mba-k-place]');if(!btn)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ btn.disabled=true;
+ mbaKPlaceLate(btn.dataset.mbaKPlace).catch(err=>alert('Late Entry: '+errText(err))).finally(()=>{if(btn.isConnected)btn.disabled=false});
+},true);
+
+
 mbaInitUi();
 wireAuth();
 document.getElementById('print-page').addEventListener('click',()=>{if(!canPrint())return;page='print';profile=null;editor=null;render();document.getElementById('view').scrollIntoView({behavior:'smooth'});});
