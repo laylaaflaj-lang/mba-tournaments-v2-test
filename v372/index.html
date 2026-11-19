@@ -753,6 +753,14 @@ nav[aria-label="Tournament management"] button{min-height:64px!important;min-wid
 .mba-v4-dialog input{min-width:0;width:100%;padding:11px;border:1px solid #bdcbd9;border-radius:9px;font:inherit;background:#fff;color:#213343}
 @media(max-width:600px){.mba-v4-entry-row{align-items:flex-start}.mba-v4-actions .btn{min-height:42px}}
 
+
+/* MBA_KERALOTSAVAM_V5_EDIT_CSS */
+#mba-k-edit-event [hidden]{display:none!important}
+#mba-k-edit-event .mba-k-scoring-config>label{min-height:32px}
+#mba-k-edit-event .mba-k-scoring-config>label input[type=checkbox]{width:19px;height:19px;flex:0 0 auto}
+#mba-k-edit-event .mba-k-scoring-config>p.helper{line-height:1.5}
+@media print{#mba-k-edit-event{display:none!important}}
+
 </style><style id="print-rule"></style></head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
@@ -5320,6 +5328,148 @@ document.addEventListener('submit',ev=>{
  const f=ev.target.closest('#mba-v4-edit-form');if(!f)return;
  ev.preventDefault();ev.stopImmediatePropagation();const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
  mbaV4EditSave(f).catch(err=>alert('Edit Entry: '+errText(err))).finally(()=>{if(b?.isConnected)b.disabled=false});
+},true);
+
+
+/* MBA_KERALOTSAVAM_V5_EDIT_20261120 — TEST-only. Quick-create-specific editing. */
+const mbaKEditChoices=[
+ ['singles',"Men's Singles",'singles'],['doubles',"Men's Doubles",'doubles'],
+ ['wSingles',"Women's Singles",'singles'],['wDoubles',"Women's Doubles",'doubles'],
+ ['mixed','Mixed Doubles','doubles']
+];
+const mbaKEditPreviousView=tournamentView;
+tournamentView=function(t){
+ if(!t?.keralaotsavam||editor?.kind!=='tournament')return mbaKEditPreviousView(t);
+ const location=String(t.keralaotsavamLocation||t.name.replace(/^Keralaotsavam\s{0,}[·:-]\s{0,}/i,'')).trim();
+ const known=mbaKLocalBodies.some(([name])=>name===location);
+ const options=mbaKLocalBodies.map(([name])=>`<option value="${esc(name)}" ${known&&name===location?'selected':''}>${esc(name)}</option>`).join('')+
+  `<option value="__other" ${known?'':'selected'}>Other (type name below)</option>`;
+ const categories=mbaKEditChoices.map(([key,label])=>{
+  const c=t.categories.find(x=>x.name===label);
+  const protectedCategory=!!(c&&(c.entrants?.length||c.groups?.length||t.fixtures.some(m=>m.categoryId===c.id)));
+  return `<label><input name="${key}" type="checkbox" ${c?'checked':''} ${protectedCategory?'disabled':''}> ${esc(label)}${protectedCategory?' 🔒':''}</label>${protectedCategory?`<input type="hidden" name="${key}" value="on">`:''}`;
+ }).join('');
+ const extra=t.categories.filter(c=>!mbaKEditChoices.some(([,label])=>label===c.name));
+ const scored=Object.keys(t.results||{}).length>0;
+ return card('✏ Edit Keralaotsavam Tournament',`<form id="mba-k-edit-event" data-tid="${esc(t.id)}" class="mba-k-form">
+ <p class="helper">Only Keralaotsavam settings are shown. Finance, league-point options and ordinary tournament settings are not part of this form.</p>
+ <label>Tournament date<input type="date" name="date" value="${esc(t.date||'')}" required></label>
+ <label>Local body<select name="body">${options}</select></label>
+ <label ${known?'hidden':''}>Other Panchayat / Municipality / Block<input type="text" name="other" maxlength="100" value="${known?'':esc(location)}"></label>
+ <label>Number of courts<input type="number" name="courts" min="1" max="12" value="${Number(t.courts)||2}" required></label>
+ <section class="mba-k-scoring-config"><h3>🏸 Keralaotsavam Categories</h3>${categories}
+ ${extra.length?`<p class="helper">Other saved categories kept unchanged: ${extra.map(c=>esc(c.name)).join(', ')}.</p>`:''}
+ <p class="helper">🔒 Categories with entries, groups or fixtures cannot be removed from tournament settings. Use Registration/Fixtures controls for those records.</p></section>
+ ${mbaKCreationControls()}
+ ${scored?'<p class="helper"><strong>Scores already exist:</strong> target, cap and win-by-two are locked. You may still change the umpire grid and court-side reminder without changing any scores.</p>':''}
+ <label>Venue Google Maps link (optional)<input name="venueUrl" type="url" placeholder="https://maps.app.goo.gl/..." value="${esc(t.venueUrl||'')}"></label>
+ <p class="helper">Keralaotsavam is a free, direct-entry tournament. Scores, players and fixtures are never cleared by editing these settings. Court count is locked once fixtures exist.</p>
+ <div class="actions"><button type="submit" class="btn primary" ${isSuper()?'':'disabled'}>Save Keralaotsavam Changes</button>${button('Cancel','cancel')}</div>
+ </form>`);
+};
+function mbaKEditLockScoring(form,locked){
+ for(const name of ['scoreTarget','customTarget','scoreCap','noCap','winByTwo']){
+  const input=form.querySelector(`[name="${name}"]`);if(input&&locked)input.disabled=true;
+ }
+}
+function mbaKEditSetDefaults(form,t){
+ const target=Number(t.rules?.target)||21;
+ form.elements.scoreTarget.value=[21,25,30].includes(target)?String(target):'custom';
+ form.elements.customTarget.value=String(target);
+ form.elements.winByTwo.checked=!!t.rules?.winByTwo;
+ form.elements.noCap.checked=t.rules?.cutoff==null;
+ form.elements.scoreCap.value=t.rules?.cutoff==null?'':String(t.rules.cutoff);
+ const point=t.sideSwitchPoint==null?null:Number(t.sideSwitchPoint);
+ form.elements.switchAt.value=point==null?'off':([11,15].includes(point)?String(point):'custom');
+ form.elements.customSwitchAt.value=point==null?'':String(point);
+ form.elements.umpireMode.value=['both','plus','tick'].includes(t.umpireInputMode)?t.umpireInputMode:'both';
+ mbaKSyncCreateForm(form);
+ mbaKEditLockScoring(form,Object.keys(t.results||{}).length>0);
+}
+const mbaKEditPreviousRender=render;
+render=function(){
+ mbaKEditPreviousRender();
+ const f=document.getElementById('mba-k-edit-event');if(f&&active()?.id===f.dataset.tid)mbaKEditSetDefaults(f,active());
+};
+document.addEventListener('change',e=>{
+ const f=e.target.closest('#mba-k-edit-event');if(!f)return;
+ mbaKSyncCreateForm(f);
+ mbaKEditLockScoring(f,Object.keys(active()?.results||{}).length>0);
+},true);
+async function mbaKEditSave(form){
+ if(!isSuper())throw Error('Super Admin permission required for editing Keralaotsavam settings.');
+ if(writePending)throw Error('Another save is in progress.');
+ const tid=form.dataset.tid;
+ if(!tid||active()?.id!==tid||!active()?.keralaotsavam)throw Error('Active tournament changed. Reload and retry.');
+ const displayed=active();
+ const data=new FormData(form);
+ const body=String(data.get('body')||'');
+ const location=mbaKFormatName(body==='__other'?data.get('other'):body);
+ if(!location)throw Error('Enter the local-body name.');
+ const date=String(data.get('date')||''),courts=Number(data.get('courts'));
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isInteger(courts)||courts<1||courts>12)throw Error('Enter a valid date and 1–12 courts.');
+ const venue=safeVenueUrl(data.get('venueUrl'));
+ const fresh=await mbaV4Fresh(tid),t=fresh.t;
+ if(!t.keralaotsavam)throw Error('Tournament type has changed online.');
+ if(displayed.categories.map(c=>c.id).join('|')!==t.categories.map(c=>c.id).join('|'))throw Error('Categories changed on another device. Refresh before editing.');
+ if((Object.keys(displayed.results||{}).length>0)!==(Object.keys(t.results||{}).length>0))throw Error('Match scoring status changed online. Refresh before editing.');
+ if(t.fixtures.length&&courts!==Number(t.courts))throw Error('Court count is locked after fixtures exist. Existing fixture court assignments must remain unchanged.');
+ const chosen=mbaKEditChoices.filter(([key])=>data.has(key));
+ const extras=t.categories.filter(c=>!mbaKEditChoices.some(([,label])=>label===c.name));
+ if(!chosen.length&&!extras.length)throw Error('Keep at least one competition category.');
+ const removed=[];
+ for(const c of t.categories){
+  const match=mbaKEditChoices.find(([,label])=>label===c.name);
+  if(match&&!data.has(match[0])){
+   if(c.entrants?.length||c.groups?.length||t.fixtures.some(m=>m.categoryId===c.id))throw Error(c.name+' has entries or fixtures. It cannot be removed here.');
+   removed.push(c);
+  }
+ }
+ const newCats=[];
+ for(const [key,label,type] of chosen){
+  if(t.categories.some(c=>c.name===label))continue;
+  const c=addCategory(t,label,{format:'knockout'});c.playType=type;c.playersPerSide=type==='singles'?1:2;
+  newCats.push(c);
+ }
+ const alreadyScored=Object.keys(t.results||{}).length>0;
+ let scoring=null;
+ if(!alreadyScored)scoring=mbaKRulesFromForm(data);
+ const rawPoint=String(data.get('switchAt')||'off');
+ const changeEnds=rawPoint==='off'?null:Number(rawPoint==='custom'?data.get('customSwitchAt'):rawPoint);
+ const scoringTarget=alreadyScored?Number(t.rules?.target)||21:scoring.rules.target;
+ if(changeEnds!==null&&(!Number.isSafeInteger(changeEnds)||changeEnds<1||changeEnds>=scoringTarget))throw Error('Change-ends point must be below target score.');
+ const mode=String(data.get('umpireMode')||'both');
+ if(!['both','plus','tick'].includes(mode))throw Error('Invalid umpire grid.');
+ const changes={
+  [mbaV4Path(tid,'meta')+'/name']:'Keralaotsavam · '+location,
+  [mbaV4Path(tid,'meta')+'/keralaotsavamLocation']:location,
+  [mbaV4Path(tid,'meta')+'/date']:date,
+  [mbaV4Path(tid,'meta')+'/courts']:courts,
+  [mbaV4Path(tid,'meta')+'/venueUrl']:venue,
+  [mbaV4Path(tid,'meta')+'/sideSwitchPoint']:changeEnds,
+  [mbaV4Path(tid,'meta')+'/umpireInputMode']:mode
+ };
+ if(scoring)changes[mbaV4Path(tid,'meta')+'/rules']={...t.rules,...scoring.rules};
+ for(const c of removed)changes[mbaV4Path(tid,'categories',c.id)]=null;
+ for(const c of newCats)changes[mbaV4Path(tid,'categories',c.id)]=c;
+ const message='Save Keralaotsavam settings for '+location+'?\n\nNew categories: '+newCats.length+'\nRemove EMPTY categories: '+removed.length+'\nExisting players, fixtures and saved scores will be preserved.';
+ if(!confirm(message))return;
+ writePending=true;
+ try{await update(ref(db),changes)}finally{writePending=false}
+ editor=null;
+ notice='Keralaotsavam tournament settings saved. Existing matches and scores preserved.';
+ if(isSuper()){
+  const all=await get(ref(db,'v3/tournaments'));setCloud(all.val());
+ }else{
+  const updated=await mbaV4Fresh(tid);rawTournamentData[tid]=updated.raw;setCloud(rawTournamentData);
+ }
+}
+document.addEventListener('submit',e=>{
+ const f=e.target.closest('#mba-k-edit-event');if(!f)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(f.dataset.busy)return;
+ f.dataset.busy='1';const b=f.querySelector('button[type="submit"]');if(b)b.disabled=true;
+ mbaKEditSave(f).catch(err=>alert('Keralaotsavam Edit: '+errText(err))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false});
 },true);
 
 
