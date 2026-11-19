@@ -1084,7 +1084,17 @@ function fixturesCheck(t){
  return {valid:problems.length===0,problems,restAlerts};
 }
 function recordResult(t,matchId,result){
- const m=t.fixtures.find(x=>x.id===matchId);need(m,'Match not found');if(t.results[matchId]&&!mba37CanEditSaved())throw Error('Saved result Edit permission required.');
+ const m=t.fixtures.find(x=>x.id===matchId);need(m,'Match not found');
+ // MBA_KERALOTSAVAM_V6_FINAL_SAVE_FIX_20261120
+ // Live points are provisional, not an edited FINAL result. Only the exact
+ // logged-in umpire who owns this live match may finalize its synced score.
+ const prior=t.results[matchId];
+ if(prior&&!mba37CanEditSaved()){
+  const ownLive=prior.mode==='live'&&prior.editorUid===authUser?.uid&&can('scoresWrite')&&editScope(t.id);
+  need(ownLive,'Saved result Edit permission required.');
+  need(result?.mode!=='winner'&&Number(result?.a)===Number(prior.a)&&Number(result?.b)===Number(prior.b),
+       'Live score changed. Reopen umpire and verify latest points before saving.');
+ }
  if(m.stage==='knockout')need(m.a&&m.b,'Finish previous knockout round first');
  const cat=t.categories.find(c=>c.id===m.categoryId);need(cat,'Category not found');
  const rules=effectiveRules(t,cat,m);validateResult(result,rules);
