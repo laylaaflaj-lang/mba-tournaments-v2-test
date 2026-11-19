@@ -952,7 +952,15 @@ function removeCategory(t,catId){
  t.fixtures=t.fixtures.filter(m=>m.categoryId!==catId);
  t.categories=t.categories.filter(c=>c.id!==catId);
 }
-const effectiveRules=(t,cat)=>({...t.rules,...(cat.rules||{})});
+function effectiveRules(t,cat,match=null){
+ let rules={...t.rules,...(cat?.rules||{})};
+ if(cat?.keralaNoCap===true)rules.cutoff=null;
+ if(t?.keralaotsavam&&match){
+  const pack=t.keralaScoring||{};
+  rules={...rules,...mbaKFlexNum(pack.roundRules?.[mbaKFlexRoundKey(t,match)]),...mbaKFlexNum(pack.matchRules?.[match.id])};
+ }
+ return rules;
+}
 const effectiveFormat=(t,cat)=>cat.format||t.format;
 function scoreWinner(result,rules){
  if(!result||result.mode==='live')return null;
@@ -1079,7 +1087,7 @@ function recordResult(t,matchId,result){
  const m=t.fixtures.find(x=>x.id===matchId);need(m,'Match not found');if(t.results[matchId]&&!mba37CanEditSaved())throw Error('Saved result Edit permission required.');
  if(m.stage==='knockout')need(m.a&&m.b,'Finish previous knockout round first');
  const cat=t.categories.find(c=>c.id===m.categoryId);need(cat,'Category not found');
- const rules=effectiveRules(t,cat);validateResult(result,rules);
+ const rules=effectiveRules(t,cat,m);validateResult(result,rules);
  const before=t.results[matchId];
  t.results[matchId]=result.mode==='winner'?{mode:'winner',winner:result.winner}:{a:+result.a,b:+result.b};
  if(m.stage==='knockout'){try{advanceKnockout(t,m.categoryId)}catch(e){if(before)t.results[matchId]=before;else delete t.results[matchId];throw e}}
@@ -1091,7 +1099,7 @@ function standings(t,categoryId,groupId=undefined){
  const rows=cat.entrants.filter(e=>groupId===undefined||(e.groupId||null)===(groupId||null)).map(e=>({id:e.id,name:entryLabel(t,cat,e.id),p:0,w:0,l:0,pts:0,for:0,against:0}));
  const map=new Map(rows.map(x=>[x.id,x]));
  for(const m of t.fixtures.filter(m=>m.categoryId===cat.id&&m.stage==='league'&&(groupId===undefined||(m.groupId||null)===(groupId||null)))){
-  const result=t.results[m.id],side=scoreWinner(result,rule);if(!side)continue;
+  const result=t.results[m.id],side=scoreWinner(result,effectiveRules(t,cat,m));if(!side)continue;
   for(const sideKey of ['a','b']){
    const row=map.get(m[sideKey]);if(!row)continue;
    row.p++;row.w+=+(side===sideKey);row.l+=+(side!==sideKey);row.pts+= side===sideKey?+rule.winPoints:+rule.lossPoints;
@@ -1116,7 +1124,7 @@ function advanceKnockout(t,categoryId){
   if(!source)return null;
   if(source.type==='entry')return source.id;
   const earlier=matches.find(m=>m.id===source.id);if(!earlier)return null;
-  const side=scoreWinner(t.results[earlier.id],effectiveRules(t,cat));
+  const side=scoreWinner(t.results[earlier.id],effectiveRules(t,cat,earlier));
   return side?earlier[side]:null;
  };
  for(const m of matches){
@@ -1151,7 +1159,7 @@ function generateKnockout(t,categoryId,{qualifiers=null}={}){
  if(fmt==='combined'){
   const matches=t.fixtures.filter(m=>m.categoryId===categoryId&&m.stage==='league');
   need(matches.length===makeRoundRobin(cat).length,'League fixtures incomplete');
-  need(matches.every(m=>scoreWinner(t.results[m.id],effectiveRules(t,cat))),'Finish category league before selecting knockout qualifiers');
+  need(matches.every(m=>scoreWinner(t.results[m.id],effectiveRules(t,cat,m))),'Finish category league before selecting knockout qualifiers');
  }
  const bracketSize=2**Math.ceil(Math.log2(entries.length)),byes=bracketSize-entries.length;
  need(bracketSize<=1024,'A single knockout bracket supports up to 1024 entries');
@@ -1213,7 +1221,7 @@ function playerHistory(t,playerId){
   const involved=['a','b'].find(side=>cat.entrants.some(e=>e.id===m[side]&&e.playerIds.includes(playerId)));
   if(!involved)continue;
   const e=cat.entrants.find(x=>x.id===m[involved]);const opponent=involved==='a'?'b':'a';
-  const r=t.results[m.id],winner=scoreWinner(r,effectiveRules(t,cat));
+  const r=t.results[m.id],winner=scoreWinner(r,effectiveRules(t,cat,m));
   matches.push({id:m.id,categoryId:cat.id,category:cat.name,group:cat.groups?.find(g=>g.id===e?.groupId)?.name||'General',stage:m.stage,round:m.round||null,slot:m.slot,court:m.court,opponent:entryLabel(t,cat,m[opponent]),score:r?(r.mode==='winner'?'Score not recorded':`${r.a} – ${r.b}`):'Not played',scoreFor:r&&r.mode!=='winner'?+r[involved]:null,scoreAgainst:r&&r.mode!=='winner'?+r[opponent]:null,outcome:!winner?'pending':winner===involved?'win':'loss'});
  }
  return {name:player.name,teamId:team.id,team:team.name,matches,played:matches.filter(m=>m.outcome!=='pending').length,wins:matches.filter(m=>m.outcome==='win').length,losses:matches.filter(m=>m.outcome==='loss').length,pointsFor:matches.reduce((a,m)=>a+(m.scoreFor||0),0),pointsAgainst:matches.reduce((a,m)=>a+(m.scoreAgainst||0),0),withoutNumericScore:matches.filter(m=>m.outcome!=='pending'&&m.scoreFor===null).length};
@@ -1224,7 +1232,7 @@ function teamHistory(t,teamId){
   const cat=t.categories.find(c=>c.id===m.categoryId);if(!cat)continue;
   const side=['a','b'].find(side=>cat.entrants.some(e=>e.id===m[side]&&e.teamId===teamId));if(!side)continue;
   const e=cat.entrants.find(x=>x.id===m[side]),opponent=side==='a'?'b':'a';
-  const r=t.results[m.id],winner=scoreWinner(r,effectiveRules(t,cat));
+  const r=t.results[m.id],winner=scoreWinner(r,effectiveRules(t,cat,m));
   matches.push({id:m.id,category:cat.name,group:cat.groups?.find(g=>g.id===e?.groupId)?.name||'General',stage:m.stage,slot:m.slot,court:m.court,players:entryLabel(t,cat,m[side]),opponent:entryLabel(t,cat,m[opponent]),score:r?(r.mode==='winner'?'Score not recorded':`${r.a} – ${r.b}`):'Not played',scoreFor:r&&r.mode!=='winner'?+r[side]:null,scoreAgainst:r&&r.mode!=='winner'?+r[opponent]:null,outcome:!winner?'pending':winner===side?'win':'loss'});
  }
  return {name:team.name,players:team.players,played:matches.filter(m=>m.outcome!=='pending').length,wins:matches.filter(m=>m.outcome==='win').length,losses:matches.filter(m=>m.outcome==='loss').length,pointsFor:matches.reduce((a,m)=>a+(m.scoreFor||0),0),pointsAgainst:matches.reduce((a,m)=>a+(m.scoreAgainst||0),0),withoutNumericScore:matches.filter(m=>m.outcome!=='pending'&&m.scoreFor===null).length,matches};
@@ -1783,7 +1791,7 @@ function groupLabel(cat,groupId){return cat?.groups?.find(g=>g.id===groupId)?.na
 function categoryDetailModal(t,c){
  const rule=effectiveRules(t,c),format=effectiveFormat(t,c);
  const matches=t.fixtures.filter(m=>m.categoryId===c.id).sort((a,b)=>(a.slot||0)-(b.slot||0)||a.court-b.court);
- const done=matches.filter(m=>scoreWinner(t.results[m.id],rule)).length;
+ const done=matches.filter(m=>scoreWinner(t.results[m.id],effectiveRules(t,c,m))).length;
  const allGroups=[{id:null,name:'General / Ungrouped'},...(c.groups||[])];
  const groupBlocks=allGroups.map(g=>{
   const entries=c.entrants.filter(e=>(e.groupId||null)===g.id);
@@ -1793,7 +1801,7 @@ function categoryDetailModal(t,c){
   return `<section class="category-group"><h4>${esc(g.name)} — ${entries.length} entries</h4><div class="category-entries">${entries.map(e=>{const team=t.teams.find(x=>x.id===e.teamId);return `<div class="entry-line"><span>${linkedEntry(t,c,e.id)}</span><span>${team?teamLink(team):'—'}</span></div>`}).join('')||'<p class="helper">No entries assigned.</p>'}</div>${table}</section>`;
  }).join('');
  const matchRows=matches.map(m=>{
-  const r=t.results[m.id],win=scoreWinner(r,rule),[a,b]=participants(t,m);
+  const r=t.results[m.id],win=scoreWinner(r,effectiveRules(t,c,m)),[a,b]=participants(t,m);
   const outcome=!win?'Pending':r.mode==='winner'?`WON: ${win==='a'?a:b} · Score not recorded`:`${r.a} – ${r.b} · WON: ${win==='a'?a:b}`;
   return `<tr><td>${m.stage==='knockout'?esc(koRoundLabel(t,m)):'League'}<small>Slot ${esc(m.slot||'—')} · Court ${esc(m.court||'—')}</small></td><td>${esc(groupLabel(c,m.groupId))}</td><td>${linkedEntry(t,c,m.a)} <span class="vs">VS</span> ${linkedEntry(t,c,m.b)}</td><td class="${win?'winner':''}">${esc(outcome)}</td></tr>`;
  }).join('');
@@ -1876,14 +1884,14 @@ function render(){
  mbaEnhanceShares();
 }
 function tournamentSummary(t){
- const total=t.fixtures?.length||0,played=(t.fixtures||[]).filter(m=>{const c=lookup(t,m.categoryId);return c&&scoreWinner(t.results[m.id],effectiveRules(t,c))}).length;
+ const total=t.fixtures?.length||0,played=(t.fixtures||[]).filter(m=>{const c=lookup(t,m.categoryId);return c&&scoreWinner(t.results[m.id],effectiveRules(t,c,m))}).length;
  return {total,played,remaining:total-played,teams:t.teams.length,players:t.teams.reduce((n,x)=>n+x.players.length,0),categories:t.categories.length,groups:t.categories.reduce((n,c)=>n+(c.groups||[]).length,0)};
 }
 function tournamentHistoryPanel(t){
  const arr=[...t.fixtures].sort((a,b)=>(a.slot||0)-(b.slot||0)||a.court-b.court);
  const items=arr.map(m=>{
   const c=lookup(t,m.categoryId);if(!c)return '';
-  const names=participants(t,m),r=t.results[m.id],win=scoreWinner(r,effectiveRules(t,c));
+  const names=participants(t,m),r=t.results[m.id],win=scoreWinner(r,effectiveRules(t,c,m));
   const score=!win?'Not played':r.mode==='winner'?'Score not recorded':`${r.a} – ${r.b}`;
   const winner=win?names[win==='a'?0:1]:'';
   return `<tr><td>Slot ${m.slot||'—'}<small>Court ${m.court||'—'}</small></td><td>${categoryLink(c)}<small>${esc(groupLabel(c,m.groupId))} · ${esc(m.stage)}</small></td><td>${esc(names[0])}<br><span class="muted">VS</span><br>${esc(names[1])}</td><td><b>${esc(score)}</b></td><td>${winner?`<span class="win">🏆 ${esc(winner)}</span>`:'<span class="pending">Pending</span>'}</td></tr>`;
@@ -2041,7 +2049,7 @@ function fixtureView(t){
  const checked=fixturesCheck(t),league=t.fixtures.filter(m=>m.stage==='league').sort((a,b)=>a.slot-b.slot||a.court-b.court),ko=t.fixtures.filter(m=>m.stage==='knockout').sort((a,b)=>a.slot-b.slot||a.court-b.court);
  const leagueCategories=t.categories.filter(c=>['league','combined'].includes(effectiveFormat(t,c)));
  const totalExpected=leagueCategories.reduce((n,c)=>n+makeRoundRobin(c).length,0);
- const matchCard=m=>{const c=lookup(t,m.categoryId),rule=effectiveRules(t,c),w=scoreWinner(t.results[m.id],rule),result=t.results[m.id];
+ const matchCard=m=>{const c=lookup(t,m.categoryId),rule=effectiveRules(t,c,m),w=scoreWinner(t.results[m.id],rule),result=t.results[m.id];
   const payment=showFixturePaymentStatus?`<div class="mba-fixture-pay">${fixtureEntryPaymentStatus(t,c,m.a)}${fixtureEntryPaymentStatus(t,c,m.b)}</div>`:'';
   const score=result?(result.mode==='winner'?'Win/Loss recorded':`${result.a} – ${result.b}`):'Pending';
   return `<article class="mba-fixture-item ${m.stage==='knockout'?(koRoundLabel(t,m)==='Final'?'mba-round-final':koRoundLabel(t,m)==='Semi-final'?'mba-round-semi':''):''}"><div class="mba-fixture-meta"><span><b>Slot ${esc(m.slot||'—')}</b> · Court ${esc(m.court||'—')}</span><span>${esc(c?.name||'')}${m.stage==='knockout'?' · '+esc(koRoundLabel(t,m)):''}</span></div><div class="mba-fixture-pairs"><div class="mba-fixture-side ${w==='a'?'mba-winning':''}">${linkedEntry(t,c,m.a)}</div><span class="vs">VS</span><div class="mba-fixture-side ${w==='b'?'mba-winning':''}">${linkedEntry(t,c,m.b)}</div></div>${payment}<div class="mba-fixture-bottom"><span class="mba-fixture-result">${esc(score)}${w?' · 🏆 '+esc(participants(t,m)[w==='a'?0:1]):''}</span>${m.a&&m.b&&can('scoresWrite')&&editScope(t.id)?`<button type="button" class="btn mba-umpire-launch" data-mba-score-match="${esc(m.id)}">🏸 Umpire Score</button>`:''}</div></article>`;
@@ -2081,9 +2089,9 @@ function fixtureView(t){
 function koRoundLabel(t,m){const max=Math.max(...t.fixtures.filter(x=>x.stage==='knockout'&&x.categoryId===m.categoryId).map(x=>x.round));return m.round===max?'Final':m.round===max-1?'Semi-final':m.round===max-2?'Quarter-final':`Knockout Round ${m.round}`;}
 function resultView(t){
  const list=[...t.fixtures].sort((a,b)=>a.slot-b.slot||a.court-b.court);
- const done=list.filter(m=>scoreWinner(t.results[m.id],effectiveRules(t,lookup(t,m.categoryId)))).length;
+ const done=list.filter(m=>scoreWinner(t.results[m.id],effectiveRules(t,lookup(t,m.categoryId),m))).length;
  return card(`Match Results (${done}/${list.length} completed)`,list.map(m=>{
- const c=lookup(t,m.categoryId),rules=effectiveRules(t,c),w=scoreWinner(t.results[m.id],rules),names=participants(t,m),result=t.results[m.id];
+ const c=lookup(t,m.categoryId),rules=effectiveRules(t,c,m),w=scoreWinner(t.results[m.id],rules),names=participants(t,m),result=t.results[m.id];
  const score=result?(result.mode==='winner'?'Score not recorded':`${result.a} – ${result.b}`):'Not played';
  const edit=editor?.kind==='result'&&editor.id===m.id;
  const form=edit?`<form data-form="result" data-id="${esc(m.id)}" class="sub-form"><div class="actions"><label class="choice"><input type="radio" name="mode" value="score" ${mode==='score'?'checked':''}> Numeric score</label><label class="choice"><input type="radio" name="mode" value="winner" ${mode==='winner'?'checked':''}> WIN / LOSS Only</label></div>
@@ -2152,7 +2160,7 @@ function reportData(t,kind,catId='all',groupId='all'){
  for(const m of [...t.fixtures].sort((a,b)=>(a.slot||0)-(b.slot||0)||a.court-b.court)){
   const c=lookup(t,m.categoryId);if(!cats.includes(c))continue;const entrant=c.entrants.find(e=>e.id===m.a);
   if(!hasGroup(c,entrant)&&!(m.stage==='knockout'&&groupId==='all'))continue;
-  const names=participants(t,m),res=t.results[m.id],win=scoreWinner(res,effectiveRules(t,c));
+  const names=participants(t,m),res=t.results[m.id],win=scoreWinner(res,effectiveRules(t,c,m));
   const match=names.join('  VS  '),score=!res?'Pending':res.mode==='winner'?'Not recorded':`${res.a} – ${res.b}`;
   const winner=win?names[win==='a'?0:1]:'—';
   if(kind==='fixtures')rows.push(['#'+(m.slot||'—'),String(m.court||'—'),c.name,...(grouped?[groupLabel(c,m.groupId)]:[]),match]);
@@ -2601,7 +2609,7 @@ function mbaRenderUmpire(){
  const host=document.getElementById('mba-umpire-overlay');if(!host)return;
  if(!mbaUmpire){host.hidden=true;host.innerHTML='';return}
  const t=active(),m=t?.fixtures.find(x=>x.id===mbaUmpire.matchId);if(!m||t.id!==mbaUmpire.tournamentId){mbaUmpire=null;host.hidden=true;return}
- const c=lookup(t,m.categoryId),r=effectiveRules(t,c),names=participants(t,m);
+ const c=lookup(t,m.categoryId),r=effectiveRules(t,c,m),names=participants(t,m);
  const cap=r.cutoff==null?Math.max(r.target,Number(mbaUmpire.tickLimit||r.target),Math.max(mbaUmpire.a,mbaUmpire.b)):Number(r.cutoff);
  const count=Math.min(250,Math.max(r.target,cap)),winner=scoreWinner({a:mbaUmpire.a,b:mbaUmpire.b},r);
  const grid=(key,name)=>{const current=mbaUmpire[key];return `<div class="mba-point-team"><h4>${esc(name)}</h4><div class="mba-point-score">${current}</div><div class="mba-point-actions"><button type="button" class="btn" data-mba-point="${key}:-1">− Undo</button><button type="button" class="btn primary" data-mba-point="${key}:1" ${winner?'disabled':''}>+ Point</button></div><div class="mba-point-grid">${Array.from({length:count},(_,i)=>`<button type="button" class="mba-point ${i<current?'is-marked':''}" data-mba-check="${key}:${i+1}" aria-label="${esc(name)} point ${i+1}" ${winner&&i>=current?'disabled':''}>${i+1}</button>`).join('')}</div></div>`};
@@ -2610,7 +2618,7 @@ function mbaRenderUmpire(){
 function mbaUmpirePoint(key,change,point){
  if(!mbaUmpire||!['a','b'].includes(key))return;
  const t=active(),m=t?.fixtures.find(x=>x.id===mbaUmpire.matchId);if(!m)return;
- const rules=effectiveRules(t,lookup(t,m.categoryId));
+ const rules=effectiveRules(t,lookup(t,m.categoryId),m);
  if(change>0&&scoreWinner({a:mbaUmpire.a,b:mbaUmpire.b},rules))return;
  if(point!==undefined){if(point===mbaUmpire[key]+1)mbaUmpire[key]++;else if(point<=mbaUmpire[key])mbaUmpire[key]=point-1;else return}
  else mbaUmpire[key]=Math.max(0,mbaUmpire[key]+change);
@@ -2620,7 +2628,7 @@ function mbaUmpirePoint(key,change,point){
 async function mbaFinishUmpire(){
  if(!mbaUmpire)throw Error('Umpire score not open.');
  const u={...mbaUmpire},t=active(),m=t?.fixtures.find(x=>x.id===u.matchId);if(!m||t.id!==u.tournamentId)throw Error('The tournament or match changed.');
- const w=scoreWinner({a:u.a,b:u.b},effectiveRules(t,lookup(t,m.categoryId)));
+ const w=scoreWinner({a:u.a,b:u.b},effectiveRules(t,lookup(t,m.categoryId),m));
  if(!w)throw Error('Finish the match according to its scoring rules.');if(t.results[u.matchId]&&t.results[u.matchId].mode!=='live'&&!mba37CanEditSaved())throw Error('Super Admin did not grant permission to EDIT a saved score.');
  if(!confirm('Save '+u.a+' – '+u.b+' as the FINAL result? Points Table will update automatically.'))return;
  const btn=document.getElementById('mba-umpire-final');if(btn)btn.disabled=true;
@@ -3034,12 +3042,12 @@ function mba36Bracket(t,c){
  const cols=roundsOrdered.map(([round,list])=>{
   const heading=round===0?'Qualifiers / Re-entry':round===maxRound?'🏆 Final':round===maxRound-1?'Semi-finals':round===maxRound-2?'Quarter-finals':`Round ${round}`;
   return `<div class="mba36-bracket-column ${round===maxRound?'mba-round-final':round===maxRound-1?'mba-round-semi':''}"><h4>${heading}</h4>${list.sort((a,b)=>(a.bracketIndex||0)-(b.bracketIndex||0)).map(m=>{
-   const winner=scoreWinner(t.results[m.id],effectiveRules(t,c)),result=t.results[m.id];
+   const winner=scoreWinner(t.results[m.id],effectiveRules(t,c,m)),result=t.results[m.id];
    const score=result?(result.mode==='winner'?'Winner saved':`${result.a} – ${result.b}`):m.a&&m.b?'Not played':'Waiting';
    return `<div class="mba36-bracket-match"><div class="mba36-bracket-row ${winner==='a'?'won':''}">${esc(labelFor(m,'a'))}${winner==='a'?'<span>✓</span>':''}</div><div class="mba36-bracket-row ${winner==='b'?'won':''}">${esc(labelFor(m,'b'))}${winner==='b'?'<span>✓</span>':''}</div><div class="mba36-bracket-foot"><small>Court ${esc(m.court)} · ${esc(score)}</small>${m.a&&m.b&&can('scoresWrite')&&editScope(t.id)?`<button type="button" data-mba-score-match="${esc(m.id)}" class="btn">✍ Score</button>`:''}</div></div>`;
   }).join('')}</div>`;
  }).join('');
- const finalMatch=roundsOrdered.at(-1)?.[1]?.[0],win=finalMatch?scoreWinner(t.results[finalMatch.id],effectiveRules(t,c)):null;
+ const finalMatch=roundsOrdered.at(-1)?.[1]?.[0],win=finalMatch?scoreWinner(t.results[finalMatch.id],effectiveRules(t,c,finalMatch)):null;
  const champion=win?entryLabel(t,c,finalMatch[win]):'';
  const byes=2**Math.ceil(Math.log2(Math.max(2,c.entrants.length)))-c.entrants.length;
  return `<section class="card mba36-bracket-section"><div class="section-head"><h2>🏸 ${esc(c.name)} — Knockout Bracket</h2><span>${c.entrants.length} entries · ${byes} bye(s)</span></div><p class="helper">Swipe sideways to see the rounds. Winners automatically advance after an authorized umpire saves a valid result.</p><div class="mba36-bracket-scroll"><div class="mba36-bracket">${cols}${champion?`<div class="mba36-bracket-column mba36-champion"><h4>Champion</h4><div class="mba36-bracket-match">🏆 ${esc(champion)}</div></div>`:''}</div></div></section>`;
@@ -3301,7 +3309,7 @@ function mba37RegistrationView(t){
  const rows=t.categories.flatMap(c=>c.entrants.map(e=>{
   const row=mba37PrivateItems[e.id]||{},names=entryLabel(t,c,e.id),count=e.playerIds.length;
   const outcomes=t.fixtures.filter(m=>m.categoryId===c.id&&(m.a===e.id||m.b===e.id));
-  const done=outcomes.some(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c)));
+  const done=outcomes.some(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c,m)));
   const team=t.teams.find(x=>x.id===e.teamId);
   const latest=receipts().filter(x=>e.playerIds.includes(x.playerId)).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))[0]||null;
   const entryCharge=mba372FeeRows(t).find(r=>r.entryId===e.id);
@@ -3436,7 +3444,7 @@ function mba37ManualNextRound(t,c){
   const target=matches.filter(m=>m.round===round),pool=target.flatMap(m=>[m.sourceA,m.sourceB]).filter(Boolean);
   if(!target.length||pool.length<2)continue;
   if(target.some(m=>t.results[m.id]))continue;
-  const previous=matches.filter(m=>m.round===round-1),prevReady=previous.every(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c)));
+  const previous=matches.filter(m=>m.round===round-1),prevReady=previous.every(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c,m)));
   if(!prevReady)continue;
   options.push(`<option value="${round}">Round ${round} · ${pool.length} qualified sources</option>`);
  }
@@ -3452,7 +3460,7 @@ fixtureView=function(t){
 function mba37RoundOptions(t,catId,round){
  const c=lookup(t,catId),matches=t.fixtures.filter(m=>m.categoryId===catId&&m.stage==='knockout'&&m.round===round),pool=matches.flatMap(m=>[m.sourceA,m.sourceB]).filter(Boolean);
  const seen=new Set();const unique=pool.filter(s=>{const key=s.type+':'+s.id;if(seen.has(key))return false;seen.add(key);return true});
- const label=s=>s.type==='entry'?entryLabel(t,c,s.id):(()=>{const p=t.fixtures.find(m=>m.id===s.id),w=p&&scoreWinner(t.results[p.id],effectiveRules(t,c));return w?'Winner: '+entryLabel(t,c,p[w]):'Winner of '+s.id})();
+ const label=s=>s.type==='entry'?entryLabel(t,c,s.id):(()=>{const p=t.fixtures.find(m=>m.id===s.id),w=p&&scoreWinner(t.results[p.id],effectiveRules(t,c,p));return w?'Winner: '+entryLabel(t,c,p[w]):'Winner of '+s.id})();
  return {matches,pool:unique,labels:Object.fromEntries(unique.map(s=>[s.type+':'+s.id,label(s)]))};
 }
 function mba37RenderRoundPairs(form){
@@ -3553,15 +3561,15 @@ function mba37LuckyState(t,c){return c.luckyMode||null}
 function mba37LuckyQualifiers(t,c){return t.fixtures.filter(m=>m.categoryId===c.id&&m.stage==='knockout'&&m.round===0&&m.id.startsWith('koq__'))}
 function mba37LuckyReplay(t,c){return t.fixtures.find(m=>m.id==='kol__'+c.id)}
 function mba37LuckyLosers(t,c){return mba37LuckyQualifiers(t,c).map(m=>{
- const side=scoreWinner(t.results[m.id],effectiveRules(t,c));return side?{id:m[side==='a'?'b':'a'],from:m.id}:null;
+ const side=scoreWinner(t.results[m.id],effectiveRules(t,c,m));return side?{id:m[side==='a'?'b':'a'],from:m.id}:null;
  }).filter(Boolean)}
-function mba37LuckyAllDone(t,c){const list=mba37LuckyQualifiers(t,c);return list.length>0&&list.every(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c)))}
+function mba37LuckyAllDone(t,c){const list=mba37LuckyQualifiers(t,c);return list.length>0&&list.every(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c,m)))}
 function mba37LuckyControls(t,c){
  const a=mba37LuckyState(t,c),n=c.entrants.length,edit=can('fixturesWrite')&&can('categoriesWrite')&&editScope(t.id);
  if(!edit||effectiveFormat(t,c)!=='knockout'||n<5)return '';
  if(!a)return `<details class="mba37-lucky"><summary>🎟 Optional Lucky Loser / Re-entry — ${esc(c.name)}</summary><p class="helper">SPECIAL RULE (not standard KO): play qualification matches, draw one losing entry back into the competition; with odd entry count, that loser plays the waiting entrant. This adds games. Participants must agree before starting.</p><label class="field">If odd entries, who waits?<select data-mba37-wait="${esc(c.id)}"><option value="">Draw waiting entrant randomly</option>${c.entrants.map(e=>`<option value="${esc(e.id)}">${esc(entryLabel(t,c,e.id))}</option>`).join('')}</select></label><button class="btn primary" type="button" data-mba37-lucky-start="${esc(c.id)}">Start Special Re-entry Qualifiers</button></details>`;
  const qs=mba37LuckyQualifiers(t,c),losers=mba37LuckyLosers(t,c),replay=mba37LuckyReplay(t,c);
- const winnerOf=m=>{const x=scoreWinner(t.results[m.id],effectiveRules(t,c));return x?m[x]:null};
+ const winnerOf=m=>{const x=scoreWinner(t.results[m.id],effectiveRules(t,c,m));return x?m[x]:null};
  const all=mba37LuckyAllDone(t,c);
  const state=a.mainGenerated?'✅ Main knockout started':a.pickedLoserId?'Qualified loser selected':'Qualifier matches in progress';
  let actions='';
@@ -3615,9 +3623,9 @@ async function mba37LuckyMain(id){
  if(!mba37LuckyAllDone(t,c)||!c.luckyMode.pickedLoserId)throw Error('Qualifiers and Lucky Loser draw incomplete.');
  const replay=mba37LuckyReplay(t,c);
  if(c.luckyMode.waitingId&&!replay)throw Error('Waiting player qualifier missing.');
- const repWinner=replay?scoreWinner(t.results[replay.id],effectiveRules(t,c)):null;
+ const repWinner=replay?scoreWinner(t.results[replay.id],effectiveRules(t,c,replay)):null;
  if(replay&&!repWinner)throw Error('Finish the waiting-vs-loser game first.');
- const qualifiers=mba37LuckyQualifiers(t,c),ids=qualifiers.map(m=>{const side=scoreWinner(t.results[m.id],effectiveRules(t,c));return m[side]});
+ const qualifiers=mba37LuckyQualifiers(t,c),ids=qualifiers.map(m=>{const side=scoreWinner(t.results[m.id],effectiveRules(t,c,m));return m[side]});
  if(replay)ids.push(replay[repWinner]);else ids.push(c.luckyMode.pickedLoserId);
  if(new Set(ids).size!==ids.length)throw Error('Duplicate qualified entry; review results.');
  const size=mba37Power2(ids.length),slots=mba37ShuffleStrong([...ids,...Array(size-ids.length).fill(null)]);
@@ -3643,7 +3651,7 @@ document.addEventListener('change',e=>{
  if(!t||!(can('scoresWrite')&&editScope(t.id))){check.checked=!check.checked;alert('Umpire scoring permission required.');return}
  const cat=t.categories.find(c=>c.id===catId);
  const related=t.fixtures.filter(m=>m.categoryId===catId&&(m.a===entryId||m.b===entryId));
- const completed=related.some(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,cat)));
+ const completed=related.some(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,cat,m)));
  if(completed){check.checked=true;alert('Completed matches cannot be unchecked here. Use Results → Edit / Delete (Super Admin permission required).');return}
  const m=related.find(x=>x.a&&x.b&&!t.results[x.id]);
  if(!m){check.checked=false;alert('First generate a fixture with both opponents, then mark it completed.');return}
@@ -4330,9 +4338,9 @@ const mbaV373NamesForEntry=(t,c,id)=>{
 const mbaV373Norm=s=>String(s||'').normalize('NFKC').trim().toLocaleLowerCase().replace(/\s+/g,' ');
 function mbaV373RoundOneStatus(t,c){
  const matches=t.fixtures.filter(m=>m.categoryId===c.id&&m.stage==='knockout'&&m.round===1&&m.sourceA&&m.sourceB);
- const completed=matches.filter(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c)));
+ const completed=matches.filter(m=>!!scoreWinner(t.results[m.id],effectiveRules(t,c,m)));
  const unplayed=matches.filter(m=>!t.results[m.id]&&m.sourceA?.type==='entry'&&m.sourceB?.type==='entry');
- const laterPlayed=t.fixtures.some(m=>m.categoryId===c.id&&m.stage==='knockout'&&m.round>1&&!!scoreWinner(t.results[m.id],effectiveRules(t,c)));
+ const laterPlayed=t.fixtures.some(m=>m.categoryId===c.id&&m.stage==='knockout'&&m.round>1&&!!scoreWinner(t.results[m.id],effectiveRules(t,c,m)));
  return {matches,completed,unplayed,laterPlayed};
 }
 function mbaV373EligibleReentry(t,c,fd){
@@ -4344,7 +4352,7 @@ function mbaV373EligibleReentry(t,c,fd){
  if(request.length!==1)throw Error('Register exactly ONE re-entry doubles pair at a time.');
  const pair=request[0].players.map(mbaV373Norm);
  const losers=state.completed.map(m=>{
-  const w=scoreWinner(t.results[m.id],effectiveRules(t,c));
+  const w=scoreWinner(t.results[m.id],effectiveRules(t,c,m));
   return mbaV373NamesForEntry(t,c,m[w==='a'?'b':'a']).map(mbaV373Norm);
  }).filter(arr=>arr.length===2);
  if(!losers.some(old=>pair.some(p=>old.includes(p))&&pair.some(p=>!old.includes(p)))){
@@ -4659,7 +4667,7 @@ function mbaKFormatEntryKey(names){
 }
 function mbaKSideReminder(){
  const u=mbaUmpire,t=active();if(!u||!t||t.id!==u.tournamentId)return;
- const point=Number(t.sideSwitchPoint||0);
+ const point=mbaKFlexSwitchPoint(t,u.matchId);
  if(!Number.isInteger(point)||point<1||Math.max(u.a,u.b)<point)return;
  const key='mba-k-side-ack-'+u.tournamentId+'-'+u.matchId+'-'+point;
  try{if(sessionStorage.getItem(key)==='yes')return}catch{}
@@ -4671,7 +4679,7 @@ function mbaKSideReminder(){
 }
 document.addEventListener('click',e=>{
  const b=e.target.closest('#mba-k-side-ack');if(!b||!mbaUmpire)return;
- const t=active(),key='mba-k-side-ack-'+mbaUmpire.tournamentId+'-'+mbaUmpire.matchId+'-'+Number(t?.sideSwitchPoint||0);
+ const t=active(),key='mba-k-side-ack-'+mbaUmpire.tournamentId+'-'+mbaUmpire.matchId+'-'+mbaKFlexSwitchPoint(t,mbaUmpire.matchId);
  try{sessionStorage.setItem(key,'yes')}catch{}
  b.closest('#mba-k-side-reminder')?.remove();
 });
@@ -5496,6 +5504,209 @@ document.addEventListener('click',e=>{
   alert('Live Sync unavailable: Umpire score edit permission is missing.');return;
  }
  mbaKPublishPoint();
+},true);
+
+
+/* MBA_KERALOTSAVAM_V6_FINAL_FLEX_20261120 — TEST-only; no automatic database changes on page load.
+ * Precedence: tournament < category < category+round < match. Existing saved score locks affected rule edits.
+ */
+function mbaKFlexRoundKey(t,m){return `${m.categoryId}|${m.stage||'knockout'}|${Number(m.round)||0}`}
+function mbaKFlexNum(entry){
+ const out={};if(!entry||typeof entry!=='object')return out;
+ for(const k of ['target','winByTwo'])if(Object.prototype.hasOwnProperty.call(entry,k))out[k]=entry[k];
+ if(entry.noCap===true)out.cutoff=null;
+ else if(Object.prototype.hasOwnProperty.call(entry,'cutoff'))out.cutoff=entry.cutoff;
+ return out;
+}
+function mbaKFlexSwitchPoint(t,mid){
+ const m=t?.fixtures?.find(x=>x.id===mid),c=t?.categories?.find(x=>x.id===m?.categoryId);
+ let point=t?.sideSwitchPoint??0;
+ if(c&&Object.prototype.hasOwnProperty.call(c,'keralaSwitchPoint'))point=c.keralaSwitchPoint;
+ if(m){
+  const pack=t.keralaScoring||{};
+  const round=pack.roundRules?.[mbaKFlexRoundKey(t,m)];
+  const one=pack.matchRules?.[m.id];
+  if(round&&Object.prototype.hasOwnProperty.call(round,'switchAt'))point=round.switchAt;
+  if(one&&Object.prototype.hasOwnProperty.call(one,'switchAt'))point=one.switchAt;
+ }
+ return Number(point)||0;
+}
+function mbaKFlexEligible(t,scope,key){
+ if(scope==='category'){
+  const c=t.categories.find(x=>x.id===key);
+  if(!c)throw Error('Category not found. Refresh.');
+  return {c,affected:t.fixtures.filter(m=>m.categoryId===c.id),key};
+ }
+ if(scope==='round'){
+  const match=t.fixtures.find(m=>mbaKFlexRoundKey(t,m)===key);
+  if(!match)throw Error('Round not found. Refresh.');
+  const c=t.categories.find(x=>x.id===match.categoryId);
+  return {c,affected:t.fixtures.filter(m=>mbaKFlexRoundKey(t,m)===key),key};
+ }
+ if(scope==='match'){
+  const m=t.fixtures.find(x=>x.id===key);if(!m)throw Error('Match not found. Refresh.');
+  return {c:t.categories.find(x=>x.id===m.categoryId),affected:[m],key};
+ }
+ throw Error('Select category, round or match.');
+}
+function mbaKFlexRuleForScope(t,scope,key){
+ const ctx=mbaKFlexEligible(t,scope,key),c=ctx.c,m=ctx.affected[0];
+ let rule={...t.rules,...(c?.rules||{})};
+ if(c?.keralaNoCap===true)rule.cutoff=null;
+ let point=c&&Object.prototype.hasOwnProperty.call(c,'keralaSwitchPoint')?c.keralaSwitchPoint:(t.sideSwitchPoint??0);
+ if(scope==='round'||scope==='match'){
+  const e=t.keralaScoring?.roundRules?.[mbaKFlexRoundKey(t,m)];
+  rule={...rule,...mbaKFlexNum(e)};
+  if(e&&Object.prototype.hasOwnProperty.call(e,'switchAt'))point=e.switchAt;
+ }
+ if(scope==='match'){
+  const e=t.keralaScoring?.matchRules?.[m.id];
+  rule={...rule,...mbaKFlexNum(e)};
+  if(e&&Object.prototype.hasOwnProperty.call(e,'switchAt'))point=e.switchAt;
+ }
+ return {rule,point:Number(point)||0,ctx};
+}
+function mbaKFlexScopeOptions(t){
+ const categories=t.categories.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join('');
+ const seen=new Set();
+ const rounds=t.fixtures.map(m=>{
+  const key=mbaKFlexRoundKey(t,m);if(seen.has(key))return '';seen.add(key);
+  const c=lookup(t,m.categoryId),label=m.stage==='knockout'?koRoundLabel(t,m):'League matches';
+  return `<option value="${esc(key)}">${esc(c?.name||'Category')} · ${esc(label)}</option>`;
+ }).filter(Boolean).join('');
+ const matches=t.fixtures.map(m=>{
+  const c=lookup(t,m.categoryId),label=m.stage==='knockout'?koRoundLabel(t,m):'League';
+  const sides=m.a&&m.b?`${entryLabel(t,c,m.a)} vs ${entryLabel(t,c,m.b)}`:'Waiting for players';
+  return `<option value="${esc(m.id)}">${esc(c?.name||'Category')} · ${esc(label)} · Court ${esc(m.court||1)} · ${esc(sides)}</option>`;
+ }).join('');
+ return {categories,rounds,matches};
+}
+function mbaKFlexPanel(t){
+ if(!t?.keralaotsavam||!isSuper())return '';
+ const o=mbaKFlexScopeOptions(t),any=t.fixtures.length>0;
+ return `<section class="card" id="mba-k-flex-card"><style>#mba-k-flex-card [hidden]{display:none!important}#mba-k-flex-card label,#mba-k-flex-card select,#mba-k-flex-card input{min-width:0}#mba-k-flex-card .mba-k-form{max-width:100%}</style><div class="section-head"><h2>🏸 Flexible Match Scoring · Keralaotsavam</h2></div>
+ <p class="helper">Set any target (21, 30, 40, 50…); customize Singles/Doubles, a full round, or one match including the Final. Priority: Tournament → Category → Round → Match. Only unstarted games can be changed.</p>
+ <form id="mba-k-flex-form" class="mba-k-form" data-tid="${esc(t.id)}">
+ <label>Which matches should change?<select name="scope"><option value="match" ${any?'':'disabled'}>ONE Match (including Final)</option><option value="round" ${any?'':'disabled'}>Entire Round of one Category</option><option value="category" ${any?'':'selected'}>Category (Singles / Doubles)</option></select></label>
+ <label data-flex-choice="category" hidden>Choose category<select name="category">${o.categories}</select></label>
+ <label data-flex-choice="round" hidden>Choose round<select name="round">${o.rounds}</select></label>
+ <label data-flex-choice="match">Choose match<select name="match">${o.matches}</select></label>
+ <div class="mba-k-scoring-config"><label>Target points (custom allowed: 1–250)<input name="target" type="number" min="1" max="250" required></label>
+ <label><input name="winByTwo" type="checkbox"> Win by 2 points</label>
+ <label><input name="noCap" type="checkbox"> No maximum cap</label>
+ <label>Maximum score cap (at least target)<input name="cutoff" type="number" min="1" max="999" required></label>
+ <label>Change ends at point (0 = Off)<input name="switchAt" type="number" min="0" max="249" required></label></div>
+ <p id="mba-k-flex-info" class="helper">Selected scoring rules appear here.</p>
+ <div class="actions"><button type="submit" class="btn primary">Save Rules for Selection</button><button id="mba-k-flex-reset" type="button" class="btn">↺ Use Inherited Rules</button></div>
+ <p class="helper">These buttons never clear players, scores, fixtures or completed results. Only Super Admin can change rules. Saved/live scores lock the affected selection; edit a future Match directly instead.</p>
+ </form></section>`;
+}
+const mbaKFlexPreviousFixtureView=fixtureView;
+fixtureView=function(t){const normal=mbaKFlexPreviousFixtureView(t);return mbaKFlexPanel(t)+normal;};
+function mbaKFlexFormContext(f){
+ const scope=f.elements.scope.value;
+ return {scope,key:String(f.elements[scope]?.value||'')};
+}
+function mbaKFlexInputState(f){
+ const noCap=!!f.elements.noCap.checked;
+ f.elements.cutoff.disabled=noCap;f.elements.cutoff.required=!noCap;
+}
+function mbaKFlexHydrate(f){
+ if(!f)return;const t=active();if(!t?.keralaotsavam||t.id!==f.dataset.tid)return;
+ const {scope,key}=mbaKFlexFormContext(f);
+ for(const label of f.querySelectorAll('[data-flex-choice]'))label.hidden=label.dataset.flexChoice!==scope;
+ const info=f.querySelector('#mba-k-flex-info'),save=f.querySelector('button[type=submit]'),reset=f.querySelector('#mba-k-flex-reset');
+ try{
+  const {rule,point,ctx}=mbaKFlexRuleForScope(t,scope,key);
+  f.elements.target.value=String(rule.target||21);
+  f.elements.winByTwo.checked=!!rule.winByTwo;
+  f.elements.noCap.checked=rule.cutoff==null;
+  f.elements.cutoff.value=rule.cutoff==null?'':String(rule.cutoff);
+  f.elements.switchAt.value=String(point);
+  mbaKFlexInputState(f);
+  const started=ctx.affected.filter(m=>!!t.results?.[m.id]);
+  const activeHere=mbaUmpire?.tournamentId===t.id&&ctx.affected.some(m=>m.id===mbaUmpire.matchId);
+  const locked=!!(started.length||activeHere);
+  if(save)save.disabled=locked||writePending;
+  if(reset)reset.disabled=locked||writePending;
+  if(info)info.textContent=locked?`🔒 ${started.length} game(s) already have a live/final score; these rules are LOCKED. For a future Final, choose ONE unplayed match.`:
+   `✅ ${ctx.affected.length} match(es) affected. Target ${rule.target}, cap ${rule.cutoff??'none'}, win-by-2 ${rule.winByTwo?'On':'Off'}, change ends ${point||'Off'}.`;
+ }catch(err){if(info)info.textContent='Choose a valid category/round/match: '+errText(err);if(save)save.disabled=true;if(reset)reset.disabled=true;}
+}
+const mbaKFlexPreviousRender=render;
+render=function(){mbaKFlexPreviousRender();mbaKFlexHydrate(document.getElementById('mba-k-flex-form'))};
+document.addEventListener('change',e=>{
+ const f=e.target.closest('#mba-k-flex-form');if(!f)return;
+ if(['scope','category','round','match'].includes(e.target.name))mbaKFlexHydrate(f);
+ else mbaKFlexInputState(f);
+},true);
+function mbaKFlexReadInput(f){
+ const target=Number(f.elements.target.value),cap=f.elements.noCap.checked?null:Number(f.elements.cutoff.value),point=Number(f.elements.switchAt.value);
+ if(!Number.isSafeInteger(target)||target<1||target>250)throw Error('Target must be a whole number from 1–250.');
+ if(cap!==null&&(!Number.isSafeInteger(cap)||cap<target||cap>999))throw Error('Maximum cap must be at least the target score (maximum 999), or choose No cap.');
+ if(!Number.isSafeInteger(point)||point<0||point>=target)throw Error('Change ends must be 0 (Off), or below target score.');
+ const entry={target,winByTwo:f.elements.winByTwo.checked,noCap:cap===null,switchAt:point};
+ if(cap!==null)entry.cutoff=cap;
+ validateRules({...defaultRules(),...mbaKFlexNum(entry)});
+ return entry;
+}
+function mbaKFlexGuard(t,scope,key){
+ if(!t.keralaotsavam)throw Error('Only Keralaotsavam tournaments can use this feature.');
+ const ctx=mbaKFlexEligible(t,scope,key);
+ if(!ctx.c)throw Error('Category was removed. Refresh.');
+ if(ctx.affected.some(m=>Object.prototype.hasOwnProperty.call(t.results||{},m.id)))throw Error('This selection contains a LIVE or completed match. Choose an unstarted match instead.');
+ if(mbaUmpire?.tournamentId===t.id&&ctx.affected.some(m=>m.id===mbaUmpire.matchId))throw Error('Close the active Umpire Score first; rules are locked while scoring.');
+ return ctx;
+}
+async function mbaKFlexSave(f,reset=false){
+ if(!isSuper()||!remoteReady||writePending)throw Error('Super Admin online access required; no other save can be in progress.');
+ const tid=f.dataset.tid,{scope,key}=mbaKFlexFormContext(f);
+ if(active()?.id!==tid)throw Error('Selected tournament changed; reopen the form.');
+ const newRule=reset?null:mbaKFlexReadInput(f);
+ const prior=(await mbaV4Fresh(tid)).t;
+ const ctx=mbaKFlexGuard(prior,scope,key);
+ const count=ctx.affected.length;
+ const where=scope==='category'?ctx.c.name:scope==='round'?ctx.c.name+' · selected round':ctx.c.name+' · one match';
+ const action=reset?'Remove this override and use inherited rules':'Set '+newRule.target+' points'+(newRule.noCap?' with NO CAP':' with cap '+newRule.cutoff);
+ if(!confirm(`${action} for ${where}?\n\n${count} unstarted match(es) affected.\nSaved scores and fixtures will remain untouched.`))return;
+ // Fresh read after confirmation: refuse to change any match that began while form was open.
+ const checked=(await mbaV4Fresh(tid)).t;
+ const scopeCtx=mbaKFlexGuard(checked,scope,key);
+ if(scopeCtx.affected.map(m=>m.id).join('|')!==ctx.affected.map(m=>m.id).join('|'))throw Error('The draw changed online. Refresh before saving rules.');
+ const base=`v3/tournaments/${tid}`,patch={};
+ if(scope==='category'){
+  const cat=scopeCtx.c;
+  if(reset){const kept=Object.fromEntries(Object.entries(cat.rules||{}).filter(([k])=>!['target','winByTwo','cutoff'].includes(k)));patch[`${base}/categories/${cat.id}/rules`]=Object.keys(kept).length?kept:null;patch[`${base}/categories/${cat.id}/keralaNoCap`]=null;patch[`${base}/categories/${cat.id}/keralaSwitchPoint`]=null;}
+  else{
+   patch[`${base}/categories/${cat.id}/rules`]={...(cat.rules||{}),target:newRule.target,winByTwo:newRule.winByTwo,...(newRule.noCap?{}:{cutoff:newRule.cutoff})};
+   if(newRule.noCap)delete patch[`${base}/categories/${cat.id}/rules`].cutoff;
+   patch[`${base}/categories/${cat.id}/keralaNoCap`]=newRule.noCap;
+   patch[`${base}/categories/${cat.id}/keralaSwitchPoint`]=newRule.switchAt;
+  }
+ }else if(scope==='round'){
+  patch[`${base}/meta/keralaScoring/roundRules/${key}`]=newRule;
+ }else{
+  patch[`${base}/meta/keralaScoring/matchRules/${key}`]=newRule;
+ }
+ writePending=true;
+ try{await update(ref(db),patch)}finally{writePending=false}
+ notice=reset?'Keralaotsavam inherited scoring restored.':'Keralaotsavam custom scoring saved for '+where+'.';
+ // Refresh the current authoritative TEST data; never replace other match results with a stale local snapshot.
+ const full=await get(ref(db,'v3/tournaments'));
+ setCloud(full.val());
+}
+document.addEventListener('submit',e=>{
+ const f=e.target.closest('#mba-k-flex-form');if(!f)return;
+ e.preventDefault();e.stopImmediatePropagation();if(f.dataset.busy)return;
+ f.dataset.busy='1';const button=f.querySelector('button[type=submit]');if(button)button.disabled=true;
+ mbaKFlexSave(f,false).catch(err=>alert('Scoring Rules: '+errText(err))).finally(()=>{delete f.dataset.busy;if(button?.isConnected)button.disabled=false});
+},true);
+document.addEventListener('click',e=>{
+ const button=e.target.closest('#mba-k-flex-reset');if(!button)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const f=button.closest('form');if(!f||f.dataset.busy)return;
+ f.dataset.busy='1';button.disabled=true;
+ mbaKFlexSave(f,true).catch(err=>alert('Scoring Rules: '+errText(err))).finally(()=>{delete f.dataset.busy;if(button?.isConnected)button.disabled=false});
 },true);
 
 
