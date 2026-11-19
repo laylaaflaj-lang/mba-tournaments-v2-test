@@ -737,6 +737,22 @@ nav[aria-label="Tournament management"] button{min-height:64px!important;min-wid
 :root[data-mba-theme="dark"] .mba-k-bulk-details{background:#1f354b;color:#e8f4ff}
 :root[data-mba-theme="dark"] .mba-k-side-reminder{background:#594725;color:#fff3d7}
 
+
+/* MBA_KERALOTSAVAM_V4_CSS */
+.mba-v4-cat{border:1px solid #cbd8e4;border-radius:12px;padding:10px 12px;margin:12px 0;background:var(--card,#fff)}
+.mba-v4-cat summary{font-weight:750;cursor:pointer;padding:5px 0}
+.mba-v4-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0}
+.mba-v4-entry-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-top:1px solid #dce5ee}
+.mba-v4-entry-row>label{display:flex;align-items:flex-start;gap:8px;min-width:0;overflow-wrap:anywhere;flex:1}
+.mba-v4-entry-row input[type=checkbox],.mba-v4-fixture-tick input[type=checkbox]{width:20px;height:20px;flex-shrink:0;accent-color:#1e6a95}
+.mba-v4-fixture-tick{display:flex;align-items:center;gap:9px;border-radius:8px;background:#eef5fa;color:#173a57;padding:8px 10px;font-size:13px;font-weight:750;cursor:pointer;margin-bottom:8px}
+.mba-v4-dialog{padding:18px;border:1px solid #cfdae4;border-radius:16px;width:min(93vw,540px);max-height:85vh;overflow:auto;color:#17304d;background:#fff}
+.mba-v4-dialog::backdrop{background:rgba(6,18,32,.7)}
+.mba-v4-dialog form,.mba-v4-dialog label{display:grid;gap:10px}
+.mba-v4-dialog label{gap:5px;font-weight:600}
+.mba-v4-dialog input{min-width:0;width:100%;padding:11px;border:1px solid #bdcbd9;border-radius:9px;font:inherit;background:#fff;color:#213343}
+@media(max-width:600px){.mba-v4-entry-row{align-items:flex-start}.mba-v4-actions .btn{min-height:42px}}
+
 </style><style id="print-rule"></style></head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
@@ -5088,6 +5104,222 @@ document.addEventListener('click',e=>{
  e.preventDefault();e.stopImmediatePropagation();
  btn.disabled=true;
  mbaKPlaceLate(btn.dataset.mbaKPlace).catch(err=>alert('Late Entry: '+errText(err))).finally(()=>{if(btn.isConnected)btn.disabled=false});
+},true);
+
+
+/* MBA_KERALOTSAVAM_V4_CONTROL_20261120 - TEST-only, additive. */
+/* Keralaotsavam-only safe administrative operations. No write occurs on startup. */
+const mbaV4Path=(tid,part='',id)=>'v3/tournaments/'+tid+(part?'/'+part:'')+(id?'/'+id:'');
+const mbaV4Tournament=()=>{const t=active();if(!t?.keralaotsavam)throw Error('Only available for Keralaotsavam tournaments.');return t};
+const mbaV4Norm=s=>String(s||'').normalize('NFKC').trim().toLocaleLowerCase();
+const mbaV4IsSingle=c=>mba37RegType(c)==='singles';
+const mbaV4IsLive=r=>r?.mode==='live';
+function mbaV4CategoryCheck(t,ids){
+ const valid=new Set(t.categories.map(c=>c.id));
+ if(ids.some(id=>!valid.has(id)))throw Error('Selected category is not in this tournament. Refresh.');
+}
+function mbaV4CalcDelete(t,categoryClears=[],entrySelection=[],fixtureSelection=[]){
+ const cats=new Set(categoryClears),selectedEntries=new Map(),selectedFixtureIDs=new Set(fixtureSelection);
+ mbaV4CategoryCheck(t,[...cats,...entrySelection.map(e=>e.catId)]);
+ const allMatches=t.fixtures||[];
+ for(const c of t.categories){
+  const ids=new Set(cats.has(c.id)?c.entrants.map(e=>e.id):entrySelection.filter(x=>x.catId===c.id).map(x=>x.id));
+  if(ids.size){for(const id of ids)if(!c.entrants.some(e=>e.id===id))throw Error('Entry has changed online. Refresh.');selectedEntries.set(c.id,ids)}
+ }
+ for(const fid of selectedFixtureIDs)if(!allMatches.some(m=>m.id===fid))throw Error('Selected fixture is missing online. Refresh.');
+ for(const m of allMatches){
+  const entryIDs=selectedEntries.get(m.categoryId);
+  if(cats.has(m.categoryId)||entryIDs&&([m.a,m.b,m.sourceA?.type==='entry'?m.sourceA.id:null,m.sourceB?.type==='entry'?m.sourceB.id:null].some(id=>id&&entryIDs.has(id))))selectedFixtureIDs.add(m.id);
+ }
+ // Always cascade downstream knockout dependencies. Never leave an orphan source-match link.
+ let changed=true;
+ while(changed){changed=false;for(const m of allMatches){if(selectedFixtureIDs.has(m.id))continue;
+   if([m.sourceA,m.sourceB].some(s=>s?.type==='match'&&selectedFixtureIDs.has(s.id))){selectedFixtureIDs.add(m.id);changed=true}
+ }}
+ const deletedResults=[...selectedFixtureIDs].filter(id=>!!t.results?.[id]);
+ const liveResults=deletedResults.filter(id=>mbaV4IsLive(t.results[id]));
+ const teamIDs=new Set();
+ for(const c of t.categories){const es=selectedEntries.get(c.id);if(!es)continue;
+  for(const e of c.entrants)if(es.has(e.id))teamIDs.add(e.teamId);
+ }
+ const orphanTeams=[...teamIDs].filter(id=>{
+  const team=t.teams.find(x=>x.id===id);if(!team?.isDirectRegistration)return false;
+  return !t.categories.some(c=>c.entrants.some(e=>e.teamId===id&&!selectedEntries.get(c.id)?.has(e.id)));
+ });
+ return {cats,selectedEntries,fixtureIDs:selectedFixtureIDs,deletedResults,liveResults,orphanTeams,
+  entryCount:[...selectedEntries.values()].reduce((n,x)=>n+x.size,0),fixtureCount:selectedFixtureIDs.size,
+  scoreCount:deletedResults.filter(id=>!mbaV4IsLive(t.results[id])).length};
+}
+function mbaV4DeletionPatch(t,plan){
+ const patch={};
+ for(const [cid,ids] of plan.selectedEntries){const c=t.categories.find(x=>x.id===cid);
+  patch[mbaV4Path(t.id,'categories',cid)]={...c,entrants:c.entrants.filter(e=>!ids.has(e.id))};}
+ for(const id of plan.fixtureIDs)patch[mbaV4Path(t.id,'fixtures',id)]=null;
+ for(const id of plan.deletedResults)patch[mbaV4Path(t.id,'results',id)]=null;
+ for(const id of plan.orphanTeams)patch[mbaV4Path(t.id,'teams',id)]=null;
+ return patch;
+}
+function mbaV4DownloadBackup(snapshot,desc){
+ const data=JSON.stringify({app:'MBA Tournaments',type:'Keralaotsavam pre-delete backup',scope:desc,createdAt:new Date().toISOString(),tournament:snapshot},null,2);
+ const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download='MBA-Keralaotsavam-BACKUP-'+new Date().toISOString().replace(/[:.]/g,'-')+'.json';
+ document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),20000);
+}
+async function mbaV4Fresh(tid){
+ const snap=await get(ref(db,mbaV4Path(tid,'')));
+ if(!snap.exists())throw Error('Tournament not found online.');
+ return {raw:snap.val(),t:dbToTournament(snap.val(),tid)};
+}
+async function mbaV4Delete(categoryClears,selectedEntries,selectedFixtures){
+ const t=mbaV4Tournament();if(!isSuper())throw Error('Only Super Admin can delete played or unplayed entries and fixtures.');
+ if(writePending)throw Error('A save is in progress.');
+ const start=await mbaV4Fresh(t.id);
+ const plan=mbaV4CalcDelete(start.t,categoryClears,selectedEntries,selectedFixtures);
+ if(!plan.entryCount&&!plan.fixtureCount)throw Error('No entries or fixtures selected.');
+ if(plan.liveResults.length)throw Error(plan.liveResults.length+' live match(es) are still being scored. Finish or stop the umpire session before clearing them.');
+ const scope=categoryClears.length?'Clear selected Singles category/ies':selectedEntries.length?'Delete selected player/partner entries':'Delete selected fixtures';
+ const message=scope+' in '+start.t.name+'?\n\nENTRIES: '+plan.entryCount+'\nFIXTURES (including dependent rounds): '+plan.fixtureCount+'\nSAVED RESULTS TO REMOVE: '+plan.scoreCount+'\n\nOther categories and their results stay untouched. A full backup will be downloaded FIRST.';
+ if(!confirm(message))return;
+ mbaV4DownloadBackup(start.raw,scope);
+ const typed=prompt('CHECK YOUR DOWNLOADS: a full tournament JSON backup was just requested.\n\nIf you have confirmed the backup exists, type DELETE to continue.\nCancel otherwise.');
+ if(typed!=='DELETE')return;
+ // Re-read online values. Abort on changes, including new live points/results.
+ const current=await mbaV4Fresh(t.id);
+ if(JSON.stringify(current.raw)!==JSON.stringify(start.raw))throw Error('The tournament changed online while you were confirming. NOTHING was deleted. Refresh and retry.');
+ const latest=mbaV4CalcDelete(current.t,categoryClears,selectedEntries,selectedFixtures);
+ if(latest.liveResults.length)throw Error('Live match started. Delete cancelled.');
+ const patches=mbaV4DeletionPatch(current.t,latest);
+ await update(ref(db),patches);
+ notice='Deleted '+latest.entryCount+' entries, '+latest.fixtureCount+' fixtures and '+latest.deletedResults.length+' results. Backup was requested.';
+ const after=await mbaV4Fresh(t.id);
+ if(isSuper()){try{const root=await get(ref(db,'v3/tournaments'));setCloud(root.val())}catch{rawTournamentData[t.id]=after.raw;setCloud(rawTournamentData)}}
+ else {rawTournamentData[t.id]=after.raw;setCloud(rawTournamentData)}
+ alert('Keralaotsavam change saved online. Check affected entries/fixtures. Keep your downloaded backup.');
+}
+function mbaV4ManageEntries(t){
+ const canEdit=isSuper()||can('teamsWrite')&&can('categoriesWrite')&&editScope(t.id);
+ const cats=t.categories.map(c=>{
+  const one=mbaV4IsSingle(c);
+  return `<details class="mba-v4-cat"><summary>${esc(c.name)} · ${c.entrants.length} entries</summary>
+  <div class="mba-v4-actions"><label><input type="checkbox" data-mba-v4-choose-all="${esc(c.id)}"> Select all</label>
+  ${isSuper()?`<button type="button" class="btn danger-outline" data-mba-v4-remove-entries="${esc(c.id)}">🗑 Delete selected</button>`:''}
+  ${one&&isSuper()?`<button type="button" class="btn danger-outline" data-mba-v4-clear-cat="${esc(c.id)}">🧹 Clear ALL ${esc(c.name)} (played + unplayed)</button>`:''}</div>
+  ${c.entrants.map(e=>`<div class="mba-v4-entry-row"><label><input type="checkbox" data-mba-v4-entry="${esc(c.id)}" value="${esc(e.id)}"> <b>${esc(entryLabel(t,c,e.id))}</b>${e.latePending?' · PENDING DRAW':''}${e.clubName?' · '+esc(e.clubName):''}</label>
+  ${canEdit?`<button class="btn" type="button" data-mba-v4-edit="${esc(c.id)}:${esc(e.id)}">✏ Edit</button>`:''}</div>`).join('')||'<p class="helper">No players in this category.</p>'}
+  </details>`;
+ }).join('');
+ return `<section class="card mba-v4-manage" aria-label="Keralaotsavam edit and bulk delete"><h2>✏ Edit / Bulk Delete Players</h2>
+ <p class="helper">Edit names or club even after a match. Super Admin may clear a Singles category including played, pending and scored matches. Backup and confirmation required. Doubles stays separate.</p>
+ ${cats}${isSuper()?'<button type="button" class="btn danger-outline" id="mba-v4-clear-all-singles">🧹 Clear ALL Singles categories (only Singles)</button>':''}</section>`;
+}
+function mbaV4FixtureTools(t){
+ if(!isSuper())return '';
+ return `<section class="card mba-v4-fixture-tools"><h2>☑ Quick Delete Fixtures · Super Admin</h2><p class="helper">Tick fixtures below, then delete selected. Dependent knockout rounds are included. Scores are backed up first. Active live scores must be stopped before deletion.</p><div class="mba-v4-actions"><label><input type="checkbox" id="mba-v4-fixture-all"> Select all fixtures</label><button type="button" id="mba-v4-delete-fixtures" class="btn danger-outline">🗑 Delete ticked fixtures</button></div></section>`;
+}
+function mbaV4MarkFixtures(t){
+ const cards=[...document.querySelectorAll('#view .mba-fixture-list .mba-fixture-item')];
+ const league=t.fixtures.filter(m=>m.stage==='league').sort((a,b)=>(a.slot||0)-(b.slot||0)||(a.court||0)-(b.court||0));
+ const ko=t.fixtures.filter(m=>m.stage==='knockout').sort((a,b)=>(a.slot||0)-(b.slot||0)||(a.court||0)-(b.court||0));
+ const ordered=[...league,...ko];
+ if(cards.length!==ordered.length){console.warn('Fixture selection card count mismatch. Disable selection to avoid selecting wrong fixture.');return}
+ cards.forEach((el,i)=>{if(el.querySelector('input[data-mba-v4-fixture]'))return;
+  const m=ordered[i],label=document.createElement('label');label.className='mba-v4-fixture-tick';
+  const inp=document.createElement('input');inp.type='checkbox';inp.setAttribute('data-mba-v4-fixture','');inp.value=m.id;
+  const name=document.createElement('span');name.textContent='Select for Delete · '+(t.categories.find(c=>c.id===m.categoryId)?.name||'')+' · '+(m.stage==='knockout'?'KO':'League');
+  label.append(inp,name);el.prepend(label);
+ });
+}
+const mbaV4OriginalQuick=mbaKQuickEntryView;
+mbaKQuickEntryView=function(t){
+ const base=mbaV4OriginalQuick(t);
+ return t?.keralaotsavam?base.replace('<h3>Saved Entries</h3>',mbaV4ManageEntries(t)+'<h3>Saved Entries</h3>'):base;
+};
+const mbaV4OriginalFixtures=fixtureView;
+fixtureView=function(t){const old=mbaV4OriginalFixtures(t);return t?.keralaotsavam?mbaV4FixtureTools(t)+old:old};
+const mbaV4OriginalRender=render;
+render=function(){mbaV4OriginalRender();if(page==='fixtures'&&active()?.keralaotsavam&&isSuper())mbaV4MarkFixtures(active());};
+// Newly CREATED tournaments default to BOTH. Existing tournaments keep their chosen mode.
+const mbaV4OriginalTournamentView=tournamentView;
+tournamentView=function(t){
+ let html=mbaV4OriginalTournamentView(t);
+ if(editor?.kind==='create')html=html.replace(/<select name="mba37-umpire-mode">([\s\S]*?)<\/select>/,(whole,options)=>{
+  const clean=options.replace(/\sselected(?=>)/g,'').replace(/<option value="both">/,'<option value="both" selected>');
+  return '<select name="mba37-umpire-mode">'+clean+'</select>';
+ });
+ return html;
+};
+function mbaV4EditOpen(catId,entryId){
+ const t=mbaV4Tournament(),cat=t.categories.find(c=>c.id===catId),e=cat?.entrants.find(x=>x.id===entryId),team=t.teams.find(x=>x.id===e?.teamId);
+ if(!e||!team)throw Error('Entry not found. Refresh.');
+ if(!(isSuper()||can('teamsWrite')&&can('categoriesWrite')&&editScope(t.id)))throw Error('Team + Category Edit required.');
+ const people=e.playerIds.map(pid=>team.players.find(p=>p.id===pid));if(people.some(p=>!p))throw Error('Player IDs are inconsistent. Do not edit.');
+ const d=document.createElement('dialog');d.id='mba-v4-edit-dialog';d.className='mba-v4-dialog';
+ d.innerHTML=`<form id="mba-v4-edit-form" data-cat="${esc(catId)}" data-entry="${esc(entryId)}"><h2>✏ Edit ${esc(cat.name)}</h2>
+ ${people.map((p,i)=>`<label>Player ${i+1}<input name="p${i}" maxlength="80" value="${esc(p.name)}" required></label>`).join('')}
+ <label>Team Name<input name="teamName" maxlength="100" value="${esc(team.name)}" required></label>
+ <label>Club (optional)<input name="club" maxlength="80" value="${esc(e.clubName||'')}"></label>
+ <p class="helper">Existing match IDs and saved numeric scores are not changed. Only display names/club will be updated.</p>
+ <div class="mba-v4-actions"><button class="btn primary" type="submit">Save edits</button><button type="button" class="btn" data-mba-v4-cancel>Cancel</button></div></form>`;
+ document.body.append(d);if(typeof d.showModal==='function')d.showModal();else d.setAttribute('open','');
+}
+async function mbaV4EditSave(form){
+ const t=mbaV4Tournament();if(!(isSuper()||can('teamsWrite')&&can('categoriesWrite')&&editScope(t.id)))throw Error('Edit permission needed.');
+ const data=new FormData(form),catId=form.dataset.cat,entryId=form.dataset.entry,remote=(await mbaV4Fresh(t.id)).t;
+ const c=remote.categories.find(x=>x.id===catId),e=c?.entrants.find(x=>x.id===entryId),team=remote.teams.find(x=>x.id===e?.teamId);
+ if(!e||!team)throw Error('Entry has been removed. Refresh.');
+ const updatedNames=e.playerIds.map((id,i)=>String(data.get('p'+i)||'').trim());
+ if(updatedNames.some(n=>!n||n.length>80)||new Set(updatedNames.map(mbaV4Norm)).size!==updatedNames.length)throw Error('Enter distinct valid player names.');
+ const teamName=String(data.get('teamName')||'').trim(),club=String(data.get('club')||'').trim();
+ if(!teamName||teamName.length>100||club.length>80)throw Error('Team/Club name invalid.');
+ const key=mbaV4Norm(updatedNames.slice().sort().join(' & '));
+ for(const other of c.entrants.filter(x=>x.id!==entryId)){
+  const ot=remote.teams.find(x=>x.id===other.teamId);
+  if(ot&&mbaV4Norm(other.playerIds.map(pid=>ot.players.find(p=>p.id===pid)?.name).sort().join(' & '))===key)throw Error('This player/pair already exists in the category.');
+ }
+ const shared=remote.categories.some(otherCat=>otherCat.entrants.some(x=>x.id!==entryId&&x.teamId===team.id));
+ let teamId=team.id,newTeam={...team,players:team.players.map(p=>({...p}))};
+ if(shared){teamId=uid('team');newTeam={...newTeam,id:teamId};}
+ newTeam.name=teamName;
+ for(let i=0;i<e.playerIds.length;i++){const p=newTeam.players.find(x=>x.id===e.playerIds[i]);if(!p)throw Error('Player link missing');p.name=updatedNames[i]}
+ const newCat={...c,entrants:c.entrants.map(x=>x.id===entryId?{...x,teamId,clubName:club}:x)};
+ const patch={[mbaV4Path(t.id,'teams',teamId)]:newTeam,[mbaV4Path(t.id,'categories',catId)]:newCat};
+ if(!confirm('Update names in '+c.name+'? Existing score numbers are preserved.'))return;
+ await update(ref(db),patch);
+ const dlg=form.closest('dialog');dlg?.close?.();dlg?.remove();
+ notice='Player/Team/Club edited. Match scores preserved.';
+ const now=await mbaV4Fresh(t.id);if(isSuper())try{const x=await get(ref(db,'v3/tournaments'));setCloud(x.val());return}catch{}
+ rawTournamentData[t.id]=now.raw;setCloud(rawTournamentData);
+}
+document.addEventListener('click',ev=>{
+ const btn=ev.target.closest('button');if(!btn||!active()?.keralaotsavam)return;
+ const run=(work)=>{ev.preventDefault();ev.stopImmediatePropagation();work().catch(err=>alert('Keralaotsavam: '+errText(err)))};
+ if(btn.dataset.mbaV4Edit){run(async()=>{const [c,e]=btn.dataset.mbaV4Edit.split(':');mbaV4EditOpen(c,e)});return}
+ if(btn.dataset.mbaV4RemoveEntries){run(()=>{
+  const cat=btn.dataset.mbaV4RemoveEntries,ids=[...document.querySelectorAll(`input[data-mba-v4-entry="${CSS.escape(cat)}"]:checked`)].map(x=>x.value);
+  if(!ids.length)throw Error('Tick at least one player/pair in this category.');
+  return mbaV4Delete([] ,ids.map(id=>({catId:cat,id})),[])
+ });return}
+ if(btn.dataset.mbaV4ClearCat){run(()=>mbaV4Delete([btn.dataset.mbaV4ClearCat],[],[]));return}
+ if(btn.id==='mba-v4-clear-all-singles'){run(()=>{
+  const t=mbaV4Tournament(),ids=t.categories.filter(mbaV4IsSingle).map(c=>c.id);
+  if(!ids.length)throw Error('No Singles category.');
+  return mbaV4Delete(ids,[],[])
+ });return}
+ if(btn.id==='mba-v4-delete-fixtures'){run(()=>{
+  const ids=[...document.querySelectorAll('input[data-mba-v4-fixture]:checked')].map(x=>x.value);
+  if(!ids.length)throw Error('Tick at least one fixture.');return mbaV4Delete([],[],ids)
+ });return}
+ if(btn.dataset.mbaV4Cancel){ev.preventDefault();ev.stopImmediatePropagation();const dialog=btn.closest('dialog');dialog?.close?.();dialog?.remove();return}
+},true);
+document.addEventListener('change',ev=>{
+ const cb=ev.target;if(cb.matches('input[data-mba-v4-choose-all]')){
+  document.querySelectorAll(`input[data-mba-v4-entry="${CSS.escape(cb.dataset.mbaV4ChooseAll)}"]`).forEach(el=>{el.checked=cb.checked});
+ }else if(cb.id==='mba-v4-fixture-all')document.querySelectorAll('input[data-mba-v4-fixture]').forEach(el=>{el.checked=cb.checked});
+});
+document.addEventListener('submit',ev=>{
+ const f=ev.target.closest('#mba-v4-edit-form');if(!f)return;
+ ev.preventDefault();ev.stopImmediatePropagation();const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
+ mbaV4EditSave(f).catch(err=>alert('Edit Entry: '+errText(err))).finally(()=>{if(b?.isConnected)b.disabled=false});
 },true);
 
 
