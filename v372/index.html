@@ -761,7 +761,29 @@ nav[aria-label="Tournament management"] button{min-height:64px!important;min-wid
 #mba-k-edit-event .mba-k-scoring-config>p.helper{line-height:1.5}
 @media print{#mba-k-edit-event{display:none!important}}
 
-</style><style id="print-rule"></style></head>
+</style><style id="print-rule"></style><style>
+/* MBA_KERALOTSAVAM_V6_UMPIRE_NAMES_TICK_ENDS_CSS_20261120 */
+#mba-umpire-overlay.mba-k-ticks-before-ends .mba-point.is-marked{background:#eab308!important;border-color:#ca8a04!important;color:#252009!important}
+#mba-umpire-overlay.mba-k-ticks-after-ends .mba-point.is-marked{background:#15803d!important;border-color:#166534!important;color:#fff!important}
+#mba-umpire-overlay .mba-k-change-ends-state{display:flex;flex-direction:column;align-items:flex-start;gap:7px;margin:9px 0;padding:13px;border-radius:12px;background:#fff5ce;border:2px solid #eab308;color:#45310b}
+#mba-umpire-overlay.mba-k-ticks-after-ends .mba-k-change-ends-state{background:#e7f7ea;border-color:#15803d;color:#14532d}
+#mba-umpire-overlay .mba-k-change-ends-state strong{font-size:14px}
+#mba-umpire-overlay .mba-k-change-ends-state small{font-size:12px}
+#mba-umpire-overlay .mba-k-ends-button{background:#1d4ed8;color:#fff;font-weight:750;min-height:42px}
+#mba-k-umpire-assign .mba-k-assignment-item{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;padding:9px;border-bottom:1px solid #ddd;font-size:13px}
+#mba-k-umpire-assign .mba-k-assignment-item strong{color:#173a76}
+#mba-k-umpire-assign .mba-k-assignment-item small{margin-left:auto;color:#64748b}
+#mba-k-umpire-assign .mba-k-assign-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0}
+#mba-k-umpire-assign .mba-k-assign-form label{display:flex;flex-direction:column;gap:5px;font-weight:650}
+#mba-k-umpire-assign .mba-k-assign-form select{width:100%;min-height:43px}
+#mba-k-umpire-assign .mba-k-assign-form .helper{grid-column:1/-1}
+.mba-k-assigned-umpire{display:inline-block;margin-left:7px;font-weight:700;color:#1f4e79}
+#mba-k-umpire-assign .mba-k-count{font-weight:700;color:#14532d}
+#mba-umpire-overlay .mba-point.is-marked:disabled{opacity:1!important;filter:none!important}
+#mba-umpire-overlay .mba-point:not(.is-marked):disabled{opacity:.38!important}
+
+</style>
+</head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
 <main class="container">
@@ -1635,6 +1657,7 @@ function accessView(){if(!isSuper())return card('User Roles','<p>Only Super Admi
  ${userFormIntro}
  ${field('Firebase User UID (from their Copy UID button)','userUid',selected,'text',editingExisting?'required readonly maxlength="128"':'required maxlength="128" autocapitalize="off" spellcheck="false"')}
  ${field('User email (label)','userEmail',existing.email||accessRequests[selected]?.email||'','email','maxlength="160"')}
+ ${field('👨‍⚖️ Umpire Name (for Scorer dropdown)','umpireName',existing.umpireName||'','text','maxlength="80" placeholder="e.g. Ameen"')}
  <label class="field"><span>Role Preset (automatically fills rights; you can customize them)</span><select name="role" id="role-preset">${Object.keys(rolePresets).map(role=>`<option value="${esc(role)}" ${existing.role===role?'selected':''}>${esc(mbaV372RoleLabels[role]||role)}</option>`).join('')}</select></label>
  <label class="choice"><input name="active" type="checkbox" ${existing.active===false?'':'checked'}> Account role active</label>
  <label class="field"><span>🖨 A4 Print / Print Center — Show or Hide for this user</span><select name="printAccess"><option value="hide" ${existing.permissions?.printView===true?'':'selected'}>HIDE — default (no print menu)</option><option value="show" ${existing.permissions?.printView===true?'selected':''}>SHOW — allow printing</option></select><small class="helper">This affects only this user's print buttons and menu. Super Admin always has Print access. Viewers cannot access private data through printing.</small></label>
@@ -1771,7 +1794,9 @@ async function accessSubmit(data){
  const userScopes=Object.fromEntries(store.tournaments.filter(t=>views.has(t.id)||edits.has(t.id)).map(t=>[t.id,{view:true,edit:edits.has(t.id)}]));
  const oldScopes=dataObj(accessScopesByUid[uidString]);
  const stamp=Date.now();
- const record={role,active:data.has('active'),permissions,email,updatedBy:authUser.uid,updatedAt:stamp};
+ const umpireName=String(data.get('umpireName')||'').trim();
+ if(umpireName.length>80)throw Error('Umpire Name is too long.');
+ const record={role,active:data.has('active'),permissions,email,umpireName,updatedBy:authUser.uid,updatedAt:stamp};
  // Firebase multi-path updates are atomic. EVERY path is scoped to this one UID.
  const updates={['v3/access/'+uidString]:record,['v3/accessRequests/'+uidString]:null};
  for(const id of new Set([...Object.keys(oldScopes),...Object.keys(userScopes)]))updates['v3/tournamentAccess/'+uidString+'/'+id]=userScopes[id]||null;
@@ -2062,7 +2087,7 @@ function fixtureView(t){
  const matchCard=m=>{const c=lookup(t,m.categoryId),rule=effectiveRules(t,c,m),w=scoreWinner(t.results[m.id],rule),result=t.results[m.id];
   const payment=showFixturePaymentStatus?`<div class="mba-fixture-pay">${fixtureEntryPaymentStatus(t,c,m.a)}${fixtureEntryPaymentStatus(t,c,m.b)}</div>`:'';
   const score=result?(result.mode==='winner'?'Win/Loss recorded':`${result.a} – ${result.b}`):'Pending';
-  return `<article class="mba-fixture-item ${m.stage==='knockout'?(koRoundLabel(t,m)==='Final'?'mba-round-final':koRoundLabel(t,m)==='Semi-final'?'mba-round-semi':''):''}"><div class="mba-fixture-meta"><span><b>Slot ${esc(m.slot||'—')}</b> · Court ${esc(m.court||'—')}</span><span>${esc(c?.name||'')}${m.stage==='knockout'?' · '+esc(koRoundLabel(t,m)):''}</span></div><div class="mba-fixture-pairs"><div class="mba-fixture-side ${w==='a'?'mba-winning':''}">${linkedEntry(t,c,m.a)}</div><span class="vs">VS</span><div class="mba-fixture-side ${w==='b'?'mba-winning':''}">${linkedEntry(t,c,m.b)}</div></div>${payment}<div class="mba-fixture-bottom"><span class="mba-fixture-result">${esc(score)}${w?' · 🏆 '+esc(participants(t,m)[w==='a'?0:1]):''}</span>${m.a&&m.b&&can('scoresWrite')&&editScope(t.id)?`<button type="button" class="btn mba-umpire-launch" data-mba-score-match="${esc(m.id)}">🏸 Umpire Score</button>`:''}</div></article>`;
+  return `<article class="mba-fixture-item ${m.stage==='knockout'?(koRoundLabel(t,m)==='Final'?'mba-round-final':koRoundLabel(t,m)==='Semi-final'?'mba-round-semi':''):''}"><div class="mba-fixture-meta"><span><b>Slot ${esc(m.slot||'—')}</b> · Court ${esc(m.court||'—')}</span><span>${esc(c?.name||'')}${m.stage==='knockout'?' · '+esc(koRoundLabel(t,m)):''}</span>${mbaKUmpireAssignedLabel(t,m)}</div><div class="mba-fixture-pairs"><div class="mba-fixture-side ${w==='a'?'mba-winning':''}">${linkedEntry(t,c,m.a)}</div><span class="vs">VS</span><div class="mba-fixture-side ${w==='b'?'mba-winning':''}">${linkedEntry(t,c,m.b)}</div></div>${payment}<div class="mba-fixture-bottom"><span class="mba-fixture-result">${esc(score)}${w?' · 🏆 '+esc(participants(t,m)[w==='a'?0:1]):''}</span>${m.a&&m.b&&can('scoresWrite')&&editScope(t.id)&&mbaKAuthorizedForMatch(t,m)?`<button type="button" class="btn mba-umpire-launch" data-mba-score-match="${esc(m.id)}">🏸 Umpire Score</button>`:''}</div></article>`;
  };
  const privatePaymentToggle=canSeePayments()?`<label class="choice noprint fixture-payment-control"><input type="checkbox" id="fixture-payment-toggle" ${showFixturePaymentStatus?'checked':''}> Show private payment status</label>`:'';
  const categoryAdvice=leagueCategories.map(c=>{
@@ -2108,7 +2133,7 @@ function resultView(t){
  ${mode==='score'?`<div class="form-grid">${field(names[0],'a',result?.mode==='winner'?'':result?.a??'','number','')}${field(names[1],'b',result?.mode==='winner'?'':result?.b??'','number','')}</div><p class="helper">Target ${rules.target}; Win by 2: ${rules.winByTwo?'Yes':'No'}; Cutoff: ${rules.cutoff??'None'}</p>`:
  `<div class="choices"><label class="choice"><input type="radio" name="winner" value="a" ${result?.winner!=='b'?'checked':''}> ${esc(names[0])} WON</label><label class="choice"><input type="radio" name="winner" value="b" ${result?.winner==='b'?'checked':''}> ${esc(names[1])} WON</label></div>`}
  <div class="actions"><button type="submit" class="btn primary">Save Result</button>${button('Cancel','cancel')}${result?button('Clear Result','clear-result',`data-id="${esc(m.id)}"`,'danger-outline'):''}</div></form>`:'';
- return `<div class="match-row"><span class="helper">Slot ${m.slot} • Court ${m.court} • ${categoryLink(c)} • ${esc(groupLabel(c,m.groupId))} ${m.stage==='knockout'?'• '+esc(koRoundLabel(t,m)):''}</span><div class="pair-row"><span class="${w==='a'?'winner':w==='b'?'loser':''}">${linkedEntry(t,c,m.a)}</span><span class="vs">VS</span><span class="${w==='b'?'winner':w==='a'?'loser':''}">${linkedEntry(t,c,m.b)}</span></div><div class="score-line"><b>${esc(score)}</b><span>${w?`🏆 ${esc(names[w==='a'?0:1])} WON`:''}</span>${m.a&&m.b?button(result?'✏ Edit Result':'＋ Enter Result','edit-result',`data-id="${esc(m.id)}"`):'<span class="helper">Awaiting previous round</span>'}</div>${form}</div>`;
+ return `<div class="match-row"><span class="helper">Slot ${m.slot} • Court ${m.court} • ${categoryLink(c)} • ${esc(groupLabel(c,m.groupId))} ${m.stage==='knockout'?'• '+esc(koRoundLabel(t,m)):''}${m.umpireName?' • Umpire: '+esc(m.umpireName):''}</span><div class="pair-row"><span class="${w==='a'?'winner':w==='b'?'loser':''}">${linkedEntry(t,c,m.a)}</span><span class="vs">VS</span><span class="${w==='b'?'winner':w==='a'?'loser':''}">${linkedEntry(t,c,m.b)}</span></div><div class="score-line"><b>${esc(score)}</b><span>${w?`🏆 ${esc(names[w==='a'?0:1])} WON`:''}</span>${m.a&&m.b?(t.keralaotsavam&&accessRecord?.role==='scorer'&&!isSuper()?'<span class="helper">Umpire Score only</span>':button(result?'✏ Edit Result':'＋ Enter Result','edit-result',`data-id="${esc(m.id)}"`)):'<span class="helper">Awaiting previous round</span>'}</div>${form}</div>`;
  }).join('')||'<p class="helper">Generate a league fixture first.</p>');
 }
 /* MBA_V35_TEAM_STANDINGS: aggregate played League matches in all categories per team */
@@ -2265,7 +2290,7 @@ document.addEventListener('click',async ev=>{
  if(action==='shuffle')return safe(()=>{need(t.categories.filter(cat=>['league','combined'].includes(effectiveFormat(t,cat))).flatMap(makeRoundRobin).length>0,'No league matches possible: open Categories and add at least two pairs/entries in the same category and group.');scheduleLeague(t,{seed:Date.now(),minimumRestSlots:t.settings?.minRestSlots??1});const check=fixturesCheck(t);need(check.valid,check.problems.join(', '));notice=`Generated ${t.fixtures.filter(m=>m.stage==='league').length} league matches. ${check.restAlerts.length} rest warnings.`});
  if(action==='clear-knockout')return safe(()=>{const kos=t.fixtures.filter(m=>m.stage==='knockout');need(!kos.some(m=>t.results[m.id]),'Recorded knockout results: cannot clear the bracket');if(!confirm('Clear all unplayed knockout brackets in this tournament? League scores stay untouched.'))return;t.fixtures=t.fixtures.filter(m=>m.stage!=='knockout');notice='Unplayed knockout brackets cleared in Production.'});
  if(action==='knockout')return safe(()=>{if(t.fixtures.some(m=>m.categoryId===id&&m.stage==='knockout')&&!confirm('Regenerate this bracket? All unplayed knockout pairing positions will be shuffled. Saved results are protected.'))return;const out=generateKnockout(t,id);notice=`Knockout bracket created: ${out.allMatches.length} matches across ${out.rounds.length} rounds, ${out.byes} byes. Winners advance automatically.`});
- if(action==='edit-result'){if(t.results[id]&&!mba37CanEditSaved()){alert('Super Admin must grant Umpire Edit permission for saved results.');return}editor={kind:'result',id};mode=t.results[id]?.mode==='winner'?'winner':'score';render();return}
+ if(action==='edit-result'){if(t.keralaotsavam&&!isSuper()&&accessRecord?.role==='scorer'){alert('Scorer: use Umpire Score, not manual Result entry.');return}if(t.results[id]&&!mba37CanEditSaved()){alert('Super Admin must grant Umpire Edit permission for saved results.');return}editor={kind:'result',id};mode=t.results[id]?.mode==='winner'?'winner':'score';render();return}
  if(action==='clear-result')return safe(()=>{need(mba37CanDeleteSaved(),'Super Admin must grant Umpire Delete permission');if(!confirm('Clear this result?'))return;const match=t.fixtures.find(m=>m.id===id);delete t.results[id];if(match?.stage==='knockout')advanceKnockout(t,match.categoryId);editor=null;notice='Production result cleared.'});
  if(action==='export'){
   const blob=new Blob([JSON.stringify({version:VERSION,exportedAt:new Date().toISOString(),tournaments:store.tournaments},null,2)],{type:'application/json'});
@@ -2348,6 +2373,7 @@ document.addEventListener('submit',async ev=>{
   }else if(kind==='entry'){
    addEntry(t,form.dataset.id,String(data.get('teamId')),[...data.getAll('playerId')].map(String),String(data.get('groupId')||'')||null);
   }else if(kind==='result'){
+   if(t.keralaotsavam&&!isSuper()&&accessRecord?.role==='scorer')throw Error('Scorer must use sequential Umpire Score, not manual result entry.');
    const m=t.fixtures.find(m=>m.id===form.dataset.id);need(m,'Match not found');const res=mode==='winner'?{mode:'winner',winner:String(data.get('winner')||'a')}:{a:String(data.get('a')||''),b:String(data.get('b')||'')};recordResult(t,m.id,res);
   }else if(kind==='settings'){
    const rules={target:+data.get('target'),cutoff:data.get('cutoff')===''?null:+data.get('cutoff'),winByTwo:data.has('winByTwo'),winPoints:+data.get('winPoints'),lossPoints:+data.get('lossPoints'),bestOf:1};validateRules(rules);
@@ -2622,7 +2648,7 @@ function mbaRenderUmpire(){
  const c=lookup(t,m.categoryId),r=effectiveRules(t,c,m),names=participants(t,m);
  const cap=r.cutoff==null?Math.max(r.target,Number(mbaUmpire.tickLimit||r.target),Math.max(mbaUmpire.a,mbaUmpire.b)):Number(r.cutoff);
  const count=Math.min(250,Math.max(r.target,cap)),winner=scoreWinner({a:mbaUmpire.a,b:mbaUmpire.b},r);
- const grid=(key,name)=>{const current=mbaUmpire[key];return `<div class="mba-point-team"><h4>${esc(name)}</h4><div class="mba-point-score">${current}</div><div class="mba-point-actions"><button type="button" class="btn" data-mba-point="${key}:-1">− Undo</button><button type="button" class="btn primary" data-mba-point="${key}:1" ${winner?'disabled':''}>+ Point</button></div><div class="mba-point-grid">${Array.from({length:count},(_,i)=>`<button type="button" class="mba-point ${i<current?'is-marked':''}" data-mba-check="${key}:${i+1}" aria-label="${esc(name)} point ${i+1}" ${winner&&i>=current?'disabled':''}>${i+1}</button>`).join('')}</div></div>`};
+ const grid=(key,name)=>{const current=mbaUmpire[key];return `<div class="mba-point-team"><h4>${esc(name)}</h4><div class="mba-point-score">${current}</div><div class="mba-point-actions"><button type="button" class="btn" data-mba-point="${key}:-1">− Undo</button><button type="button" class="btn primary" data-mba-point="${key}:1" ${winner?'disabled':''}>+ Point</button></div><div class="mba-point-grid">${Array.from({length:count},(_,i)=>`<button type="button" class="mba-point ${i<current?'is-marked':''}" data-mba-check="${key}:${i+1}" aria-label="${esc(name)} point ${i+1}" ${(winner&&i>=current)||(!isSuper()&&i!==current)?'disabled':''}>${i+1}</button>`).join('')}</div></div>`};
  host.hidden=false;host.innerHTML=`<div class="mba-umpire-backdrop" role="presentation"></div><section class="mba-umpire-card" role="dialog" aria-modal="true" aria-label="Umpire Score"><div class="mba-umpire-head"><div><h2>🏸 Umpire Score · Court ${esc(m.court)}</h2><p>Target ${esc(r.target)} · ${r.winByTwo?'Win by 2':'No win-by-2'} · Cap ${r.cutoff??'none'}</p></div><button class="btn" type="button" id="mba-umpire-close">✕ Close</button></div><div class="mba-point-teams">${grid('a',names[0])}${grid('b',names[1])}</div><div class="mba-umpire-footer"><b>${winner?'🏆 '+esc(names[winner==='a'?0:1])+' WON':'Match in progress · not yet a valid final result'}</b><button type="button" class="btn primary" id="mba-umpire-final" ${winner?'':'disabled'}>✅ Finish Match &amp; Save Result</button><p class="helper">Each tick records one point on this device. Undo is available. Only after Finish & Save will the confirmed score be sent to Firebase and update Results/Standings. Manual Score or Win/Loss in Results remains available.</p></div></section>`;
 }
 function mbaUmpirePoint(key,change,point){
@@ -3054,7 +3080,7 @@ function mba36Bracket(t,c){
   return `<div class="mba36-bracket-column ${round===maxRound?'mba-round-final':round===maxRound-1?'mba-round-semi':''}"><h4>${heading}</h4>${list.sort((a,b)=>(a.bracketIndex||0)-(b.bracketIndex||0)).map(m=>{
    const winner=scoreWinner(t.results[m.id],effectiveRules(t,c,m)),result=t.results[m.id];
    const score=result?(result.mode==='winner'?'Winner saved':`${result.a} – ${result.b}`):m.a&&m.b?'Not played':'Waiting';
-   return `<div class="mba36-bracket-match"><div class="mba36-bracket-row ${winner==='a'?'won':''}">${esc(labelFor(m,'a'))}${winner==='a'?'<span>✓</span>':''}</div><div class="mba36-bracket-row ${winner==='b'?'won':''}">${esc(labelFor(m,'b'))}${winner==='b'?'<span>✓</span>':''}</div><div class="mba36-bracket-foot"><small>Court ${esc(m.court)} · ${esc(score)}</small>${m.a&&m.b&&can('scoresWrite')&&editScope(t.id)?`<button type="button" data-mba-score-match="${esc(m.id)}" class="btn">✍ Score</button>`:''}</div></div>`;
+   return `<div class="mba36-bracket-match"><div class="mba36-bracket-row ${winner==='a'?'won':''}">${esc(labelFor(m,'a'))}${winner==='a'?'<span>✓</span>':''}</div><div class="mba36-bracket-row ${winner==='b'?'won':''}">${esc(labelFor(m,'b'))}${winner==='b'?'<span>✓</span>':''}</div><div class="mba36-bracket-foot"><small>Court ${esc(m.court)} · ${esc(score)}${m.umpireName?' · Umpire: '+esc(m.umpireName):''}</small>${m.a&&m.b&&can('scoresWrite')&&editScope(t.id)&&mbaKAuthorizedForMatch(t,m)?`<button type="button" data-mba-score-match="${esc(m.id)}" class="btn">✍ Score</button>`:''}</div></div>`;
   }).join('')}</div>`;
  }).join('');
  const finalMatch=roundsOrdered.at(-1)?.[1]?.[0],win=finalMatch?scoreWinner(t.results[finalMatch.id],effectiveRules(t,c,finalMatch)):null;
@@ -3078,7 +3104,7 @@ mbaRenderUmpire=function(){
  const footer=document.querySelector('#mba-umpire-overlay .mba-umpire-footer');if(!footer||footer.querySelector('#mba36-reset-local'))return;
  const saved=!!active()?.results?.[mbaUmpire.matchId];
  const actions=document.createElement('div');actions.className='mba36-umpire-reset-actions';
- actions.innerHTML=`<button id="mba36-reset-local" class="btn" type="button">↺ Reset Ticks (0–0)</button>${saved&&mba37CanDeleteSaved()?'<button id="mba36-delete-final" class="btn danger-outline" type="button">🗑 Delete Saved Result</button>':''}`;
+ actions.innerHTML=`${isSuper()?'<button id="mba36-reset-local" class="btn" type="button">↺ Reset Ticks (0–0)</button>':''}${saved&&mba37CanDeleteSaved()?'<button id="mba36-delete-final" class="btn danger-outline" type="button">🗑 Delete Saved Result</button>':''}`;
  footer.appendChild(actions);
 };
 
@@ -3168,6 +3194,7 @@ document.addEventListener('click',async event=>{
    await op(()=>{const c=addCategory(t,name,{format:'knockout'});c.playType=type;notice=name+' category created.'});return;
   }
   if(b.id==='mba36-reset-local'){
+   if(!isSuper())throw Error('Only Super Admin may reset all umpire ticks. Regular Scorer: − Undo exactly one point.');
    if(!mbaUmpire||!(can('scoresWrite')&&editScope(active()?.id)))throw Error('Score Edit permission required.');
    if(!confirm('Reset the current umpire ticks to 0–0? Saved Firebase result will NOT be deleted.'))return;
    mbaUmpire.a=0;mbaUmpire.b=0;mbaSaveDraft();mbaRenderUmpire();return;
@@ -3530,6 +3557,12 @@ document.addEventListener('click',e=>{
   e.preventDefault();e.stopImmediatePropagation();
   const mode=active()?.umpireInputMode||'plus';if(mode==='plus')return;
   const [key,p]=tick.split(':'),n=Number(p),old=mbaUmpire[key];
+  if(!isSuper()){
+   if(!['a','b'].includes(key)||!mbaKScorerMayTick(old,n)){
+    alert('Scorer: Only the NEXT point may be ticked. Use − Undo for ONE point correction. Jumping or unticking previous columns is not allowed.');return;
+   }
+   mbaUmpirePoint(key,0,n);return;
+  }
   if(n>old+1&&!confirm('Jump '+(n-old)+' points? Confirm the umpire score.'))return;
   if(n>0&&n<=250){mbaUmpire[key]=n>old?n:n-1;mbaSaveDraft();mbaRenderUmpire();mbaKPublishPoint()}
   return;
@@ -4680,7 +4713,7 @@ function mbaKSideReminder(){
  const point=mbaKFlexSwitchPoint(t,u.matchId);
  if(!Number.isInteger(point)||point<1||Math.max(u.a,u.b)<point)return;
  const key='mba-k-side-ack-'+u.tournamentId+'-'+u.matchId+'-'+point;
- try{if(sessionStorage.getItem(key)==='yes')return}catch{}
+ try{if(sessionStorage.getItem(key)==='yes'||localStorage.getItem(key)==='yes')return}catch{}
  const footer=document.querySelector('#mba-umpire-overlay .mba-umpire-footer');
  if(!footer||footer.querySelector('#mba-k-side-reminder'))return;
  const div=document.createElement('div');div.id='mba-k-side-reminder';div.className='mba-k-side-reminder';
@@ -4690,7 +4723,7 @@ function mbaKSideReminder(){
 document.addEventListener('click',e=>{
  const b=e.target.closest('#mba-k-side-ack');if(!b||!mbaUmpire)return;
  const t=active(),key='mba-k-side-ack-'+mbaUmpire.tournamentId+'-'+mbaUmpire.matchId+'-'+mbaKFlexSwitchPoint(t,mbaUmpire.matchId);
- try{sessionStorage.setItem(key,'yes')}catch{}
+ try{sessionStorage.setItem(key,'yes');localStorage.setItem(key,'yes')}catch{}
  b.closest('#mba-k-side-reminder')?.remove();
 });
 
@@ -4705,7 +4738,7 @@ function mbaKLiveStatus(){
 }
 function mbaKPublishPoint(){
  const u=mbaUmpire,local=active();
- if(!u||!local||u.tournamentId!==local.id||!can('scoresWrite')||!editScope(local.id))return;
+ if(!u||!local||u.tournamentId!==local.id||!can('scoresWrite')||!editScope(local.id)||!mbaKAuthorizedForMatch(local,local.fixtures.find(m=>m.id===u.matchId)))return;
  const snap={tournamentId:u.tournamentId,matchId:u.matchId,a:u.a,b:u.b};
  mbaKLiveError='';mbaKLiveOkay=false;mbaKLiveStatus();
  mbaKLiveChain=mbaKLiveChain.catch(()=>{}).then(async()=>{
@@ -4732,6 +4765,8 @@ mbaUmpirePoint=function(key,change,point){
 const mbaKOldOpenUmpire=mbaOpenUmpire;
 mbaOpenUmpire=function(mid){
  const t=active(),live=t?.results?.[mid];
+ const selected=t?.fixtures?.find(x=>x.id===mid);
+ if(!mbaKAuthorizedForMatch(t,selected))throw Error('Super Admin assigned this match to a different umpire.');
  if(live?.mode==='live'){
    if(live.editorUid&&live.editorUid!==authUser?.uid&&Date.now()-Number(live.updatedAt||0)<120000)throw Error('Another umpire is scoring this match. Contact Super Admin.');
    // Existing app treats ANY result record as a completed match. Hide only the
@@ -4756,6 +4791,7 @@ mbaRenderUmpire=function(){
 };
 const mbaKOldFinishUmpire=mbaFinishUmpire;
 mbaFinishUmpire=async function(){
+ if(mbaUmpire&&!mbaKAuthorizedForMatch(active(),active()?.fixtures?.find(m=>m.id===mbaUmpire.matchId)))throw Error('Match is now assigned to a different umpire.');
  await mbaKLiveChain;
  const u=mbaUmpire,t=active();
  if(!u||!t||t.id!==u.tournamentId)throw Error('Umpire match changed.');
@@ -4775,7 +4811,7 @@ function mbaKLiveDashboard(t){
  if(!live.length)return '';
  return `<section class="card mba-k-live-board"><div class="mba-k-live-heading"><h2>🔴 LIVE · Match Scores</h2><span>Updates automatically for approved viewers</span></div><div class="mba-k-live-cards">${live.map(m=>{
    const r=t.results[m.id],c=lookup(t,m.categoryId),nameA=entryLabel(t,c,m.a),nameB=entryLabel(t,c,m.b);
-   return `<article class="mba-k-live-card"><small>${esc(c?.name||'')} · Court ${esc(m.court||1)} · Slot ${esc(m.slot||'—')}</small><div><b>${esc(nameA)}</b><strong>${Number(r.a)||0} – ${Number(r.b)||0}</strong><b>${esc(nameB)}</b></div><small>🏸 In progress · live from umpire</small></article>`;
+   return `<article class="mba-k-live-card"><small>${esc(c?.name||'')} · Court ${esc(m.court||1)} · Slot ${esc(m.slot||'—')}</small><div><b>${esc(nameA)}</b><strong>${Number(r.a)||0} – ${Number(r.b)||0}</strong><b>${esc(nameB)}</b></div><small>🏸 In progress · live from umpire${m.umpireName?' · Umpire: '+esc(m.umpireName):''}</small></article>`;
  }).join('')}</div></section>`;
 }
 /* MBA_KERA_V2_SCORING_UI */
@@ -5718,6 +5754,160 @@ document.addEventListener('click',e=>{
  f.dataset.busy='1';button.disabled=true;
  mbaKFlexSave(f,true).catch(err=>alert('Scoring Rules: '+errText(err))).finally(()=>{delete f.dataset.busy;if(button?.isConnected)button.disabled=false});
 },true);
+
+
+/* MBA_KERALOTSAVAM_V6_UMPIRE_NAMES_TICK_ENDS_20261120
+ * TEST-only user interface. Production and Firebase Rules untouched.
+ * Labels for assigned umpires are copied into each fixture at assignment time.
+ * Assignment is protected client-side; Firebase Rules remain separate enforcement.
+ */
+function mbaKAuthorizedForMatch(t,m){
+ if(!t?.keralaotsavam || isSuper())return true;
+ if(!m)return false;
+ return !m.umpireUid || m.umpireUid===authUser?.uid;
+}
+function mbaKUmpireAssignedLabel(t,m){
+ return t?.keralaotsavam&&m?.umpireName?`<small class="mba-k-assigned-umpire">👨‍⚖️ Umpire: ${esc(m.umpireName)}</small>`:'';
+}
+function mbaKScorerMayTick(current,next){
+ return Number.isSafeInteger(next)&&next===Number(current)+1;
+}
+function mbaKUmpireListFor(t){
+ if(!isSuper()||!t||!accessListReady||!accessScopesReady)return [];
+ return Object.entries(accessList).filter(([uid,r])=>
+   r?.active===true && r.role==='scorer' && r.permissions?.scoresWrite===true &&
+   accessScopesByUid[uid]?.[t.id]?.edit===true &&
+   typeof r.umpireName==='string'&&r.umpireName.trim()
+ ).map(([uid,r])=>({uid,name:r.umpireName.trim()})).sort((a,b)=>a.name.localeCompare(b.name));
+}
+function mbaKUmpireAssignmentPanel(t){
+ if(!t?.keralaotsavam||!isSuper())return '';
+ const users=mbaKUmpireListFor(t),ready=accessListReady&&accessScopesReady;
+ const fixtures=[...(t.fixtures||[])].sort((a,b)=>(a.slot||0)-(b.slot||0)||a.court-b.court);
+ const count=fixtures.filter(m=>m.umpireUid).length;
+ const matchOptions=fixtures.map(m=>{
+   const c=lookup(t,m.categoryId);
+   const when=m.stage==='knockout'?koRoundLabel(t,m):'League';
+   const who=m.umpireName?' · Umpire: '+m.umpireName:'';
+   return `<option value="${esc(m.id)}">${esc(c?.name||'Category')} · ${esc(when)} · Court ${esc(m.court||1)} · Slot ${esc(m.slot||'—')}${esc(who)}</option>`;
+ }).join('');
+ const userOptions=users.map(u=>`<option value="${esc(u.uid)}">${esc(u.name)}</option>`).join('');
+ const assignments=fixtures.map(m=>{
+   const c=lookup(t,m.categoryId);
+   const status=t.results?.[m.id]?'🔒 Already started':'Ready';
+   return `<div class="mba-k-assignment-item"><span>${esc(c?.name||'')} · ${esc(m.stage==='knockout'?koRoundLabel(t,m):'League')} · Court ${esc(m.court||1)} · Slot ${esc(m.slot||'—')}</span><strong>${m.umpireName?esc(m.umpireName):'Not assigned'}</strong><small>${status}</small></div>`;
+ }).join('');
+ return `<section class="card mba-k-umpire-assign" id="mba-k-umpire-assign">
+  <h2>👨‍⚖️ Umpire Names & Match Assignment</h2>
+  <p class="helper"><b>Step 1:</b> User Roles → select each Scorer → enter <b>Umpire Name</b> → grant Scorer + Keralaotsavam View &amp; Edit → Save.<br><b>Step 2:</b> Return here and select an Umpire for each match. Four active named Scorers will appear as four dropdown choices.</p>
+  <div class="actions"><button type="button" class="btn" id="mba-k-open-umpire-users">👥 Open User Roles · Add Umpire Names</button></div>
+  <p class="mba-k-count">${users.length} named eligible umpire(s) · ${count}/${fixtures.length} match(es) assigned</p>
+  ${!ready?'<p class="helper">Loading scorer names and tournament permissions. Reopen Fixtures if needed.</p>':''}
+  ${ready&&!users.length?'<p class="helper">No eligible named Scorer yet. Set each Umpire Name in User Roles and grant this tournament Edit access.</p>':''}
+  <form id="mba-k-assign-umpire" data-tid="${esc(t.id)}" class="mba-k-assign-form">
+   <label>Choose the match<select name="matchId" required ${fixtures.length?'':'disabled'}>${matchOptions}</select></label>
+   <label>Choose the umpire<select name="umpireUid" ${users.length?'required':'disabled'}><option value="">-- Select or unassign --</option>${userOptions}</select></label>
+   <div class="actions"><button class="btn primary" type="submit" ${fixtures.length&&ready?'':'disabled'}>✅ Save Umpire Assignment</button></div>
+   <p class="helper">Unassign by selecting -- Select or unassign -- and saving. Cannot change assignment after a match has started. Existing unassigned matches remain usable for backward compatibility.</p>
+  </form>
+  <details class="mba-k-umpire-assignment-list"><summary>View all match assignments (${count} assigned)</summary>${assignments||'<p>No fixtures yet.</p>'}</details>
+ </section>`;
+}
+const mbaKUmpirePreviousFixtureView=fixtureView;
+fixtureView=function(t){return mbaKUmpireAssignmentPanel(t)+mbaKUmpirePreviousFixtureView(t);};
+
+async function mbaKSaveUmpireAssignment(f){
+ if(!isSuper()||!remoteReady||writePending)throw Error('Only Super Admin can assign umpires while online.');
+ const tid=f.dataset.tid,mid=f.elements.matchId.value,uid=f.elements.umpireUid.value;
+ if(!tid||!mid||active()?.id!==tid)throw Error('Selected tournament changed. Reopen Fixtures.');
+ const base=`v3/tournaments/${tid}`;
+ // Read Firebase afresh immediately before writing; no local stale fixture snapshot.
+ const data=(await get(ref(db,base))).val();
+ if(data?.meta?.keralaotsavam!==true)throw Error('This tool is only for a Keralaotsavam tournament.');
+ const match=data?.fixtures?.[mid];
+ if(!match)throw Error('Match was changed online. Refresh Fixtures.');
+ if(data.results?.[mid])throw Error('Match already started or finished. Assignment locked to protect scorer ownership and result.');
+ let umpireName='';
+ if(uid){
+   const profile=(await get(ref(db,'v3/access/'+uid))).val();
+   const scope=(await get(ref(db,'v3/tournamentAccess/'+uid+'/'+tid))).val();
+   if(!profile?.active || profile.role!=='scorer'||profile.permissions?.scoresWrite!==true||!scope?.edit)
+     throw Error('This scorer needs an active Scorer role, Score permission and Keralaotsavam Edit scope.');
+   umpireName=String(profile.umpireName||'').trim();
+   if(!umpireName||umpireName.length>80)throw Error('Add a valid Umpire Name in User Roles first.');
+ }
+ if(!confirm((uid?'Assign '+umpireName:'Unassign umpire')+' for '+(match.stage==='knockout'?'knockout':'league')+' Court '+(match.court||1)+' Slot '+(match.slot||'—')+'?'))return;
+ // Second read after user confirms, so a just-started match cannot be changed.
+ const refreshed=(await get(ref(db,base+'/results/'+mid))).val();
+ if(refreshed)throw Error('Match began while confirming. Assignment not changed.');
+ const patch={};
+ patch[base+'/fixtures/'+mid+'/umpireUid']=uid||null;
+ patch[base+'/fixtures/'+mid+'/umpireName']=umpireName||null;
+ writePending=true;
+ try{await update(ref(db),patch)}finally{writePending=false}
+ notice='Umpire assignment saved to TEST Firebase. Existing scores untouched.';
+ const full=await get(ref(db,'v3/tournaments'));
+ setCloud(full.val());
+}
+document.addEventListener('submit',e=>{
+ const f=e.target.closest('#mba-k-assign-umpire');if(!f)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(f.dataset.busy)return;
+ f.dataset.busy='1';const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
+ mbaKSaveUmpireAssignment(f).catch(err=>alert('Assign Umpire: '+errText(err))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false});
+},true);
+document.addEventListener('click',e=>{
+ const b=e.target.closest('#mba-k-open-umpire-users');if(!b)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(!isSuper())return;
+ page='access';editor=null;render();document.getElementById('view')?.scrollIntoView();
+},true);
+
+function mbaKEndsAckKey(t,u){
+ return 'mba-k-side-ack-'+u.tournamentId+'-'+u.matchId+'-'+mbaKFlexSwitchPoint(t,u.matchId);
+}
+function mbaKEndsConfirmed(t,u){
+ const point=mbaKFlexSwitchPoint(t,u.matchId);
+ if(point<1||Math.max(Number(u.a)||0,Number(u.b)||0)<point)return false;
+ const key=mbaKEndsAckKey(t,u);
+ try{return sessionStorage.getItem(key)==='yes'||localStorage.getItem(key)==='yes'}catch{return false}
+}
+function mbaKPaintUmpireEnds(){
+ const host=document.getElementById('mba-umpire-overlay'),u=mbaUmpire,t=active();
+ if(!host||host.hidden||!u||!t||t.id!==u.tournamentId)return;
+ const point=mbaKFlexSwitchPoint(t,u.matchId),changed=mbaKEndsConfirmed(t,u);
+ host.classList.toggle('mba-k-ticks-before-ends',point>0&&!changed);
+ host.classList.toggle('mba-k-ticks-after-ends',point>0&&changed);
+ if(point<=0)return;
+ const footer=host.querySelector('.mba-umpire-footer');if(!footer)return;
+ const tag=document.createElement('div');tag.className='mba-k-change-ends-state';
+ if(changed){
+   tag.innerHTML='<strong>🟢 CHANGE ENDS CONFIRMED · Tick marks now GREEN</strong><small>Scores unchanged · Further points continue normally.</small>';
+ }else{
+   tag.innerHTML=`<strong>🟡 BEFORE CHANGE ENDS · Tick marks YELLOW</strong><small>Change ends at ${point} points. When players physically switch sides, confirm to turn ticks GREEN.</small>${Math.max(Number(u.a)||0,Number(u.b)||0)>=point?'<button type="button" class="btn mba-k-ends-button" id="mba-k-confirm-ends-v6">🔄 Confirm CHANGE ENDS · Turn ticks GREEN</button>':'<small>Confirmation unlocks at the configured Change Ends score.</small>'}`;
+ }
+ footer.prepend(tag);
+}
+const mbaKOriginalRenderForUmpireColor=mbaRenderUmpire;
+mbaRenderUmpire=function(){mbaKOriginalRenderForUmpireColor();mbaKPaintUmpireEnds();};
+function mbaKConfirmChangedEnds(){
+ const u=mbaUmpire,t=active();if(!u||!t||t.id!==u.tournamentId)return;
+ const point=mbaKFlexSwitchPoint(t,u.matchId);if(point<1||Math.max(Number(u.a)||0,Number(u.b)||0)<point)return;
+ const key=mbaKEndsAckKey(t,u);
+ try{sessionStorage.setItem(key,'yes');localStorage.setItem(key,'yes')}catch{}
+ mbaRenderUmpire();
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('#mba-k-confirm-ends-v6');if(!b)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(!mbaUmpire||!confirm('Players have physically CHANGED ENDS? Scores will not change. The Tick Grid becomes GREEN.'))return;
+ mbaKConfirmChangedEnds();
+},true);
+// Existing CHANGE ENDS reminder has its own handler; respond after it runs too.
+document.addEventListener('click',e=>{
+ if(!e.target.closest('#mba-k-side-ack'))return;
+ if(mbaUmpire)mbaKConfirmChangedEnds();
+});
 
 
 mbaInitUi();
