@@ -5910,6 +5910,84 @@ document.addEventListener('click',e=>{
 });
 
 
+/* MBA_KERALOTSAVAM_V6_SCORER_SINGLE_UNDO_20261120
+ * TEST-only: Scorer may undo the most recently awarded point once.
+ * No repeated undo: a NEW point must be awarded before a new undo is available.
+ * Only affects Keralaotsavam regular Scorers; Super Admin can still correct results.
+ * Client-side usability guard. Firebase Rules remain unchanged.
+ */
+const mbaKUndoOneCache=new Map();
+function mbaKUndoOneKey(u){
+ return 'mba-k-one-undo-'+String(authUser?.uid||'unknown')+'-'+String(u.tournamentId)+'-'+String(u.matchId);
+}
+function mbaKUndoOneRead(u){
+ if(!u)return null;
+ const k=mbaKUndoOneKey(u);
+ let state=mbaKUndoOneCache.get(k);
+ if(!state){
+  try{state=JSON.parse(localStorage.getItem(k)||'null')}catch{}
+  if(state)mbaKUndoOneCache.set(k,state);
+ }
+ // A score changed elsewhere or the match was reopened from a different state:
+ // fail closed rather than undo an unknown point.
+ if(!state||state.a!==u.a||state.b!==u.b)return null;
+ return state;
+}
+function mbaKUndoOneWrite(u,lastSide,available){
+ const k=mbaKUndoOneKey(u);
+ const state={a:u.a,b:u.b,lastSide,available:!!available,at:Date.now()};
+ mbaKUndoOneCache.set(k,state);
+ try{localStorage.setItem(k,JSON.stringify(state))}catch{}
+}
+function mbaKUndoOneMay(u,key){
+ const state=mbaKUndoOneRead(u);
+ return !!(state?.available&&state.lastSide===key&&u[key]>0);
+}
+const mbaKUndoOneOriginalPoint=mbaUmpirePoint;
+mbaUmpirePoint=function(key,change,point){
+ const u=mbaUmpire,t=active();
+ if(!u||!t?.keralaotsavam||isSuper())return mbaKUndoOneOriginalPoint(key,change,point);
+ if(!['a','b'].includes(key))return;
+ const beforeA=u.a,beforeB=u.b;
+ const isUndo=point===undefined&&change===-1;
+ const isForward=point!==undefined?(change===0&&point===u[key]+1):(change===1);
+ if(isUndo){
+  if(!mbaKUndoOneMay(u,key)){
+   alert('Scorer: Undo is allowed ONLY ONCE for the latest point. Give the next point before another Undo.');
+   return;
+  }
+ }else if(!isForward)return;
+ mbaKUndoOneOriginalPoint(key,change,point);
+ if(!mbaUmpire||mbaUmpire.tournamentId!==u.tournamentId||mbaUmpire.matchId!==u.matchId)return;
+ if(beforeA===mbaUmpire.a&&beforeB===mbaUmpire.b)return;
+ if(isUndo)mbaKUndoOneWrite(mbaUmpire,null,false);
+ else mbaKUndoOneWrite(mbaUmpire,key,true);
+ mbaRenderUmpire(); // reflect Undo lock after the existing point/live-sync handling
+};
+const mbaKUndoOneOriginalRender=mbaRenderUmpire;
+mbaRenderUmpire=function(){
+ mbaKUndoOneOriginalRender();
+ const u=mbaUmpire,t=active();
+ if(!u||!t?.keralaotsavam||isSuper())return;
+ const footer=document.querySelector('#mba-umpire-overlay .mba-umpire-footer');
+ const buttons=document.querySelectorAll('#mba-umpire-overlay button[data-mba-point$=":-1"]');
+ for(const button of buttons){
+  const key=button.dataset.mbaPoint?.split(':')[0];
+  const allowed=!!key&&mbaKUndoOneMay(u,key);
+  button.disabled=!allowed;
+  button.title=allowed?'Undo only the most recently given point':'Next point needed before Undo is available';
+ }
+ if(footer&&!footer.querySelector('#mba-k-undo-one-hint')){
+  const hint=document.createElement('small');
+  hint.id='mba-k-undo-one-hint';
+  hint.className='helper';
+  footer.appendChild(hint);
+ }
+ const hint=footer?.querySelector('#mba-k-undo-one-hint');
+ if(hint)hint.textContent='Scorer: Only NEXT Tick / +1. Undo latest point ONCE; no repeated Undo until a new point.';
+};
+
+
 mbaInitUi();
 wireAuth();
 document.getElementById('print-page').addEventListener('click',()=>{if(!canPrint())return;page='print';profile=null;editor=null;render();document.getElementById('view').scrollIntoView({behavior:'smooth'});});
