@@ -5988,6 +5988,186 @@ mbaRenderUmpire=function(){
 };
 
 
+/* MBA_KERALOTSAVAM_V6_ALL_PLAY_MANUAL_LOT_20261120
+ * TEST only. Does not change existing scoring, Firebase Rules, umpire permissions or scores.
+ * Special Keralaotsavam knockout: everybody plays in the first round; on an odd
+ * survivor count the Super Admin manually picks TWO existing winners for one
+ * extra elimination match, leaving an even number for the next round.
+ * For 20 entrants: 10 + 5 + 1 (from five) + 2 + 1 = 19 matches.
+ */
+const mbaKAllPlayOldKoLabel=koRoundLabel;
+koRoundLabel=function(t,m){
+ if(m?.keralaAllPlay){
+  if(m.keralaAllPlayKind==='extra')return 'Manual Lot · Extra Match';
+  if(m.keralaAllPlayKind==='semi')return 'Semifinal';
+  if(m.keralaAllPlayKind==='final')return 'Final';
+  return 'Round '+m.round;
+ }
+ return mbaKAllPlayOldKoLabel(t,m);
+};
+const mbaKAllPlayOldGenerate=generateKnockout;
+generateKnockout=function(t,categoryId,options){
+ if(t?.categories?.some(c=>c.id===categoryId&&c.keralaAllPlayMode))throw Error('All Play is enabled for this category. Use Fixtures → All Play / Manual Lot controls.');
+ return mbaKAllPlayOldGenerate(t,categoryId,options);
+};
+const mbaKAllPlayOldManualSeed=mba37ManualSeedPanel;
+mba37ManualSeedPanel=function(t,c){return c?.keralaAllPlayMode?'':mbaKAllPlayOldManualSeed(t,c)};
+const mbaKAllPlayOldManualNext=mba37ManualNextRound;
+mba37ManualNextRound=function(t,c){return c?.keralaAllPlayMode?'':mbaKAllPlayOldManualNext(t,c)};
+const mbaKAllPlayOldLuckyControls=mba37LuckyControls;
+mba37LuckyControls=function(t,c){return c?.keralaAllPlayMode?'':mbaKAllPlayOldLuckyControls(t,c)};
+
+function mbaKAllPlayMatches(t,c){
+ return t.fixtures.filter(m=>m.categoryId===c.id&&m.stage==='knockout');
+}
+function mbaKAllPlaySourceKey(s){return s.type+':'+s.id}
+function mbaKAllPlayName(t,c,s){
+ if(s.type==='entry')return entryLabel(t,c,s.id);
+ const m=t.fixtures.find(x=>x.id===s.id);
+ if(!m)return 'Missing match';
+ const w=scoreWinner(t.results[m.id],effectiveRules(t,c,m));
+ return w?entryLabel(t,c,m[w]):'Winner of '+koRoundLabel(t,m)+' / Match '+((m.bracketIndex||0)+1);
+}
+function mbaKAllPlayContext(t,c){
+ const matches=mbaKAllPlayMatches(t,c);
+ if(!c.keralaAllPlayMode){
+  if(matches.length)return {status:'existing',matches};
+  const entrants=c.entrants.filter(mba372EntryActive);
+  const pool=entrants.map(e=>({type:'entry',id:e.id}));
+  return pool.length<2?{status:'few',pool}:pool.length%2?{status:'oddstart',pool}: {status:'pairs',pool,round:1,kind:pool.length===2?'final':'round',initial:true};
+ }
+ if(!matches.length)return {status:'broken'};
+ if(matches.some(m=>!m.keralaAllPlay))return {status:'broken'};
+ const round=Math.max(...matches.map(m=>Number(m.round)||0));
+ const last=matches.filter(m=>m.round===round).sort((a,b)=>(a.bracketIndex||0)-(b.bracketIndex||0));
+ const pending=last.filter(m=>!scoreWinner(t.results[m.id],effectiveRules(t,c,m)));
+ if(pending.length)return {status:'playing',last,pending,round};
+ if(last.some(m=>m.keralaAllPlayKind==='final'))return {status:'done',last,round};
+ const pool=last.map(m=>({type:'match',id:m.id}));
+ if(last[0]?.keralaAllPlayKind==='extra'){
+  const wait=c.keralaAllPlayWaiting;
+  if(!Array.isArray(wait)||wait.length<1)return {status:'broken'};
+  const joined=[...wait,...pool];
+  if(new Set(joined.map(mbaKAllPlaySourceKey)).size!==joined.length)return {status:'broken'};
+  return {status:'pairs',pool:joined,round:round+1,kind:joined.length===4?'semi':joined.length===2?'final':'round',initial:false};
+ }
+ if(pool.length%2===1){
+  if(pool.length<3)return {status:'broken'};
+  return {status:'extra',pool,round:round+1};
+ }
+ return {status:'pairs',pool,round:round+1,kind:pool.length===4?'semi':pool.length===2?'final':'round',initial:false};
+}
+function mbaKAllPlayOptions(t,c,pool,selected){
+ return pool.map(s=>`<option value="${esc(mbaKAllPlaySourceKey(s))}" ${mbaKAllPlaySourceKey(s)===selected?'selected':''}>${esc(mbaKAllPlayName(t,c,s))}</option>`).join('');
+}
+function mbaKAllPlayPanel(t){
+ if(!t?.keralaotsavam||!isSuper())return '';
+ const cats=t.categories.filter(c=>effectiveFormat(t,c)==='knockout');
+ if(!cats.length)return '';
+ return `<section class="card noprint" id="mba-k-allplay-panel">
+  <style>#mba-k-allplay-panel .mba-k-ap-form{display:grid;gap:10px;margin:10px 0}#mba-k-allplay-panel select{max-width:100%;width:100%;min-height:40px}#mba-k-allplay-panel .mba-k-ap-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:9px;border:1px solid #d5ddec;border-radius:10px;margin:8px 0}#mba-k-allplay-panel .mba-k-ap-pair label{min-width:0;display:flex;flex-direction:column;gap:5px}#mba-k-allplay-panel details{margin:10px 0}#mba-k-allplay-panel button{min-height:42px}@media(max-width:500px){#mba-k-allplay-panel .mba-k-ap-pair{grid-template-columns:1fr}}</style>
+  <div class="section-head"><h2>🏸 All Teams Play + Manual Lot Knockout (TEST)</h2></div>
+  <p class="helper">Committee method: 20 entries → 10 matches → 10 winners → 5 matches → 5 winners → manual lot TWO winners for ONE extra match → 4 semifinalists → final. No first-round BYE. Every advancing winner is linked to a real saved result.</p>
+  ${cats.map(c=>{
+   const x=mbaKAllPlayContext(t,c),title=esc(c.name),intro=`<h3>${title}</h3>`;
+   if(x.status==='existing')return `<section class="mba-k-ap-form">${intro}<p class="helper">Existing Knockout fixtures detected. This new method will NOT overwrite or delete them. Use a NEW practice category/tournament, or Super Admin's existing safe Clear Knockout control before starting (only if no real score must be preserved).</p></section>`;
+   if(x.status==='few')return `<section class="mba-k-ap-form">${intro}<p class="helper">Register at least 2 active entries before drawing fixtures.</p></section>`;
+   if(x.status==='oddstart')return `<section class="mba-k-ap-form">${intro}<p class="helper">${x.pool.length} active entries. To make EVERYONE play in the first round, the initial count must be even. Register the remaining team or use another committee-approved method.</p></section>`;
+   if(x.status==='playing')return `<section class="mba-k-ap-form">${intro}<p class="helper">Round ${x.round}: ${x.last.length-x.pending.length}/${x.last.length} match(es) finished. Save EVERY match result; then the next manual draw will appear automatically.</p></section>`;
+   if(x.status==='done')return `<section class="mba-k-ap-form">${intro}<p>🏆 Champion: <b>${esc(mbaKAllPlayName(t,c,{type:'match',id:x.last[0].id}))}</b> · All Play complete.</p></section>`;
+   if(x.status==='broken')return `<section class="mba-k-ap-form">${intro}<p class="helper">⚠ Draw data requires Super Admin review. Nothing was changed.</p></section>`;
+   if(x.status==='extra'){
+    const opts=mbaKAllPlayOptions(t,c,x.pool,'');
+    return `<section class="mba-k-ap-form">${intro}<p><b>${x.pool.length} winners remain.</b> Select TWO of these winners after your paper lot. They play ONE Extra Match; the remaining ${x.pool.length-2} winners wait for the next round.</p>
+     <form data-mba-k-allplay-extra="${esc(c.id)}" class="mba-k-ap-form"><label>Lot winner A<select name="extraA" required>${opts}</select></label><label>Lot winner B<select name="extraB" required>${opts}</select></label><button class="btn primary" type="submit">Save Manual Lot → Create Extra Match</button></form></section>`;
+   }
+   const choices=x.pool.map((s,i)=>({key:mbaKAllPlaySourceKey(s),name:mbaKAllPlayName(t,c,s)}));
+   const pairRows=Array.from({length:x.pool.length/2},(_,i)=>`<div class="mba-k-ap-pair"><label>Match ${i+1} · A<select name="source" required>${mbaKAllPlayOptions(t,c,x.pool,choices[2*i].key)}</select></label><label>Match ${i+1} · B<select name="source" required>${mbaKAllPlayOptions(t,c,x.pool,choices[2*i+1].key)}</select></label></div>`).join('');
+   const label=x.kind==='semi'?'Create 2 Semifinals':x.kind==='final'?'Create Final':`Create ${x.pool.length/2} Matches · Round ${x.round}`;
+   return `<section class="mba-k-ap-form">${intro}<p><b>${x.pool.length} ${x.initial?'registered teams':'qualified winners'}</b> → ${x.pool.length/2} matches. ${x.initial?'All teams play; no BYE.':'All remaining winners play.'}</p>
+     <button class="btn primary" type="button" data-mba-k-allplay-auto="${esc(c.id)}">${esc(label)} (listed order)</button>
+     <details><summary>✍️ Manual paper lot pairings (optional)</summary><form data-mba-k-allplay-pairs="${esc(c.id)}" class="mba-k-ap-form"><p class="helper">Choose each team/winner once. Names come from saved registration/results, not free text, so scores and brackets remain linked correctly.</p>${pairRows}<button type="submit" class="btn primary">Save these manual pairings</button></form></details></section>`;
+  }).join('')}
+ </section>`;
+}
+const mbaKAllPlayPriorFixtureView=fixtureView;
+fixtureView=function(t){return mbaKAllPlayPanel(t)+mbaKAllPlayPriorFixtureView(t)};
+
+function mbaKAllPlayValidatePairing(pool,keys){
+ if(pool.length%2||pool.length<2)throw Error('Need an even number of registered/qualified teams.');
+ const allowed=pool.map(mbaKAllPlaySourceKey);
+ if(keys.length!==allowed.length||new Set(keys).size!==keys.length||keys.some(k=>!allowed.includes(k)))throw Error('Choose each registered or winning team EXACTLY ONCE. Do not duplicate any team.');
+ const map=new Map(pool.map(s=>[mbaKAllPlaySourceKey(s),s]));
+ return keys.map(k=>map.get(k));
+}
+function mbaKAllPlayAppend(t,c,ordered,round,kind){
+ const base=Math.max(0,...t.fixtures.map(m=>Number(m.slot)||0))+1;
+ const gap=Math.max(0,Number(t.settings?.minRestSlots??1)||0);
+ const courts=Math.max(1,Number(t.courts)||1);
+ for(let i=0;i<ordered.length;i+=2){
+  const a=ordered[i],b=ordered[i+1],idx=i/2;
+  const m={id:`ko__${c.id}__r${round}__m${idx+1}`,categoryId:c.id,stage:'knockout',round,bracketIndex:idx,
+   keralaAllPlay:true,keralaAllPlayKind:kind,sourceA:a,sourceB:b,
+   a:a.type==='entry'?a.id:null,b:b.type==='entry'?b.id:null,
+   court:idx%courts+1,slot:base+Math.floor(idx/courts)};
+  if(t.fixtures.some(e=>e.id===m.id))throw Error('Duplicate fixture ID; stop and review.');
+  t.fixtures.push(m);
+ }
+ advanceKnockout(t,c.id);
+}
+async function mbaKAllPlaySave(categoryId,mode,keys){
+ if(!isSuper()||!can('fixturesWrite')||!editScope(active()?.id)||writePending)throw Error('Super Admin Fixtures access required and previous save must finish.');
+ const local=active(),cat=local?.categories.find(c=>c.id===categoryId);
+ if(!local?.keralaotsavam||!cat||effectiveFormat(local,cat)!=='knockout')throw Error('Select a Keralaotsavam Knockout Category.');
+ const ctx=mbaKAllPlayContext(local,cat);
+ if((mode==='extra'&&ctx.status!=='extra')||(mode!=='extra'&&ctx.status!=='pairs'))throw Error('Next round is not ready. Finish preceding results or refresh.');
+ const ordered=mode==='extra'?mbaKAllPlayValidatePairing(ctx.pool.filter(s=>keys.includes(mbaKAllPlaySourceKey(s))),keys):mbaKAllPlayValidatePairing(ctx.pool,keys);
+ if(mode==='extra'&&(keys.length!==2||ctx.pool.length<3))throw Error('Select exactly two distinct winners for the Extra Match.');
+ if(!confirm(mode==='extra'?'Save the TWO manually drawn winners for one extra elimination match?':'Create '+(ordered.length/2)+' fixtures from these pairs? Results already saved will not be touched.'))return;
+ const now=(await mbaV4Fresh(local.id)).t,nowCat=now.categories.find(c=>c.id===categoryId);
+ if(!nowCat || !eq(nowCat,cat))throw Error('Category was changed online. Refresh and retry.');
+ const oldFixtures=mbaKAllPlayMatches(local,cat),freshFixtures=mbaKAllPlayMatches(now,nowCat);
+ if(!eq(oldFixtures,freshFixtures))throw Error('Fixtures changed online. Refresh and retry.');
+ const oldResults=oldFixtures.map(m=>[m.id,local.results[m.id]||null]);
+ const freshResults=freshFixtures.map(m=>[m.id,now.results[m.id]||null]);
+ if(!eq(oldResults,freshResults))throw Error('A score changed online. Refresh and retry; no fixture has been created.');
+ const recheck=mbaKAllPlayContext(now,nowCat);
+ if(recheck.status!==ctx.status||recheck.round!==ctx.round||!eq(recheck.pool,ctx.pool))throw Error('Next round changed online. Refresh and retry.');
+ await op(()=>{
+  const t=active(),c=t.categories.find(x=>x.id===categoryId);
+  const step=mbaKAllPlayContext(t,c);
+  if(!eq(step.pool,ctx.pool)||step.round!==ctx.round)throw Error('Fixture changed while saving.');
+  if(!c.keralaAllPlayMode)c.keralaAllPlayMode=true;
+  if(mode==='extra'){
+   c.keralaAllPlayWaiting=ctx.pool.filter(s=>!keys.includes(mbaKAllPlaySourceKey(s)));
+   mbaKAllPlayAppend(t,c,ordered,ctx.round,'extra');
+  }else{
+   if(ctx.initial)c.keralaAllPlayWaiting=null;
+   else if(c.keralaAllPlayWaiting)c.keralaAllPlayWaiting=null;
+   mbaKAllPlayAppend(t,c,ordered,ctx.round,ctx.kind);
+  }
+  notice='All Play manual knockout fixtures saved on TEST Firebase.';
+ });
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest?.('[data-mba-k-allplay-auto]');if(!b)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const t=active(),c=t?.categories.find(x=>x.id===b.dataset.mbaKAllplayAuto),ctx=c&&mbaKAllPlayContext(t,c);
+ if(!ctx||ctx.status!=='pairs'){alert('Round not ready. Refresh.');return}
+ b.disabled=true;
+ mbaKAllPlaySave(c.id,'pairs',ctx.pool.map(mbaKAllPlaySourceKey)).catch(x=>alert('All Play Draw: '+errText(x))).finally(()=>{if(b.isConnected)b.disabled=false});
+},true);
+document.addEventListener('submit',e=>{
+ const f=e.target.closest?.('[data-mba-k-allplay-pairs],[data-mba-k-allplay-extra]');if(!f)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(f.dataset.busy)return;
+ f.dataset.busy='1';const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
+ const extra=!!f.dataset.mbaKAllplayExtra,id=extra?f.dataset.mbaKAllplayExtra:f.dataset.mbaKAllplayPairs;
+ const data=new FormData(f),keys=extra?[String(data.get('extraA')),String(data.get('extraB'))]:data.getAll('source').map(String);
+ mbaKAllPlaySave(id,extra?'extra':'pairs',keys).catch(x=>alert('All Play Draw: '+errText(x))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false});
+},true);
+
+
 mbaInitUi();
 wireAuth();
 document.getElementById('print-page').addEventListener('click',()=>{if(!canPrint())return;page='print';profile=null;editor=null;render();document.getElementById('view').scrollIntoView({behavior:'smooth'});});
