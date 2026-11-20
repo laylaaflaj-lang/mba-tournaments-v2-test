@@ -2668,6 +2668,10 @@ async function mbaFinishUmpire(){
  if(!w)throw Error('Finish the match according to its scoring rules.');if(t.results[u.matchId]&&t.results[u.matchId].mode!=='live'&&!mba37CanEditSaved())throw Error('Super Admin did not grant permission to EDIT a saved score.');
  if(!confirm('Save '+u.a+' – '+u.b+' as the FINAL result? Points Table will update automatically.'))return;
  const btn=document.getElementById('mba-umpire-final');if(btn)btn.disabled=true;
+ if(t?.keralaotsavam && !isSuper()){
+  try{await mbaKSafeScorerFinalize(u)}finally{if(btn?.isConnected)btn.disabled=false}
+  return;
+ }
  await op(()=>{const current=active();if(current?.id!==u.tournamentId)throw Error('Tournament changed');recordResult(current,u.matchId,{a:u.a,b:u.b});notice='Final Umpire Result saved to Production Firebase.'});
  if(notice==='Saved online to TEST Firebase.'){
   try{sessionStorage.removeItem(mbaDraftKey(u.tournamentId,u.matchId))}catch{}
@@ -6167,6 +6171,117 @@ document.addEventListener('submit',e=>{
  mbaKAllPlaySave(id,extra?'extra':'pairs',keys).catch(x=>alert('All Play Draw: '+errText(x))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false});
 },true);
 
+
+/* MBA_KERALA_V6_FINAL_SCORER_ACCESS_AND_QR_20261120
+   TEST ONLY. Never broadens Firebase database rules or adds super-admins.
+   Super Admin explicitly repairs one scorer role at a time.
+*/
+function mbaKScorerAuditPanel(t){
+ if(!t?.keralaotsavam||!isSuper())return '';
+ const ready=accessListReady&&accessScopesReady;
+ const rows=ready?Object.entries(accessList).filter(([uid,r])=>
+  uid!==authUser?.uid&&r?.role!=='super'&&
+  (r?.role==='scorer'||r?.role==='admin'||String(r?.umpireName||'').trim())
+ ).sort((a,b)=>String(a[1]?.umpireName||a[1]?.email||a[0]).localeCompare(String(b[1]?.umpireName||b[1]?.email||b[0]))):[];
+ const html=rows.map(([uid,r])=>{
+  const scope=accessScopesByUid[uid]?.[t.id]||{};
+  const good=r.active===true&&r.role==='scorer'&&r.permissions?.scoresWrite===true&&scope.view===true&&scope.edit===true;
+  const label=r.umpireName||r.email||uid;
+  const assigned=t.fixtures.filter(m=>m.umpireUid===uid).length;
+  return `<div class="mba-k-repair-row"><span><b>${esc(label)}</b><small>${esc(r.email||'')} · Role ${esc(r.role||'none')} · Assigned ${assigned} match(es)</small><small>${r.active?'✅ Active':'❌ Inactive'} · ${r.permissions?.scoresWrite?'✅ Score':'❌ Score permission'} · ${scope.edit?'✅ Tournament Edit':'❌ Tournament Edit'}</small></span><button class="btn ${good?'':'primary'}" type="button" data-mba-k-repair="${esc(uid)}" ${good?'disabled':''}>${good?'✓ App rights ready':'Fix Scorer Access'}</button></div>`;
+ }).join('');
+ return `<section class="card mba-k-scorer-audit" id="mba-k-scorer-audit">
+  <h3>👨‍⚖️ Umpire / Scorer Permission Check · TEST</h3>
+  <p class="helper">Super Admin: add a Google-login account in User Roles first. Scorer means SCORE ONLY, not Super Admin. The check below covers app role and tournament scope, NOT unpublished Firebase Rules.</p>
+  <button type="button" class="btn" id="mba-k-refresh-scopes">↻ Refresh Scorer Permissions</button>
+  ${!ready?'<p class="helper">User permissions loading. Tap Refresh.</p>':html||'<p class="helper">No Scorer accounts found. Open User Roles, assign Scorer and Umpire Name first.</p>'}
+  <p class="helper">If rights are ready but Firebase says PERMISSION_DENIED, verify TEST Realtime Database Rules. Do not make this user Super Admin.</p>
+ </section>`;
+}
+const mbaKBeforeScorerAudit=fixtureView;
+fixtureView=function(t){return mbaKBeforeScorerAudit(t)+mbaKScorerAuditPanel(t)};
+async function mbaKRepairScorerAccess(uid){
+ if(!isSuper()||!remoteReady||writePending)throw Error('Super Admin online access required.');
+ if(!/^[\w-]{8,128}$/.test(uid)||uid===authUser?.uid)throw Error('Invalid scorer UID.');
+ const tid=active()?.id,t=active();if(!t?.keralaotsavam)throw Error('Open Keralaotsavam first.');
+ const before=await get(ref(db,'v3/access/'+uid));
+ if(!before.exists())throw Error('No saved user account. Add it in User Roles first.');
+ const r=before.val();if(r?.role==='super')throw Error('A Super Admin cannot be changed with this helper.');
+ const person=r.umpireName||r.email||uid;
+ if(!confirm('Enable '+person+' as a SCORER for '+t.name+'?\n\nSets role to Scorer only (removes extra Admin/Finance/Edit/Delete rights), activates account, grants Scores Write, and grants View + Edit for THIS tournament.\n\nFirebase Rules are NOT changed.'))return;
+ const next={...r,role:'scorer',active:true,
+  permissions:{scoresWrite:true,umpireEdit:false,umpireDelete:false,printView:r.permissions?.printView===true},
+  updatedBy:authUser.uid,updatedAt:Date.now()};
+ const patch={['v3/access/'+uid]:next,['v3/tournamentAccess/'+uid+'/'+tid]:{view:true,edit:true}};
+ await update(ref(db),patch);
+ const verify=await Promise.all([get(ref(db,'v3/access/'+uid)),get(ref(db,'v3/tournamentAccess/'+uid+'/'+tid))]);
+ if(!verify[0].exists()||verify[0].val()?.role!=='scorer'||verify[0].val()?.permissions?.scoresWrite!==true||verify[1].val()?.edit!==true)throw Error('Online verification failed. Refresh User Roles.');
+ accessList[uid]=verify[0].val();
+ accessScopesByUid[uid]={...(accessScopesByUid[uid]||{}),[tid]:verify[1].val()};
+ alert('✅ Scorer rights saved online for '+person+'. Refresh that Umpire phone and retry a PRACTICE match.');
+ render();
+}
+async function mbaKRefreshScorerAccess(){
+ if(!isSuper())throw Error('Super Admin only.');
+ const [a,b]=await Promise.all([get(ref(db,'v3/access')),get(ref(db,'v3/tournamentAccess'))]);
+ accessList=a.val()||{};accessScopesByUid=b.val()||{};accessListReady=true;accessScopesReady=true;render();
+}
+document.addEventListener('click',e=>{
+ const repair=e.target.closest?.('[data-mba-k-repair]');
+ const refresh=e.target.closest?.('#mba-k-refresh-scopes');
+ if(!repair&&!refresh)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const btn=repair||refresh;btn.disabled=true;
+ const job=repair?mbaKRepairScorerAccess(repair.dataset.mbaKRepair):mbaKRefreshScorerAccess();
+ job.catch(err=>alert('Scorer Permissions: '+errText(err))).finally(()=>{if(btn.isConnected)btn.disabled=false});
+},true);
+
+/* Scorer/ordinary Admin: finalize exactly their own currently synced Live Result.
+   This touches ONE result path only, never tournament meta, fixtures, player library or admin roles.
+   RunTransaction refuses final results, score changes, and another umpire's live session.
+*/
+async function mbaKSafeScorerFinalize(u){
+ const t=active();
+ if(!t?.keralaotsavam||!u||u.tournamentId!==t.id||!authUser||!can('scoresWrite')||!editScope(t.id))
+  throw Error('Scorer needs Active role, Scores Write and View + Edit on this tournament.');
+ const m=t.fixtures.find(x=>x.id===u.matchId);
+ if(!m||!mbaKAuthorizedForMatch(t,m))throw Error('This match is assigned to another umpire.');
+ const valid=scoreWinner({a:u.a,b:u.b},effectiveRules(t,lookup(t,m.categoryId),m));
+ if(!valid)throw Error('Score is not a valid match result.');
+ // Read the current fixture assignment again: Super Admin might have changed it meanwhile.
+ const fixtureSnap=await get(ref(db,'v3/tournaments/'+t.id+'/fixtures/'+u.matchId));
+ const freshMatch=fixtureSnap.val();
+ if(!freshMatch||!mbaKAuthorizedForMatch(t,freshMatch))throw Error('Umpire assignment changed online. Reopen the match.');
+ const path=mbaKLivePath(u.tournamentId,u.matchId),reference=ref(db,path);
+ const now=(await get(reference)).val();
+ if(!now||now.mode!=='live')throw Error('No own online Live Score found. Check green Live Sync first, then retry.');
+ if(now.editorUid!==authUser.uid)throw Error('Another umpire owns this Live Match.');
+ if(Number(now.a)!==u.a||Number(now.b)!==u.b)throw Error('Online score differs. Reopen match and check points.');
+ let tx;
+ try{
+  tx=await runTransaction(reference,current=>{
+   if(!current||current.mode!=='live'||current.editorUid!==authUser.uid || Number(current.a)!==u.a||Number(current.b)!==u.b)return undefined;
+   return {a:u.a,b:u.b};
+  },{applyLocally:false});
+ }catch(err){
+  const reason=errText(err);
+  if(/permission[_ -]?denied/i.test(reason))throw Error('Firebase PERMISSION_DENIED for result. Check User Roles → Scores Write + tournament View/Edit. If both are ON, TEST Database Rules need a separate review. Do NOT grant Super Admin.');
+  throw err;
+ }
+ if(!tx.committed)throw Error('Live score changed or was finalized on another phone. Reopen match and verify; nothing was overwritten.');
+ notice='Saved online to TEST Firebase.';
+ try{sessionStorage.removeItem(mbaDraftKey(u.tournamentId,u.matchId))}catch{}
+ mbaUmpire=null;mbaRenderUmpire();render();
+}
+
+/* App QR is only on the main Tournaments tab; printed QR links to public TEST site.
+   It does not grant user permissions or disclose any private data. */
+const mbaKBeforeAppQr=tournamentView;
+tournamentView=function(t){
+ const normal=mbaKBeforeAppQr(t);
+ if(!t?.keralaotsavam||editor?.kind==='create'||editor?.kind==='tournament')return normal;
+ return `<details class="card mba-k-share-app-qr"><summary>📱 Scan QR · Keralaotsavam App Link</summary><div style="text-align:center;padding:12px"><img src="./keralaotsavam-app-qr.png" width="240" height="295" style="width:min(100%,240px);height:auto;background:white;border-radius:9px;padding:7px" alt="Keralaotsavam TEST App QR code"><p><a href="https://laylaaflaj-lang.github.io/mba-tournaments-v2-test/v372/" target="_blank" rel="noopener">Open Keralaotsavam TEST App</a></p><small>QR is for opening the app; it does not give scoring permissions.</small></div></details>`+normal;
+};
 
 mbaInitUi();
 wireAuth();
