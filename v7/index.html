@@ -878,6 +878,90 @@ nav[aria-label="Tournament management"] .mba-nav-text::after{display:none!import
 /* Hide legacy secondary tabs while module initializes. They are moved into More without cloning. */
 nav[aria-label="Tournament management"]>button[data-page]:not([data-page="tournaments"]):not([data-page="registration"]):not([data-page="fixtures"]):not([data-page="results"]){display:none!important}
 
+
+
+/* MBA_V7_1_COMPACT_TWO_COLUMN_NAV_20261121
+   Compact two-column navigation: left core tabs, right direct Registration and Fixtures.
+   V7 TEST only. Existing data-page routes, auth, Firebase and live scoring are unchanged.
+*/
+nav[aria-label="Tournament management"]{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;
+  overflow:visible!important;
+  padding:0 0 10px!important;
+  margin:0!important;
+}
+nav[aria-label="Tournament management"]>button:nth-child(n){
+  min-height:72px!important;
+  width:100%!important;
+  grid-column:auto!important;
+  align-self:stretch!important;
+  padding:10px 6px!important;
+  font-size:23px!important;
+  border-radius:13px!important;
+  box-shadow:0 3px 10px #112c4810!important;
+  white-space:normal!important;
+  line-height:1.1!important;
+  gap:3px!important;
+}
+nav[aria-label="Tournament management"]>button .mba-nav-text{
+  font-size:13px!important;
+  font-weight:750!important;
+  line-height:1.15!important;
+}
+nav[aria-label="Tournament management"]>button[data-page="tournaments"]{order:1!important}
+nav[aria-label="Tournament management"]>#mba-v71-short-register{order:2!important}
+nav[aria-label="Tournament management"]>button[data-page="registration"]{order:3!important}
+nav[aria-label="Tournament management"]>#mba-v71-short-fixtures{order:4!important}
+nav[aria-label="Tournament management"]>button[data-page="fixtures"]{order:5!important}
+nav[aria-label="Tournament management"]>button[data-page="results"]{order:6!important}
+nav[aria-label="Tournament management"]>#mba-v7-more-button{
+  order:7!important;
+  grid-column:1/-1!important;
+  min-height:49px!important;
+  flex-direction:row!important;
+  gap:8px!important;
+  font-size:20px!important;
+  background:#f3f7fc;
+}
+nav[aria-label="Tournament management"]>button.mba-v71-quick{
+  background:#eaf3ff!important;
+  border:1px solid #a9c9e9!important;
+  color:#163e70!important;
+  font-weight:700!important;
+}
+nav[aria-label="Tournament management"]>#mba-v71-short-fixtures{
+  background:#ebf7f3!important;
+  border-color:#a3d2c4!important;
+  color:#17664f!important;
+}
+nav[aria-label="Tournament management"]>button.mba-v71-quick small{
+  display:block!important;
+  font-size:10px!important;
+  font-weight:500!important;
+  opacity:.84!important;
+  text-align:center!important;
+}
+nav[aria-label="Tournament management"]>button.selected:not(.mba-v71-quick){
+  background:#173c75!important;
+  border-color:#173c75!important;
+  color:#fff!important;
+}
+:root[data-mba-theme="dark"] nav[aria-label="Tournament management"]>button.mba-v71-quick{
+  background:#213b5a!important;border-color:#4b7199!important;color:#f4f9ff!important;
+}
+:root[data-mba-theme="dark"] nav[aria-label="Tournament management"]>#mba-v71-short-fixtures{
+  background:#173f39!important;border-color:#407b6e!important;color:#eafff6!important;
+}
+:root[data-mba-theme="dark"] nav[aria-label="Tournament management"]>#mba-v7-more-button{
+  background:#20334c!important;color:#f2f7fe!important;
+}
+@media(min-width:760px){
+ nav[aria-label="Tournament management"]{grid-template-columns:repeat(7,minmax(0,1fr))!important}
+ nav[aria-label="Tournament management"]>#mba-v7-more-button{grid-column:auto!important;min-height:72px!important;flex-direction:column!important}
+ nav[aria-label="Tournament management"]>button.mba-v71-quick small{font-size:9px!important}
+}
 </style>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
@@ -6521,7 +6605,46 @@ render=function(){
  mbaV7NavState();
  if(page==='registration')mbaV7SyncRegistration();
 };
+
+/* MBA_V7_1_COMPACT_TWO_COLUMN_NAV_20261121
+ * Direct shortcuts use existing original V7 tab buttons and their guards;
+ * no duplicate routing, save code, Firebase permissions or scoring changes.
+ */
+function mbaV71AddNavigationShortcuts(){
+ const nav=document.querySelector('nav[aria-label="Tournament management"]');
+ if(!nav || document.getElementById('mba-v71-short-register'))return;
+ const items=[
+  {id:'mba-v71-short-register',page:'registration',icon:'📝',name:'Registration',hint:'Quick entry'},
+  {id:'mba-v71-short-fixtures',page:'fixtures',icon:'📋',name:'Fixtures',hint:'Match schedule'}
+ ];
+ for(const spec of items){
+  const shortcut=document.createElement('button');
+  shortcut.type='button';shortcut.id=spec.id;
+  shortcut.className='mba-v71-quick';
+  shortcut.setAttribute('aria-label','Open '+spec.name);
+  const icon=document.createElement('span');icon.textContent=spec.icon;
+  const text=document.createElement('span');text.className='mba-nav-text';text.textContent=spec.name;
+  const small=document.createElement('small');small.textContent=spec.hint;
+  shortcut.append(icon,text,small);
+  shortcut.addEventListener('click',()=>{
+   if(!authUser||!remoteReady||readError)return;
+   const original=nav.querySelector('button[data-page="'+spec.page+'"]');
+   if(!original||original.hidden)return;
+   original.click(); // Applies existing save-discard prompt and permission guards.
+   if(page===spec.page){
+    const menu=document.getElementById('mba-v7-more-menu');
+    if(menu)menu.hidden=true;
+    const more=document.getElementById('mba-v7-more-button');
+    if(more)more.setAttribute('aria-expanded','false');
+   }
+  });
+  nav.append(shortcut);
+ }
+}
+
+
 mbaV7InstallNavigation();
+mbaV71AddNavigationShortcuts();
 
 mbaInitUi();
 wireAuth();
