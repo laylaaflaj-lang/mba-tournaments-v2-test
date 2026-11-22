@@ -783,6 +783,77 @@ nav[aria-label="Tournament management"] button{min-height:64px!important;min-wid
 #mba-umpire-overlay .mba-point:not(.is-marked):disabled{opacity:.38!important}
 
 </style>
+<style id="mba-v75-simple-style">
+/* MBA_V7_5_SIMPLE_TOURNAMENT_AND_LIVE_VIEW_TEST_20261123 */
+.mba-v75-tour-list{margin:10px 0;padding:16px}
+.mba-v75-section-head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:15px}
+.mba-v75-section-head h2{margin:0;font-size:20px}
+.mba-v75-tour-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}
+.mba-v75-tour-card{border:1px solid #d8e3ee;border-radius:13px;background:#fff;padding:13px;display:flex;flex-direction:column;gap:10px}
+.mba-v75-tour-card.mba-v75-current{border:2px solid #1c5a9a;background:#f4f9ff}
+.mba-v75-tour-select{display:flex;flex-direction:column;gap:6px;align-items:flex-start;text-align:left;width:100%;background:transparent;color:#152d48;border:0;cursor:pointer;padding:3px}
+.mba-v75-tour-select strong{font-size:17px;overflow-wrap:anywhere}
+.mba-v75-tour-select small{font-size:12px;color:#5c6e83}
+.mba-v75-tour-actions{display:flex;gap:8px;flex-wrap:wrap}
+.mba-v75-tour-actions button{flex:1;min-height:44px;padding:9px}
+.mba-v75-detail{margin-top:10px;border:1px solid #d9e3ee;border-radius:11px;padding:12px}
+.mba-v75-detail>summary{font-size:14px;font-weight:700;cursor:pointer}
+.mba-v75-create{padding:16px;max-width:760px;margin:auto}
+.mba-v75-create h2{margin:0 0 14px;font-size:20px}
+.mba-v75-form{display:grid;gap:14px}
+.mba-v75-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mba-v75-categories{padding:12px;border:1px solid #c9d7e6;border-radius:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mba-v75-categories legend{font-weight:800;padding:0 5px}
+.mba-v75-categories>label:not(.field){padding:10px;background:#f1f6fb;border-radius:9px;font-size:14px;font-weight:700}
+.mba-v75-categories>.field{grid-column:1/-1}
+.mba-v75-categories>[hidden]{display:none!important}
+.mba-v75-advanced{border:1px solid #d4e0eb;border-radius:12px;padding:10px}
+.mba-v75-advanced summary{font-weight:700;cursor:pointer}
+.mba-v75-advanced .mba-v75-two{margin-top:13px}
+.mba-v75-create-actions{display:flex;gap:9px;flex-wrap:wrap}
+.mba-v75-create-actions .btn{flex:1}
+.mba-v75-tip{font-size:12px;color:#62758b}
+.mba-v75-share-live{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.mba-v75-share-live .btn{min-height:43px}
+/* A viewer sees only the sanitized Live View. The existing authenticated Firebase subscription still runs in the hidden app. */
+body.mba-v75-live-only{background:#0e172b!important;color:#fff!important;min-height:100vh}
+body.mba-v75-live-only>*:not(#mba-v75-live-root):not(script){display:none!important}
+#mba-v75-live-root[hidden]{display:none!important}
+#mba-v75-live-root{display:block;min-height:100vh;background:#0e172b;color:white;font-family:system-ui,-apple-system,Segoe UI,sans-serif;padding:0!important;box-sizing:border-box}
+#mba-v75-live-root *{box-sizing:border-box}
+.mba-v75-live-header{background:#101c32;padding:22px 15px 16px;text-align:center;border-bottom:3px solid #2dd47c}
+.mba-v75-live-header h1{font-size:21px;line-height:1.35;margin:0 0 12px;color:#fff;overflow-wrap:anywhere}
+.mba-v75-live-pill{display:inline-block;background:#db3038;color:#fff;border-radius:999px;padding:6px 17px;font-size:13px;font-weight:900}
+.mba-v75-live-body{max-width:780px;margin:0 auto;padding:17px 15px 50px}
+.mba-v75-live-controls{display:flex;align-items:flex-end;gap:9px;justify-content:space-between;flex-wrap:wrap;margin-bottom:21px}
+.mba-v75-live-controls label{font-size:12px;flex:1;min-width:200px}
+.mba-v75-live-controls select{display:block;width:100%;color:#183154;background:#fff;border:1px solid #afc2d8;border-radius:10px;padding:10px;margin-top:6px;font-size:14px}
+.mba-v75-live-ctrl-actions{display:flex;gap:7px}
+.mba-v75-live-ctrl-actions button{background:#263955;color:#fff;border:1px solid #485d7c;border-radius:10px;padding:9px;font-size:12px}
+.mba-v75-live-body section{margin-bottom:23px}
+.mba-v75-live-body h2{font-size:19px;color:white;margin:0 0 12px}
+.mba-v75-live-match{background:#fff;color:#172237;border-radius:17px;padding:20px 16px;margin-bottom:10px;text-align:center}
+.mba-v75-match-sub{font-size:14px;font-weight:750;margin-bottom:15px}
+.mba-v75-live-pair{display:grid;grid-template-columns:minmax(0,1fr) 36px minmax(0,1fr);gap:6px;align-items:center}
+.mba-v75-live-pair>div{display:grid;gap:3px}
+.mba-v75-live-pair b{font-size:14px;overflow-wrap:anywhere}
+.mba-v75-live-pair strong{font-size:54px;line-height:1.15;color:#111}
+.mba-v75-live-pair>span{color:#929aa7;font-size:20px}
+.mba-v75-live-match>small{display:block;margin-top:15px;color:#1c905b}
+.mba-v75-live-panel{background:#fff;color:#152237;border-radius:15px;overflow:hidden;padding:12px}
+.mba-v75-table{border-collapse:collapse;width:100%;font-size:13px}
+.mba-v75-table th{background:#15253d;color:white;text-align:left;padding:10px 7px}
+.mba-v75-table td{padding:11px 7px;border-bottom:1px solid #e8ebf1}
+.mba-v75-table td:not(:first-child),.mba-v75-table th:not(:first-child){text-align:center}
+.mba-v75-result-row{display:flex;justify-content:space-between;gap:10px;padding:11px 7px;border-bottom:1px solid #e1e5ed;font-size:13px}
+.mba-v75-result-row:last-child{border-bottom:0}
+.mba-v75-result-row>span:last-child{text-align:right;flex-shrink:0}
+.mba-v75-result-row small{display:block;color:#66748a;font-size:11px;margin-top:4px}
+.mba-v75-muted{color:#6a798e;font-size:14px;line-height:1.6;text-align:center}
+.mba-v75-live-body footer{text-align:center;font-size:12px;color:#94a8c5;padding:14px 0}
+@media(max-width:400px){.mba-v75-two{grid-template-columns:1fr}.mba-v75-live-pair strong{font-size:43px}.mba-v75-categories{grid-template-columns:1fr 1fr}.mba-v75-live-body{padding:12px 10px}}
+
+</style>
 </head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
@@ -6846,6 +6917,225 @@ document.addEventListener('submit',e=>{
  f.dataset.busy='1';const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
  mbaV74SaveNames(f).catch(err=>alert('Edit Player Names: '+errText(err))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false;});
 },true);
+
+/* MBA_V7_5_SIMPLE_TOURNAMENT_AND_LIVE_VIEW_TEST_20261123
+ * TEST v7 only. No Firebase Rules changes. No new write paths.
+ * Approved sign-in required for viewer scores, per existing RTDB permissions.
+ */
+let mbaV75ForcedLive = new URLSearchParams(window.location.search).get('live') === '1';
+const mbaV75CategoryChoices = [
+ ['singles','Singles','singles',0],
+ ['doubles','Doubles','doubles',0],
+ ['80','80+ Doubles','doubles',80],
+ ['90','90+ Doubles','doubles',90],
+ ['100','100+ Doubles','doubles',100]
+];
+function mbaV75QuickCreateForm(){
+ if(!isSuper())return '<section class="card">Super Admin required.</section>';
+ return `<section class="card mba-v75-create"><h2>🏆 Create Tournament · Quick Setup</h2>
+  <form id="mba-v75-quick-create" class="mba-v75-form">
+   <label class="field"><span>Tournament Name *</span><input name="name" required maxlength="100" placeholder="e.g. MBA Sunday Tournament"></label>
+   <div class="mba-v75-two">
+    <label class="field"><span>Date</span><input name="date" type="date" required value="${esc(today())}"></label>
+    <label class="field"><span>Courts</span><input name="courts" type="number" min="1" max="12" required value="2"></label>
+   </div>
+   <fieldset class="mba-v75-categories"><legend>Choose Categories *</legend>
+    ${mbaV75CategoryChoices.map(([key,label])=>`<label><input type="checkbox" name="category" value="${key}" ${key==='singles'||key==='doubles'?'checked':''}> ${label}</label>`).join('')}
+    <label><input type="checkbox" name="category" value="custom"> Custom</label>
+    <label class="field mba-v75-custom-field" hidden><span>Custom Category Name</span><input name="customName" maxlength="80" placeholder="Custom category name"></label>
+    <label class="field mba-v75-custom-field" hidden><span>Custom Category Type</span><select name="customType"><option value="singles">Singles</option><option value="doubles">Doubles</option></select></label>
+   </fieldset>
+   <details class="mba-v75-advanced"><summary>⚙ Optional Scoring &amp; Format</summary>
+     <div class="mba-v75-two"><label class="field"><span>Format</span><select name="format"><option value="knockout">Knockout</option><option value="league">League</option></select></label>
+       <label class="field"><span>Target Points</span><input type="number" name="target" min="1" max="250" value="21"></label>
+       <label class="field"><span>Score Cap (0 = No cap)</span><input type="number" name="cap" min="0" max="999" value="25"></label>
+       <label class="field"><span>Win by 2</span><select name="winByTwo"><option value="yes">Yes</option><option value="no">No</option></select></label></div>
+   </details>
+   <div class="mba-v75-create-actions"><button type="submit" class="btn primary">✅ Create Tournament</button><button type="button" class="btn" data-mba-v75-cancel>Cancel</button></div>
+  </form>
+  <p class="mba-v75-tip">For Keralaotsavam, use the existing Keralaotsavam Quick Tournament option on Home.</p>
+ </section>`;
+}
+const mbaV75PriorLibrary=tournamentLibrary;
+tournamentLibrary=function(t){
+ if(!t)return '';
+ const items=store.tournaments.map(one=>{
+  const sm=tournamentSummary(one),selected=one.id===t.id;
+  const editAllowed=isSuper()||Boolean(accessRecord?.active&&accessRecord?.permissions?.settingsWrite&&editScope(one.id));
+  return `<article class="mba-v75-tour-card ${selected?'mba-v75-current':''}">
+    <button type="button" class="mba-v75-tour-select" data-action="open-tournament" data-id="${esc(one.id)}" aria-pressed="${selected}">
+      <strong>${selected?'✅ ':''}${esc(one.name)}</strong><small>📅 ${esc(dateShow(one.date))} · ${sm.categories} categories · ${sm.played}/${sm.total} matches</small>
+    </button>
+    <div class="mba-v75-tour-actions">
+      ${editAllowed?`<button class="btn" type="button" data-mba-v75-edit="${esc(one.id)}">✏️ Edit</button>`:''}
+      ${isSuper()?`<button class="btn danger-outline" type="button" data-mba-v75-delete="${esc(one.id)}">🗑 Delete</button>`:''}
+    </div>
+  </article>`;
+ }).join('');
+ return `<section class="mba-v75-tour-list card"><div class="mba-v75-section-head"><h2>🏆 My Tournaments (${store.tournaments.length})</h2>
+  ${isSuper()?'<button type="button" class="btn primary" data-mba-v75-new>＋ New Tournament</button>':''}</div>
+  <div class="mba-v75-tour-grid">${items}</div>
+  <details class="mba-v75-detail"><summary>📋 Selected Tournament Details</summary>${tournamentDetailsPanel(t)}</details>
+  <details class="mba-v75-detail"><summary>📜 History &amp; Scores</summary>${tournamentHistoryPanel(t)}</details>
+ </section>`;
+};
+const mbaV75PreviousTournamentView=tournamentView;
+tournamentView=function(t){
+ if(editor?.kind==='create')return mbaV75QuickCreateForm();
+ const html=mbaV75PreviousTournamentView(t);
+ // Remove ONLY former global controls, leaving card-specific controls intact.
+ if(!t||editor?.kind==='tournament')return html;
+ return html.replace(/<button\b[^>]*\bdata-action="(?:edit-tournament|delete-tournament|new-tournament)"[^>]*>[\s\S]*?<\/button>/g,'');
+};
+async function mbaV75SaveQuickTournament(form){
+ if(!isSuper()||writePending)throw Error('Only Super Admin can create a tournament.');
+ const fd=new FormData(form),name=String(fd.get('name')||'').trim(),date=String(fd.get('date')||''),courts=Number(fd.get('courts'));
+ const format=String(fd.get('format')||'knockout'),keys=fd.getAll('category').map(String);
+ if(!name||name.length>100)throw Error('Enter a tournament name (1–100 characters).');
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isInteger(courts)||courts<1||courts>12)throw Error('Enter a valid date and 1–12 courts.');
+ if(!['league','knockout'].includes(format))throw Error('Invalid tournament format.');
+ if(!keys.length||new Set(keys).size!==keys.length||keys.some(k=>!mbaV75CategoryChoices.some(c=>c[0]===k)&&k!=='custom'))throw Error('Select valid category options.');
+ const customName=String(fd.get('customName')||'').trim(),customType=String(fd.get('customType')||'singles');
+ if(keys.includes('custom')&&(!customName||customName.length>80||!['singles','doubles'].includes(customType)))throw Error('Enter a Custom category name and type.');
+ const target=Number(fd.get('target')),cap=Number(fd.get('cap'));
+ if(!Number.isInteger(target)||target<1||target>250||!Number.isInteger(cap)||cap<0||cap>999||(cap&&cap<target))throw Error('Scoring: target 1–250; cap 0 or at least target.');
+ if(store.tournaments.some(t=>t.name.toLocaleLowerCase()===name.toLocaleLowerCase()&&t.date===date))throw Error('A tournament with this name and date already exists.');
+ const event=makeTournament({name,date,courts,format});
+ event.rules={...defaultRules(),target,cutoff:cap===0?null:cap,winByTwo:fd.get('winByTwo')==='yes',bestOf:1};validateRules(event.rules);
+ event.registrationMode='direct';
+ const createdNames=new Set();
+ for(const key of keys){
+  const tuple=mbaV75CategoryChoices.find(c=>c[0]===key);
+  const label=tuple?tuple[1]:customName,playType=tuple?tuple[2]:customType,age=tuple?tuple[3]:0;
+  if(createdNames.has(label.toLocaleLowerCase()))continue;createdNames.add(label.toLocaleLowerCase());
+  const c=addCategory(event,label,{format});c.playType=playType;c.playersPerSide=playType==='singles'?1:2;
+  if(age)c.ageMinimum=age;
+ }
+ if(!confirm(`Create ${name} with ${event.categories.length} categories? Existing tournaments remain unchanged.`))return;
+ await op(()=>{
+  store.tournaments.push(event);store.selected=event.id;page='registration';editor=null;
+  notice='New TEST tournament created. Register players and pairs.';
+ });
+}
+
+// Viewer-only display reuses existing authenticated subscriptions. Nothing public or private is re-published.
+function mbaV75ViewerForced(){
+ return !!authUser&&!isSuper()&&(accessRecord?.role==='viewer'||!accessRecord?.active);
+}
+function mbaV75LiveRequested(){return mbaV75ForcedLive||mbaV75ViewerForced();}
+function mbaV75LiveCard(t,m){
+ const c=lookup(t,m.categoryId),r=t.results?.[m.id]||{};
+ const a=participants(t,m),scoreA=Number(r.a)||0,scoreB=Number(r.b)||0;
+ return `<article class="mba-v75-live-match"><div class="mba-v75-match-sub">${esc(c?.name||'Match')} · Court ${esc(m.court||1)} · Slot ${esc(m.slot||'—')}</div>
+ <div class="mba-v75-live-pair"><div><b>${esc(a[0])}</b><strong>${scoreA}</strong></div><span>VS</span><div><b>${esc(a[1])}</b><strong>${scoreB}</strong></div></div>
+ <small>🟢 Live from umpire · Updating automatically</small></article>`;
+}
+function mbaV75LiveResults(t){
+ const completed=t.fixtures.filter(m=>{
+  const r=t.results?.[m.id],c=lookup(t,m.categoryId);
+  return c&&r&&r.mode!=='live'&&!!scoreWinner(r,effectiveRules(t,c,m));
+ }).slice().sort((a,b)=>(b.slot||0)-(a.slot||0)).slice(0,12);
+ if(!completed.length)return '<p class="mba-v75-muted">ഇതുവരെ Result ഇല്ല / No completed matches yet.</p>';
+ return completed.map(m=>{
+  const c=lookup(t,m.categoryId),r=t.results[m.id],names=participants(t,m),win=scoreWinner(r,effectiveRules(t,c,m));
+  const score=r.mode==='winner'?'Winner recorded':`${Number(r.a)||0} – ${Number(r.b)||0}`;
+  return `<div class="mba-v75-result-row"><span><b>${esc(names[0])}</b> vs <b>${esc(names[1])}</b><small>${esc(c?.name||'')}</small></span><span>${esc(score)}<small>🏆 ${esc(names[win==='a'?0:1])}</small></span></div>`;
+ }).join('');
+}
+function mbaV75LiveStandings(t){
+ const rows=mbaTeamOverallData(t);
+ if(!t.fixtures.some(m=>m.stage==='league'))return '<p class="mba-v75-muted">League Points Table is not applicable to knockout-only tournaments.</p>';
+ return `<table class="mba-v75-table"><thead><tr><th>Team</th><th>Played</th><th>Won</th><th>Points</th></tr></thead>
+  <tbody>${rows.map(row=>`<tr><td>${esc(row.name)}</td><td>${row.p}</td><td>${row.w}</td><td><b>${row.pts}</b></td></tr>`).join('')||'<tr><td colspan="4">No teams yet</td></tr>'}</tbody></table>`;
+}
+function mbaV75RenderLive(){
+ let host=document.getElementById('mba-v75-live-root');
+ if(!host){host=document.createElement('main');host.id='mba-v75-live-root';host.hidden=true;document.body.append(host);}
+ const show=mbaV75LiveRequested()&&!!authUser&&remoteReady&&!readError;
+ document.body.classList.toggle('mba-v75-live-only',show);
+ host.hidden=!show;
+ if(!show)return;
+ const t=active(),matches=t?.fixtures.filter(m=>m.a&&m.b&&t.results?.[m.id]?.mode==='live')||[];
+ const selectable=store.tournaments.map(x=>`<option value="${esc(x.id)}" ${x.id===t?.id?'selected':''}>${esc(x.name)}</option>`).join('');
+ host.innerHTML=`<header class="mba-v75-live-header"><h1>🏸 ${t?esc(t.name):'MBA Badminton Tournament'}</h1>
+  <span class="mba-v75-live-pill">● LIVE VIEW</span></header>
+  <div class="mba-v75-live-body">
+   <div class="mba-v75-live-controls"><label>🏆 Tournament <select id="mba-v75-live-tournament">${selectable}</select></label>
+    <div class="mba-v75-live-ctrl-actions">${isSuper()||accessRecord?.role!=='viewer'?'<button type="button" data-mba-v75-live-exit>Exit Live View</button>':''}<button type="button" data-mba-v75-logout>Logout</button></div>
+   </div>
+   <section><h2>🔴 Live Match Scores</h2>${matches.length?matches.map(m=>mbaV75LiveCard(t,m)).join(''):'<div class="mba-v75-live-match"><p class="mba-v75-muted">No live match right now · അടുത്ത മത്സരം തുടങ്ങിയിട്ടില്ല</p></div>'}</section>
+   <section><h2>🏆 Points Table</h2><div class="mba-v75-live-panel">${t?mbaV75LiveStandings(t):'No tournament selected'}</div></section>
+   <section><h2>📋 Results</h2><div class="mba-v75-live-panel">${t?mbaV75LiveResults(t):'No results available'}</div></section>
+   <footer>App created by Usthad · Viewer-only · No editing controls</footer>
+  </div>`;
+}
+const mbaV75PreviousRender=render;
+render=function(){mbaV75PreviousRender();mbaV75RenderLive();};
+
+document.addEventListener('click',async ev=>{
+ const b=ev.target.closest('button');if(!b)return;
+ if(!b.matches('[data-mba-v75-edit],[data-mba-v75-delete],[data-mba-v75-new],[data-mba-v75-cancel],[data-mba-v75-live-open],[data-mba-v75-live-exit],[data-mba-v75-logout]'))return;
+ ev.preventDefault();ev.stopImmediatePropagation();
+ if(b.hasAttribute('data-mba-v75-live-open')){
+  if(unsavedFormChanges&&!confirm('Discard unsaved form changes to open Live View?'))return;
+  unsavedFormChanges=false;mbaV75ForcedLive=true;editor=null;render();window.scrollTo(0,0);return;
+ }
+ if(b.hasAttribute('data-mba-v75-live-exit')){
+  mbaV75ForcedLive=false;
+  if(window.location.search.includes('live='))history.replaceState(null,'',window.location.pathname);
+  render();window.scrollTo(0,0);return;
+ }
+ if(b.hasAttribute('data-mba-v75-logout')){document.getElementById('logout')?.click();return;}
+ if(!authUser||!remoteReady||readError)return;
+ if(b.hasAttribute('data-mba-v75-cancel')){editor=null;render();return;}
+ if(b.hasAttribute('data-mba-v75-new')){
+  if(!isSuper())return;editor={kind:'create'};page='tournaments';render();return;
+ }
+ if(b.hasAttribute('data-mba-v75-edit')){
+  const id=b.dataset.mbaV75Edit,one=store.tournaments.find(x=>x.id===id);
+  if(!one||!(isSuper()||(accessRecord?.active&&accessRecord.permissions?.settingsWrite&&editScope(id))))return alert('No edit permission for this tournament.');
+  if(id!==active()?.id){switchTournament(id);if(active()?.id!==id)return;}
+  editor={kind:'tournament'};page='tournaments';render();return;
+ }
+ if(b.hasAttribute('data-mba-v75-delete')){
+  if(!isSuper())return alert('Super Admin only.');
+  const id=b.dataset.mbaV75Delete,one=store.tournaments.find(x=>x.id===id);if(!one)return;
+  if(Object.keys(one.results||{}).length)return alert('Cannot quick-delete a tournament with recorded results or live scores. Backup/archive first.');
+  if(publicTournaments[id])return alert('This tournament is published to viewers. Hide it in Tournament Visibility before deleting.');
+  if(id!==active()?.id){switchTournament(id);if(active()?.id!==id)return;}
+  if(!confirm('Delete TEST tournament "'+one.name+'"? This removes its registered teams and fixtures.'))return;
+  const typed=prompt('Type the EXACT tournament name to confirm deletion:\n'+one.name);
+  if(typed!==one.name)return;
+  await op(()=>{
+   store.tournaments=store.tournaments.filter(x=>x.id!==id);store.selected=store.tournaments[0]?.id||null;
+   editor=null;notice='TEST tournament deleted.';
+  });
+ }
+},true);
+document.addEventListener('submit',ev=>{
+ const f=ev.target.closest('#mba-v75-quick-create');if(!f)return;
+ ev.preventDefault();ev.stopImmediatePropagation();
+ if(f.dataset.busy)return;
+ f.dataset.busy='1';const b=f.querySelector('button[type="submit"]');if(b)b.disabled=true;
+ mbaV75SaveQuickTournament(f).catch(err=>alert('Quick Tournament: '+errText(err))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false});
+},true);
+document.addEventListener('change',ev=>{
+ if(ev.target?.name==='category'&&ev.target.closest('#mba-v75-quick-create')){
+  const form=ev.target.closest('form'),custom=[...form.querySelectorAll('.mba-v75-custom-field')];
+  const on=[...form.querySelectorAll('input[name="category"]')].some(x=>x.value==='custom'&&x.checked);
+  custom.forEach(el=>{el.hidden=!on;const child=el.querySelector('input');if(child)child.required=on;});
+ }
+ if(ev.target?.id==='mba-v75-live-tournament'){switchTournament(ev.target.value);}
+},true);
+
+const mbaV75PreviousLiveHome=tournamentView;
+tournamentView=function(t){
+ const html=mbaV75PreviousLiveHome(t);
+ if(!t||editor?.kind==='create'||editor?.kind==='tournament'||!authUser||!remoteReady)return html;
+ const link=window.location.origin+window.location.pathname+'?live=1';
+ const bar=`<div class="mba-v75-share-live"><button type="button" class="btn" data-mba-v75-live-open>👁 Open Live View Only</button><a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">🔗 Viewer Link</a></div>`;
+ return bar+html;
+};
 
 mbaV7InstallNavigation();
 mbaV71AddNavigationShortcuts();
