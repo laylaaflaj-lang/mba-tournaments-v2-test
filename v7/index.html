@@ -980,6 +980,21 @@ nav[aria-label="Tournament management"]>button.selected:not(.mba-v71-quick){
 :root[data-mba-theme="dark"] .mba-v73-rows li{background:#213953;border-color:#48637f}
 :root[data-mba-theme="dark"] .mba-v73-list-head span{background:#385477;color:#fff}
 </style>
+<style id="mba-v74-inline-editor-style">
+/* MBA_V7_4_INLINE_TEAM_EDIT_20261122: TEST-only presentation, no scoring or rules change. */
+.mba-v73-rows li.mba-v74-entry{display:block}
+.mba-v74-row-heading{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}
+.mba-v74-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.mba-v74-edit-btn{font-size:12px!important;min-height:35px!important;padding:6px 11px!important;border:1px solid #8eb3da!important;border-radius:8px!important;background:#e9f3ff!important;color:#173c75!important;font-weight:700!important;cursor:pointer}
+.mba-v74-inline-edit{margin-top:11px;padding:11px;border:1px solid #c9dbee;border-radius:10px;background:#f5f9fe;display:grid;gap:9px}
+.mba-v74-inline-edit label{display:grid;gap:4px;font-size:13px;font-weight:700}
+.mba-v74-inline-edit input{box-sizing:border-box;width:100%;min-width:0;padding:11px;font-size:16px;border:1px solid #b7cde1;border-radius:8px;background:#fff;color:#172c47}
+.mba-v74-form-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mba-v74-form-actions button{padding:10px 13px!important;min-height:42px!important}
+.mba-v74-inline-edit .mba-v74-explain{font-size:11px;color:#50657b;margin:0}
+:root[data-mba-theme="dark"] .mba-v74-inline-edit{background:#1b2f4a;border-color:#4a647f}
+:root[data-mba-theme="dark"] .mba-v74-edit-btn{background:#24466b!important;color:#f0f7ff!important;border-color:#52789c!important}
+</style>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
 import { getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
@@ -6497,11 +6512,32 @@ function mbaV7InitialCategory(t){
  return list.find(c=>c.id===preferred)||list.find(c=>mba372AgeMinimum(c)>0)||list[0]||null;
 }
 /* V7.3 inline visible entrants — list is read-only and contains NO phone or private details. */
+/* MBA_V7_4_INLINE_TEAM_EDIT_20261122 — name-only inline editing.
+ * Existing entry, team, fixture and match IDs are preserved.
+ * The phone, private registration, score and finance paths are never written here.
+ */
+let mbaV74Editing = null;
+function mbaV74RefreshInlineList(){
+ const t=active(),node=document.getElementById('mba-v73-registered-list');
+ if(!t||!node)return;
+ const catId=document.getElementById('mba-v7-category')?.value||mbaV7InitialCategory(t)?.id;
+ node.innerHTML=mbaV73RegisteredTeams(t,catId);
+}
 function mbaV73RegisteredTeams(t,catId){
  const c=mbaV7Category(t,catId);
  if(!c)return '<p class="mba-v73-empty">Select a category to view registered players / teams.</p>';
  const entries=[...(c.entrants||[])].filter(mba372EntryActive).reverse();
- const list=entries.map(e=>`<li><span class="mba-v73-name">🏸 ${esc(entryLabel(t,c,e.id))}</span><small>✓ Saved</small></li>`).join('');
+ const list=entries.map(e=>{
+  const team=t.teams.find(x=>x.id===e.teamId);
+  const names=e.playerIds.map(pid=>team?.players.find(p=>p.id===pid)?.name||'');
+  const editable=mba37CanRegister()&&!!team&&names.every(Boolean);
+  const editing=editable&&mbaV74Editing?.tid===t.id&&mbaV74Editing?.cid===c.id&&mbaV74Editing?.eid===e.id;
+  const key=esc(c.id+'|'+e.id);
+  const fields=names.map((name,i)=>`<label>Player ${i+1} / പേര് ${i+1}<input name="p${i}" value="${esc(name)}" maxlength="80" autocomplete="off" required></label>`).join('');
+  const controls=editable?`<button type="button" class="mba-v74-edit-btn" data-mba-v74-${editing?'cancel':'open'}="${key}" aria-label="${editing?'Cancel editing':'Edit players for'} ${esc(entryLabel(t,c,e.id))}">${editing?'✕ Cancel':'✏️ Edit'}</button>`:'';
+  const form=editing?`<form data-mba-v74-form="${key}" data-tid="${esc(t.id)}" class="mba-v74-inline-edit">${fields}<div class="mba-v74-form-actions"><button class="btn primary" type="submit">💾 Save Names</button><button class="btn" type="button" data-mba-v74-cancel="${key}">Cancel</button></div><p class="mba-v74-explain">Only names change. Fixtures, match IDs and saved scores remain unchanged. No phone numbers here.</p></form>`:'';
+  return `<li class="mba-v74-entry"><div class="mba-v74-row-heading"><span class="mba-v73-name">🏸 ${esc(entryLabel(t,c,e.id))}</span><span class="mba-v74-actions"><small>✓ Saved</small>${controls}</span></div>${form}</li>`;
+ }).join('');
  return `<div class="mba-v73-list-head"><strong>✅ Registered Players / Teams</strong><span>${entries.length} saved</span></div>`+
    `<p class="mba-v73-cat">${esc(c.name)}</p>`+
    (list?`<ol class="mba-v73-rows">${list}</ol>`:'<p class="mba-v73-empty">No registrations in this category yet.</p>')+
@@ -6745,6 +6781,72 @@ function mbaV71AddNavigationShortcuts(){
 
 
 /* MBA_V7_SUPER_ADMIN_PHONE_ONLY_20261122 — registration UI and private-data access only; scoring untouched. */
+/* MBA_V7_4_INLINE_TEAM_EDIT_EVENTS_20261122 */
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-mba-v74-open],[data-mba-v74-cancel]');if(!b)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const t=active();if(!t||!mba37CanRegister())return;
+ if(b.hasAttribute('data-mba-v74-open')){
+  const [cid,eid]=String(b.getAttribute('data-mba-v74-open')||'').split('|');
+  const cat=t.categories.find(c=>c.id===cid);
+  if(!cat?.entrants.some(en=>en.id===eid))return;
+  mbaV74Editing={tid:t.id,cid,eid};
+ }else mbaV74Editing=null;
+ mbaV74RefreshInlineList();
+ const first=document.querySelector('.mba-v74-inline-edit input[name="p0"]');if(first)first.focus();
+},true);
+
+async function mbaV74SaveNames(f){
+ if(!authUser||!remoteReady||writePending||!mba37CanRegister())throw Error('Registration Edit permission required.');
+ const t=active(),[cid,eid]=String(f.getAttribute('data-mba-v74-form')||'').split('|');
+ if(!t||f.dataset.tid!==t.id||mbaV74Editing?.tid!==t.id||mbaV74Editing?.cid!==cid||mbaV74Editing?.eid!==eid)
+   throw Error('Selected registration changed. Reopen Edit.');
+ const c=t.categories.find(x=>x.id===cid),entry=c?.entrants.find(x=>x.id===eid),team=t.teams.find(x=>x.id===entry?.teamId);
+ if(!entry||!team||!Array.isArray(team.players))throw Error('Player or team not found. Refresh.');
+ const ids=entry.playerIds.slice();
+ const before=ids.map(pid=>team.players.find(p=>p.id===pid)?.name||'');
+ const names=ids.map((pid,i)=>String(f.elements['p'+i]?.value||'').trim());
+ if(!ids.length||ids.length>8||names.some(x=>!x||x.length>80||/[|&\r\n]/.test(x)))
+   throw Error('Enter valid player names (1–80 characters, no & or |).');
+ if(new Set(names.map(x=>x.toLocaleLowerCase())).size!==names.length)
+   throw Error('Two players cannot have the same name in one pair.');
+ if(names.every((x,i)=>x===before[i])){mbaV74Editing=null;mbaV74RefreshInlineList();return;}
+ const tid=t.id,teamId=team.id;
+ if(!confirm('Save updated names for '+entryLabel(t,c,eid)+'? Fixtures and scores will NOT change.'))return;
+ // Check the registration remains assigned to the same team and players.
+ const liveEntry=(await get(ref(db,'v3/tournaments/'+tid+'/categories/'+cid+'/entrants/'+eid))).val();
+ if(!liveEntry||liveEntry.teamId!==teamId||JSON.stringify(liveEntry.playerIds)!==JSON.stringify(ids))
+   throw Error('Registration changed on another device. Refresh before editing.');
+ const path='v3/tournaments/'+tid+'/teams/'+teamId,node=ref(db,path);
+ const liveTeam=(await get(node)).val();
+ if(!liveTeam||!Array.isArray(liveTeam.players)||before.some((name,i)=>liveTeam.players.find(p=>p.id===ids[i])?.name!==name))
+   throw Error('Team names were changed on another device. Refresh before editing.');
+ writePending=true;
+ let outcome;
+ try{
+  outcome=await runTransaction(node,current=>{
+   if(!current||current.id!==teamId||!Array.isArray(current.players))return;
+   if(before.some((name,i)=>current.players.find(p=>p.id===ids[i])?.name!==name))return;
+   return {...current,players:current.players.map(p=>{
+    const i=ids.indexOf(p.id);return i<0?p:{...p,name:names[i]};
+   })};
+  },{applyLocally:false});
+ }finally{writePending=false;}
+ if(!outcome?.committed)throw Error('Another edit happened first. Refresh and retry.');
+ // Update the in-memory tournament map without touching another tournament.
+ if(rawTournamentData?.[tid]?.teams)rawTournamentData[tid].teams[teamId]=outcome.snapshot.val();
+ mbaV74Editing=null;
+ notice='Player names updated. Fixtures, scores and private mobiles were not changed.';
+ setCloud(rawTournamentData);
+}
+document.addEventListener('submit',e=>{
+ const f=e.target.closest('form[data-mba-v74-form]');if(!f)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(f.dataset.busy)return;
+ f.dataset.busy='1';const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
+ mbaV74SaveNames(f).catch(err=>alert('Edit Player Names: '+errText(err))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false;});
+},true);
+
 mbaV7InstallNavigation();
 mbaV71AddNavigationShortcuts();
 
