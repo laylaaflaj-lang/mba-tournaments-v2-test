@@ -3461,13 +3461,13 @@ async function mba37PayPrize(kind){
 }
 
 /* Registration private details (mobile and payment method) are NEVER written to public teams/category data. */
-let mba37PrivateItems={},mba37PrivateOff=null,mba37PrivateTournament='';
+let mba37PrivateItems={},mba37PrivateOff=null,mba37PrivateTournament='',mba37PrivateReaderUid='';
 function mba37WatchPrivate(t){
- const tid=t?.id||'';
- if(mba37PrivateTournament===tid)return;
+ const tid=t?.id||'',reader=isSuper()?String(authUser?.uid||''):'';
+ if(mba37PrivateTournament===tid&&mba37PrivateReaderUid===reader)return;
  if(mba37PrivateOff){mba37PrivateOff();mba37PrivateOff=null}
- mba37PrivateTournament=tid;mba37PrivateItems={};
- if(!tid||!authUser||!(isSuper()||canSeePayments()||mba37CanTakePayment()))return;
+ mba37PrivateTournament=tid;mba37PrivateReaderUid=reader;mba37PrivateItems={};
+ if(!tid||!authUser||!isSuper())return;
  mba37PrivateOff=onValue(ref(db,'v3/privateRegistrations/'+tid),s=>{mba37PrivateItems=s.val()||{};if(page==='registration')render()},e=>console.warn('Private Registration records:',errText(e)));
 }
 function mba37RegType(c){if(['singles','doubles','other'].includes(c.playType))return c.playType;
@@ -3490,7 +3490,7 @@ function mba37RegistrationView(t){
   const chargeRows=entryCharge?[entryCharge]:mba372FeeRows(t).filter(r=>r.kind==='player'&&e.playerIds.includes(r.primary));
   const fees=chargeRows.reduce((n,r)=>n+Number(r.fee||0),0);
   const paid=chargeRows.reduce((n,r)=>n+Number(r.paid||0),0);
-  return `<tr><td><b class="${done?'mba37-done':'mba37-pending'}">${esc(names)}</b><small>${esc(c.name)}${e.clubName?' · '+esc(e.clubName):''}</small></td><td>${count} ${count===1?'player':'players'}</td>${paymentAccess?`<td>${esc(row.mobile||'—')}</td><td>${esc(money(paid))} / ${esc(money(fees))}</td><td>${fees===0?'NO FEE':paid>=fees?'✅ PAID':paid>0?'PARTIAL':'UNPAID'}</td><td>${esc(latest?.mode||'—')}</td><td>${esc(latest?.receivedBy||'—')}</td>`:''}<td><label><input type="checkbox" data-mba37-complete="${esc(c.id)}:${esc(e.id)}" ${done?'checked':''} ${!can('scoresWrite')?'disabled':''} aria-label="Mark match completed by recording winner"> ${done?'Completed':'Pending'}</label></td></tr>`;
+  return `<tr><td><b class="${done?'mba37-done':'mba37-pending'}">${esc(names)}</b><small>${esc(c.name)}${e.clubName?' · '+esc(e.clubName):''}</small></td><td>${count} ${count===1?'player':'players'}</td>${paymentAccess?`${isSuper()?`<td>${esc(row.mobile||'—')}</td>`:''}<td>${esc(money(paid))} / ${esc(money(fees))}</td><td>${fees===0?'NO FEE':paid>=fees?'✅ PAID':paid>0?'PARTIAL':'UNPAID'}</td><td>${esc(latest?.mode||'—')}</td><td>${esc(latest?.receivedBy||'—')}</td>`:''}<td><label><input type="checkbox" data-mba37-complete="${esc(c.id)}:${esc(e.id)}" ${done?'checked':''} ${!can('scoresWrite')?'disabled':''} aria-label="Mark match completed by recording winner"> ${done?'Completed':'Pending'}</label></td></tr>`;
  })).join('');
  const typeOptions=[['singles','Singles (1 player)'],['doubles','Doubles (2 players)'],['other','Other / Custom']].map(([v,l])=>`<option value="${v}">${l}</option>`).join('');
  const form=editor?`<form class="mba37-reg-form" id="mba37-register-form"><h3>＋ Register directly to Category & Fixtures</h3>
@@ -3501,14 +3501,14 @@ function mba37RegistrationView(t){
   <label class="field">Player(s) / Pair(s), one entry per line<textarea name="players" rows="5" required placeholder="Singles: Shamil\nDoubles: Nithin & Shamil\nOptional Club: Jafar & Mubarak | Tirur Club"></textarea></label>
   <div class="mba37-name-quick"><label class="field">Saved player name suggestions<input id="mba37-quick-name" list="mba37-saved-names" placeholder="Start typing a previously saved player name"></label><button type="button" class="btn" id="mba37-add-saved-name">＋ Insert Saved Name</button></div>
   <p class="helper">Each line becomes one tournament entry in the selected Category automatically; ready to generate Fixtures without retyping. Bulk registrations are saved as UNPAID unless an amount is collected. Club after | is optional.</p>
-  ${paymentAccess?`<div class="mba37-finance-fields"><label class="field">Contact mobile for ONE registration (Singles or Doubles)<input name="mobile" inputmode="tel" maxlength="20" placeholder="Private — not public"></label>
+  ${paymentAccess?`<div class="mba37-finance-fields">${isSuper()?`<label class="field">Contact mobile for ONE registration (Singles or Doubles)<input name="mobile" inputmode="tel" maxlength="20" placeholder="Super Admin only"></label>`:''}
   <label class="field">Amount received TOTAL (₹, optional)<input type="number" name="received" min="0" step="0.01" value="0"></label>
   <label class="field">Payment Method<select name="mode">${payModes.map(m=>`<option value="${esc(m)}">${esc(m)}</option>`).join('')}</select></label>
   <label class="field">Paid to committee member${mba372WhoSelect()}<input name="receivedByOther" maxlength="100" placeholder="Use only if Other person selected"></label></div>`:''}
   <datalist id="mba37-saved-names">${mba37Names().slice(0,160).map(n=>`<option value="${esc(n)}"></option>`).join('')}</datalist>
   <div class="actions"><button type="submit" class="btn primary">💾 Save Registration & Sync Finance</button></div></form>`:'<p class="helper">View only. Super Admin must grant Team + Category editing access for Registration.</p>';
  const hint=`<div class="mba37-stat">${entryCount} entries · ${players} player seats · ${t.categories.length} categories</div>`;
- return card('📝 Team & Player Registration',`<p class="helper">Singles, Doubles, Club / Custom and paid Cash Prize registration. Player contacts and receipts are private. Completed match names turn green; pending entries stay red.</p>${hint}${form}<div class="scroll"><table><thead><tr><th>Entry / Club</th><th>Type</th>${paymentAccess?'<th>Mobile (private)</th><th>Collected / Fee</th><th>Paid</th><th>Mode</th><th>Paid to whom</th>':''}<th>Match</th></tr></thead><tbody>${rows||'<tr><td colspan="6">No registrations yet.</td></tr>'}</tbody></table></div><div class="actions"><button class="btn" type="button" data-mba37-open-fixtures="1">🏸 Go to Fixtures</button></div>`);
+ return card('📝 Team & Player Registration',`<p class="helper">Singles, Doubles, Club / Custom and paid Cash Prize registration. Player contacts and receipts are private. Completed match names turn green; pending entries stay red.</p>${hint}${form}<div class="scroll"><table><thead><tr><th>Entry / Club</th><th>Type</th>${paymentAccess?`${isSuper()?'<th>Mobile (private)</th>':''}<th>Collected / Fee</th><th>Paid</th><th>Mode</th><th>Paid to whom</th>`:''}<th>Match</th></tr></thead><tbody>${rows||'<tr><td colspan="6">No registrations yet.</td></tr>'}</tbody></table></div><div class="actions"><button class="btn" type="button" data-mba37-open-fixtures="1">🏸 Go to Fixtures</button></div>`);
 }
 function mba37ParseEntries(value,type,customCount){
  const lines=String(value||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
@@ -3543,7 +3543,7 @@ async function mba37Register(form){
  for(const e of entries){if(namesSeen.has(e.key))throw Error('Duplicate registration: '+e.players.join(' & '));namesSeen.add(e.key)}
  if((c?.entrants.length||0)+entries.length>256)throw Error('Max 256 entries per category.');
  const received=Number(fd.get('received')||0);if(!mba37Money(received))throw Error('Invalid amount received.');
- const mobile=String(fd.get('mobile')||'').trim();if(mobile&&!/^[0-9+()\s-]{6,20}$/.test(mobile))throw Error('Check mobile number format.');
+ const mobile=isSuper()?String(fd.get('mobile')||'').trim():'';if(mobile&&!/^[0-9+()\s-]{6,20}$/.test(mobile))throw Error('Check mobile number format.');
  if(mobile&&entries.length>1)throw Error('Enter mobile number only when adding a single registration. For bulk, leave mobile blank.');
  if(received>0&&!mba37CanTakePayment())throw Error('Payments Write permission required to record collected cash.');
  const receivedBy=received>0?mba372ResolveCollector(fd):'';if(received>0&&!receivedBy)throw Error('Enter the committee member who received the payment.');
@@ -3558,7 +3558,7 @@ async function mba37Register(form){
   const entrantId=uid('entry');newTeamIds.push(teamId);
   cat.entrants.push({id:entrantId,teamId,playerIds:players.map(p=>p.id),groupId:null,clubName:entry.club,directRegistration:true,...(fd.has('mba-v373-reentry')?{registrationStatus:'hold',paidReentry:true,reentryPending:true,reentryRequestedAt:now,reentryRequestedBy:authUser.uid}:{})});
   patch['v3/tournaments/'+t.id+'/teams/'+teamId]=team;
-  const privateRec={categoryId:cat.id,club:entry.club,mobile,contactName:String(fd.get('contactName')||entry.players[0]||'').trim(),createdBy:authUser.uid,createdAt:now,...(mba372AgeMinimum(cat)?{birthYears:[Number(fd.get('birthYear1')),Number(fd.get('birthYear2'))],ageOverride:!!fd.has('ageOverride'),ageOverrideReason:String(fd.get('ageOverrideReason')||'').trim(),ageOverrideBy:fd.has('ageOverride')?authUser.uid:''}:{}),...(fd.has('mba-v373-reentry')?{paidReentry:true,reentryRequestedBy:authUser.uid,reentryRequestedAt:now}:{})};
+  const privateRec={categoryId:cat.id,club:entry.club,...(isSuper()?{mobile}:{}),contactName:String(fd.get('contactName')||entry.players[0]||'').trim(),createdBy:authUser.uid,createdAt:now,...(mba372AgeMinimum(cat)?{birthYears:[Number(fd.get('birthYear1')),Number(fd.get('birthYear2'))],ageOverride:!!fd.has('ageOverride'),ageOverrideReason:String(fd.get('ageOverrideReason')||'').trim(),ageOverrideBy:fd.has('ageOverride')?authUser.uid:''}:{}),...(fd.has('mba-v373-reentry')?{paidReentry:true,reentryRequestedBy:authUser.uid,reentryRequestedAt:now}:{})};
   patch['v3/privateRegistrations/'+t.id+'/'+entrantId]=privateRec;
   const isKnockout=mba372EventFmt(t,cat)==='knockout';
   for(const p of (isKnockout?players.slice(0,1):players)){const part=Math.min(remaining,Number((isKnockout?(finance.config?.feePerEntry??t.registrationFeePerPair):null)??finance.config?.feePerPlayer??t.registrationFeePerPlayer??received)||received);if(part>0){
@@ -4268,7 +4268,7 @@ function mba372AgeCheck(c,yearA,yearB,eventYear,override,reason){
 const mba372EventYear=t=>/^\d{4}/.test(t.date||'')?Number(t.date.slice(0,4)):new Date().getFullYear();
 const mba372RegBase=mba37RegistrationView;
 mba37RegistrationView=function(t){
- const original=mba372RegBase(t),canReg=mba37CanRegister(),privateAllowed=isSuper()||canSeePayments()||mba37CanTakePayment();
+ const original=mba372RegBase(t),canReg=mba37CanRegister(),privateAllowed=isSuper();
  const rows=t.categories.flatMap(c=>c.entrants.map(e=>{
   const names=e.playerIds.map(pid=>t.teams.find(tm=>tm.id===e.teamId)?.players.find(p=>p.id===pid)?.name||'?');
   const record=mba37PrivateItems[e.id]||{},status=mba372RegStatus(e),age=mba372AgeMinimum(c),years=record.birthYears||[];
@@ -4278,7 +4278,7 @@ mba37RegistrationView=function(t){
     ${canReg?`<form data-mba372-reg-edit="${esc(c.id)}:${esc(e.id)}" class="sub-form"><div class="form-grid">${names.map((name,i)=>field('Player '+(i+1),'p'+i,name,'text','required maxlength="80"')).join('')}
       ${field('Club','club',e.clubName||'','text','maxlength="80"')}
       ${privateAllowed?`${field('Contact person','contactName',record.contactName||names[0]||'','text','maxlength="100"')}${field('Private mobile','mobile',record.mobile||'','tel','maxlength="20"')}`:''}
-      ${age?`${field('Player 1 Birth Year','year1',years[0]||'','number','required min="1900" max="2100"')}${field('Player 2 Birth Year','year2',years[1]||'','number','required min="1900" max="2100"')}`:''}
+      ${age&&isSuper()?`${field('Player 1 Birth Year','year1',years[0]||'','number','required min="1900" max="2100"')}${field('Player 2 Birth Year','year2',years[1]||'','number','required min="1900" max="2100"')}`:''}
       ${age&&isSuper()?`<label class="choice"><input type="checkbox" name="ageOverride" ${record.ageOverride?'checked':''}> Super Admin age override</label>${field('Override reason','overrideReason',record.ageOverrideReason||'','text','maxlength="160"')}`:''}
       </div><button type="submit" class="btn primary">Save registration changes</button></form>
     <div class="actions">${['active','hold','cancelled','deleted'].filter(x=>x!==status).map(s=>`<button type="button" class="btn ${s==='deleted'?'danger-outline':''}" data-mba372-status="${esc(c.id)}:${esc(e.id)}:${s}">${s==='active'?'Restore':s==='hold'?'Hold / Pending':s==='cancelled'?'Cancel':'Delete / Archive'}</button>`).join('')}</div>`:''}
@@ -4315,9 +4315,9 @@ function mba372RegistrationDraft(catId,entryId,fd){
  de.clubName=String(fd.get('club')||'').slice(0,80);
  const current=mba37PrivateItems[entryId]||{},privateValue={...current,categoryId:catId,club:de.clubName,
   mobile:String(fd.get('mobile')||current.mobile||'').trim(),contactName:String(fd.get('contactName')||current.contactName||'').trim(),
-  createdBy:authUser.uid,createdAt:Date.now()};
+  createdBy:current.createdBy||authUser.uid,createdAt:current.createdAt||Date.now()};
  if(privateValue.mobile&&!/^[0-9+()\s-]{6,20}$/.test(privateValue.mobile))throw Error('Invalid private contact mobile.');
- if(mba372AgeMinimum(c)){
+ if(mba372AgeMinimum(c)&&isSuper()){
   const info=mba372AgeCheck(c,fd.get('year1'),fd.get('year2'),mba372EventYear(t),fd.has('ageOverride'),fd.get('overrideReason'));
   privateValue.birthYears=[Number(fd.get('year1')),Number(fd.get('year2'))];privateValue.ageOverride=!!info.overridden;
   privateValue.ageOverrideReason=info.overridden?String(fd.get('overrideReason')||'').slice(0,160):'';
@@ -4330,7 +4330,7 @@ async function mba372SaveRegistration(catId,entryId,fd){
  if(!mba37CanRegister())throw Error('Registration Edit permission required.');
  const {after,privateValue}=mba372RegistrationDraft(catId,entryId,fd),patch=patchesForMutation(store,after);
  if(Object.keys(patch).length===0&&!(mba37PrivateItems[entryId]))throw Error('No changes.');
- if(isSuper()||canSeePayments()||mba37CanTakePayment())patch['v3/privateRegistrations/'+active().id+'/'+entryId]=privateValue;
+ if(isSuper())patch['v3/privateRegistrations/'+active().id+'/'+entryId]=privateValue;
  if(!confirm('Save changes to this registration? Existing match results and payments remain.'))return;
  await update(ref(db),patch);notice='Registration edited. Existing receipts/results remain unchanged.';render();
 }
@@ -6504,7 +6504,7 @@ function mbaV7QuickRegistration(t){
   </div>
   <details class="mba-v7-optional"><summary>Optional: Club & Contact / ക്ലബ്ബും കോൺടാക്റ്റും</summary>
    <div class="mba-v7-input-row"><label class="field"><span>Club / Academy</span><input name="club" maxlength="80" placeholder="Optional"></label><label class="field"><span>Contact person</span><input name="contactName" maxlength="100" placeholder="Optional"></label></div>
-   <label class="field"><span>Private mobile</span><input name="mobile" inputmode="tel" maxlength="20" placeholder="Optional"></label>
+   ${isSuper()?`<label class="field"><span>Private mobile · Super Admin only</span><input name="mobile" inputmode="tel" maxlength="20" placeholder="Optional"></label>`:''}
   </details>
   <button class="btn primary mba-v7-submit" type="submit">💾 Save Player / Pair</button>
   <p class="helper" id="mba-v7-note">Quick Save adds one player or doubles pair. It does not record payment. Existing permissions and duplicate checks still apply.</p>
@@ -6517,11 +6517,82 @@ function mbaV7QuickRegistration(t){
   <div class="mba-v7-counts">${rows||'No registered categories yet'}</div>
  </section>`;
 }
+
+/* Super Admin-only private phone editor; does not write tournament, fixtures or scores. */
+const mbaV7PhoneEntrySelections=new Map();
+function mbaV7SuperPhonePanel(t){
+ if(!t||!isSuper())return '';
+ mba37WatchPrivate(t); // Phone records are fetched for Super Admin ONLY.
+ const entries=t.categories.flatMap(c=>(c.entrants||[]).map(e=>({c,e})));
+ const remembered=mbaV7PhoneEntrySelections.get(t.id);
+ const current=entries.find(({c,e})=>c.id+'|'+e.id===remembered)||entries[0];
+ const opts=entries.map(({c,e})=>{
+  const key=c.id+'|'+e.id;
+  return `<option value="${esc(key)}" ${current&&c.id===current.c.id&&e.id===current.e.id?'selected':''}>${esc(entryLabel(t,c,e.id))} · ${esc(c.name)}</option>`;
+ }).join('');
+ const value=current?String(mba37PrivateItems[current.e.id]?.mobile||''):'';
+ return `<details class="mba-v7-advanced mba-v7-phone-editor"><summary>🔒 Super Admin · Player Edit · Mobile Number</summary>
+  <div class="mba-v7-advanced-inner"><p class="helper">Only Super Admin can VIEW, ADD, CHANGE or REMOVE a phone number. Other registration users do not need a number.</p>
+  ${entries.length?`<form id="mba-v7-phone-form" data-tid="${esc(t.id)}" class="sub-form">
+   <label class="field"><span>Player / Pair / Category</span><select id="mba-v7-phone-entry" name="entry">${opts}</select></label>
+   <label class="field"><span>Private mobile · Super Admin only</span><input id="mba-v7-phone-number" name="mobile" value="${esc(value)}" type="tel" inputmode="tel" autocomplete="off" maxlength="20" placeholder="Add mobile later"></label>
+   <button class="btn primary" type="submit">💾 Save private mobile</button>
+   <small>Leave blank to remove the saved mobile number. This does NOT modify match results.</small>
+   </form>`:'<p class="helper">No registrations yet.</p>'}</div></details>`;
+}
+function mbaV7UpdateSuperPhoneField(){
+ if(!isSuper())return;
+ const t=active(),select=document.getElementById('mba-v7-phone-entry'),field=document.getElementById('mba-v7-phone-number');
+ if(!t||!select||!field)return;
+ const [cid,eid]=select.value.split('|');
+ if(!t.categories.some(c=>c.id===cid&&c.entrants.some(e=>e.id===eid)))return;
+ mbaV7PhoneEntrySelections.set(t.id,select.value);
+ field.value=String(mba37PrivateItems[eid]?.mobile||'');
+}
+async function mbaV7SaveSuperPhone(f){
+ if(!isSuper()||!authUser||!remoteReady)throw Error('Only Super Admin can edit mobile numbers.');
+ const t=active();
+ if(!t||f.dataset.tid!==t.id)throw Error('Selected tournament changed. Reopen Registration.');
+ const [cid,eid]=String(f.elements.entry.value||'').split('|');
+ const c=t.categories.find(c=>c.id===cid),entry=c?.entrants.find(e=>e.id===eid);
+ if(!entry)throw Error('Player/Pair entry not found. Refresh.');
+ const value=String(f.elements.mobile.value||'').trim();
+ if(value&&!/^[0-9+()\s-]{6,20}$/.test(value))throw Error('Enter a valid mobile number (6–20 characters), or leave blank.');
+ if(!confirm((value?'Save':'Remove')+' private mobile for '+entryLabel(t,c,eid)+'? Only Super Admin will see it.'))return;
+ const now=Date.now(),uidAtStart=authUser.uid,tid=t.id;
+ const node=ref(db,'v3/privateRegistrations/'+tid+'/'+eid);
+ const result=await runTransaction(node,current=>{
+  if(current&&typeof current==='object'&&current.categoryId&&current.categoryId!==cid)return;
+  const record=current&&typeof current==='object'?{...current}:{categoryId:cid,createdAt:now,createdBy:uidAtStart};
+  if(!record.categoryId)record.categoryId=cid;
+  if(!record.createdAt)record.createdAt=now;
+  if(!record.createdBy)record.createdBy=uidAtStart;
+  if(value)record.mobile=value;else delete record.mobile;
+  record.mobileUpdatedBy=uidAtStart;record.mobileUpdatedAt=now;
+  return record;
+ },{applyLocally:false});
+ if(!result.committed)throw Error('Mobile update was not committed. Reload and check the entry.');
+ mbaV7PhoneEntrySelections.set(tid,cid+'|'+eid);
+ notice='Super Admin private mobile updated. Scores and fixtures were not changed.';
+ render();
+}
+document.addEventListener('change',e=>{
+ if(e.target?.id==='mba-v7-phone-entry')mbaV7UpdateSuperPhoneField();
+},true);
+document.addEventListener('submit',e=>{
+ const f=e.target.closest('#mba-v7-phone-form');if(!f)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(f.dataset.busy)return;
+ f.dataset.busy='yes';const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
+ mbaV7SaveSuperPhone(f).catch(err=>alert('Super Admin Mobile: '+errText(err)))
+   .finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false});
+},true);
+
 const mbaV7RegistrationPrevious=mba37RegistrationView;
 mba37RegistrationView=function(t){
  const previous=mbaV7RegistrationPrevious(t);
  if(!t)return previous;
- return mbaV7QuickRegistration(t)+`<details class="mba-v7-advanced"><summary>⚙ Advanced Registration, Edit, Bulk Import & History</summary><div class="mba-v7-advanced-inner">${previous}</div></details>`;
+ return mbaV7QuickRegistration(t)+mbaV7SuperPhonePanel(t)+`<details class="mba-v7-advanced"><summary>⚙ Advanced Registration, Edit, Bulk Import & History</summary><div class="mba-v7-advanced-inner">${previous}</div></details>`;
 };
 function mbaV7SyncRegistration(){
  const f=document.getElementById('mba-v7-register-form');if(!f)return;
@@ -6570,7 +6641,7 @@ async function mbaV7SaveQuick(form){
  field('categoryId',cat.id);field('eventType',type);
  field('players',(type==='singles'?p1:p1+' & '+p2)+(club?' | '+club:''));
  field('received',0);field('contactName',form.elements.contactName.value.trim()||p1);
- field('mobile',form.elements.mobile.value.trim());
+ if(isSuper())field('mobile',form.elements.mobile.value.trim());
  if(age){field('birthYear1',years[0]);field('birthYear2',years[1]);}
  mbaV7SelectedCategories.set(t.id,cat.id);
  await mba37Register(hidden); // Reuse existing atomic DB write, duplicate and permission guards.
@@ -6643,6 +6714,7 @@ function mbaV71AddNavigationShortcuts(){
 }
 
 
+/* MBA_V7_SUPER_ADMIN_PHONE_ONLY_20261122 — registration UI and private-data access only; scoring untouched. */
 mbaV7InstallNavigation();
 mbaV71AddNavigationShortcuts();
 
