@@ -963,6 +963,23 @@ nav[aria-label="Tournament management"]>button.selected:not(.mba-v71-quick){
  nav[aria-label="Tournament management"]>button.mba-v71-quick small{font-size:9px!important}
 }
 </style>
+<style id="mba-v73-registered-style">
+/* MBA_V7_3_INLINE_REGISTERED_TEAMS_20261122 — read-only V7 TEST registration list. */
+.mba-v73-list{margin:10px 0 14px;padding:14px;border:1px solid #b5cde5;border-radius:13px;background:#f3f8fe;color:#172e4a}
+.mba-v73-list-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px}
+.mba-v73-list-head strong{font-size:17px}
+.mba-v73-list-head span{font-size:13px;background:#dcecfb;color:#183a68;padding:5px 9px;border-radius:20px;font-weight:700}
+.mba-v73-cat{font-size:13px;font-weight:650;margin:8px 0}
+.mba-v73-rows{margin:8px 0 0;list-style:none;padding:0;display:grid;gap:6px;max-height:340px;overflow:auto}
+.mba-v73-rows li{display:flex;justify-content:space-between;align-items:center;gap:8px;border:1px solid #d8e2ef;background:#fff;padding:9px 10px;border-radius:9px}
+.mba-v73-name{font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.mba-v73-rows small{color:#60728b;font-size:11px;white-space:nowrap}
+.mba-v73-info{display:block;margin-top:8px;color:#5e718b;font-size:11px}
+.mba-v73-empty{padding:10px 0;font-size:13px}
+:root[data-mba-theme="dark"] .mba-v73-list{background:#152840;color:#e5efff;border-color:#3b5877}
+:root[data-mba-theme="dark"] .mba-v73-rows li{background:#213953;border-color:#48637f}
+:root[data-mba-theme="dark"] .mba-v73-list-head span{background:#385477;color:#fff}
+</style>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
 import { getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
@@ -6479,6 +6496,17 @@ function mbaV7InitialCategory(t){
  const list=mbaV7Categories(t),preferred=mbaV7SelectedCategories.get(t.id);
  return list.find(c=>c.id===preferred)||list.find(c=>mba372AgeMinimum(c)>0)||list[0]||null;
 }
+/* V7.3 inline visible entrants — list is read-only and contains NO phone or private details. */
+function mbaV73RegisteredTeams(t,catId){
+ const c=mbaV7Category(t,catId);
+ if(!c)return '<p class="mba-v73-empty">Select a category to view registered players / teams.</p>';
+ const entries=[...(c.entrants||[])].filter(mba372EntryActive).reverse();
+ const list=entries.map(e=>`<li><span class="mba-v73-name">🏸 ${esc(entryLabel(t,c,e.id))}</span><small>✓ Saved</small></li>`).join('');
+ return `<div class="mba-v73-list-head"><strong>✅ Registered Players / Teams</strong><span>${entries.length} saved</span></div>`+
+   `<p class="mba-v73-cat">${esc(c.name)}</p>`+
+   (list?`<ol class="mba-v73-rows">${list}</ol>`:'<p class="mba-v73-empty">No registrations in this category yet.</p>')+
+   '<small class="mba-v73-info">Latest registration first · Private phone numbers never displayed.</small>';
+}
 function mbaV7QuickRegistration(t){
  if(!t)return '';
  const list=mbaV7Categories(t),choice=mbaV7InitialCategory(t),canEdit=mba37CanRegister();
@@ -6514,6 +6542,7 @@ function mbaV7QuickRegistration(t){
   <div class="mba-v7-presets" aria-label="Quick combined-age categories">${agePresets}</div>
   ${custom}
   ${form}
+  <div id="mba-v73-registered-list" class="mba-v73-list" aria-live="polite">${mbaV73RegisteredTeams(t,choice?.id)}</div>
   <div class="mba-v7-counts">${rows||'No registered categories yet'}</div>
  </section>`;
 }
@@ -6597,6 +6626,7 @@ mba37RegistrationView=function(t){
 function mbaV7SyncRegistration(){
  const f=document.getElementById('mba-v7-register-form');if(!f)return;
  const t=active(),c=mbaV7Category(t,f.elements.categoryId.value);if(!c)return;
+ const list=document.getElementById('mba-v73-registered-list');if(list)list.innerHTML=mbaV73RegisteredTeams(t,c.id);
  const age=mba372AgeMinimum(c),doubles=mba37RegType(c)==='doubles';
  const player2=f.querySelector('#mba-v7-player2-wrap'),birth=f.querySelector('#mba-v7-birth-section');
  player2.hidden=!doubles;f.elements.player2.required=doubles;
