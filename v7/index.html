@@ -854,7 +854,21 @@ body.mba-v75-live-only>*:not(#mba-v75-live-root):not(script){display:none!import
 @media(max-width:400px){.mba-v75-two{grid-template-columns:1fr}.mba-v75-live-pair strong{font-size:43px}.mba-v75-categories{grid-template-columns:1fr 1fr}.mba-v75-live-body{padding:12px 10px}}
 
 </style>
-<style>.mba751-pay{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid #9bb4ce;border-radius:10px}.mba751-pay>label:first-child{flex:1;min-width:108px}.mba751-pay input[type=number]{width:100%;min-width:75px}.mba751-line{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}.mba751-pay [data-mba751-status]{font-size:.8rem;font-weight:bold}.mba-v74-actions{flex-wrap:wrap}.mba-v74-entry small{font-size:.75rem}.mba-v74-entry .payment-unpaid,.mba751-pay .payment-unpaid{color:#bd2035}</style></head>
+<style>.mba751-pay{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid #9bb4ce;border-radius:10px}.mba751-pay>label:first-child{flex:1;min-width:108px}.mba751-pay input[type=number]{width:100%;min-width:75px}.mba751-line{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}.mba751-pay [data-mba751-status]{font-size:.8rem;font-weight:bold}.mba-v74-actions{flex-wrap:wrap}.mba-v74-entry small{font-size:.75rem}.mba-v74-entry .payment-unpaid,.mba751-pay .payment-unpaid{color:#bd2035}</style><style>
+.mba751-pay{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px 12px;padding:12px;box-sizing:border-box}
+.mba751-pay>label:first-child{grid-column:1/-1;min-width:0;display:grid;gap:6px;grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.mba751-pay input[name=mba751Paid]{grid-column:1/-1;display:block;width:100%;min-width:0;box-sizing:border-box;border:1px solid var(--border,#bacbdc);border-radius:10px;padding:12px;font:inherit;min-height:44px;background:var(--surface,#fff);color:var(--text,#172b40)}
+.mba751-pay .mba753-paid{display:flex;align-items:center;gap:8px;white-space:nowrap;margin:0;min-width:0}
+.mba751-pay .mba753-paid input{width:20px;height:20px;min-width:20px;margin:0}
+.mba751-pay [data-mba751-status]{justify-self:end;text-align:right;overflow-wrap:anywhere;min-width:0}
+.mba753-collector-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 5px}
+.mba753-collector-tools small{flex-basis:100%}
+.mba753-prizes{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
+.mba753-prize{display:grid;gap:8px;min-width:0;padding:10px;border:1px solid #c9d7e6;border-radius:10px}
+.mba753-trophy{display:flex;align-items:center;gap:7px;font-weight:700;min-height:36px}
+.mba753-trophy input{width:20px;height:20px;flex:none}
+@media(max-width:500px){.mba753-prizes{grid-template-columns:1fr}}
+</style></head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
 <main class="container">
@@ -6640,6 +6654,7 @@ function mbaV7QuickRegistration(t){
   ${isSuper()?`<label class="field"><span>Mobile Number (Optional) · Private</span><input name="mobile" type="tel" inputmode="numeric" enterkeyhint="done" autocomplete="tel" maxlength="20" placeholder="Mobile number"></label>`:''}
   ${mbaV751PaymentForm(t,choice)}
    ${canSeePayments()&&mba37CanTakePayment()?mbaV751Collector():''}
+  ${can('feesWrite')?`<div class="mba753-collector-tools"><button type="button" class="btn" data-mba753-add>＋ Add Committee Member</button>${mba372Committee().length?'':'<small>No committee members saved in this tournament.</small>'}</div>`:mba37CanTakePayment()&&!mba372Committee().length?'<small>No committee members saved. Ask the fee manager to add names.</small>':''}
   <details class="mba-v7-optional"><summary>Optional: Club & Contact / ക്ലബ്ബും കോൺടാക്റ്റും</summary>
    <div class="mba-v7-input-row"><label class="field"><span>Club / Academy</span><input name="club" maxlength="80" placeholder="Optional"></label><label class="field"><span>Contact person</span><input name="contactName" maxlength="100" placeholder="Optional"></label></div>
    </details>
@@ -6960,12 +6975,11 @@ function mbaV75QuickCreateForm(){
        <label class="field"><span>Score Cap (0 = No cap)</span><input type="number" name="cap" min="0" max="999" value="25"></label>
        <label class="field"><span>Win by 2</span><select name="winByTwo"><option value="yes">Yes</option><option value="no">No</option></select></label></div>
    </details>
-   <fieldset class="mba-v75-categories"><legend>Fee, Prize &amp; Umpire (optional)</legend>
+   <fieldset class="mba-v75-categories mba753-fee-settings"><legend>Fee, Prize &amp; Umpire (optional)</legend>
     <label class="field">Singles / league per-player fee (₹)<input name="mba37-fee" type="number" min="0" step=".01" inputmode="decimal" placeholder="Optional: 500"></label>
     <label class="field">Knockout entry / pair fee (₹)<input name="pairFee" type="number" min="0" step=".01" inputmode="decimal" placeholder="Same as above if blank"></label>
-    <div class="mba-v75-two"><label class="field">Winner cash prize (₹)<input name="mba37-winner-prize" type="number" min="0" step=".01"></label><label class="field">Runner-up cash prize (₹)<input name="mba37-runner-prize" type="number" min="0" step=".01"></label></div>
-    <label><input type="checkbox" name="mba37-trophy-winner"> Winner trophy</label><label><input type="checkbox" name="mba37-trophy-runner"> Runner trophy</label>
-    <label class="field">Umpire Score Input Mode<select name="mba37-umpire-mode"><option value="both" selected>Both + and Tick grid</option><option value="plus">+ Button only</option><option value="tick">Tick grid only</option></select></label>
+    <div class="mba753-prizes"><div class="mba753-prize"><label class="field">Winner cash prize (₹)<input name="mba37-winner-prize" type="number" min="0" step=".01" inputmode="decimal"></label><label class="mba753-trophy"><input type="checkbox" name="mba37-trophy-winner"> Winner trophy</label></div><div class="mba753-prize"><label class="field">Runner-up cash prize (₹)<input name="mba37-runner-prize" type="number" min="0" step=".01" inputmode="decimal"></label><label class="mba753-trophy"><input type="checkbox" name="mba37-trophy-runner"> Runner trophy</label></div></div>
+   <label class="field">Umpire Score Input Mode<select name="mba37-umpire-mode"><option value="both" selected>Both + and Tick grid</option><option value="plus">+ Button only</option><option value="tick">Tick grid only</option></select></label>
    </fieldset>
    <div class="mba-v75-create-actions"><button type="submit" class="btn primary">✅ Create Tournament</button><button type="button" class="btn" data-mba-v75-cancel>Cancel</button></div>
   </form>
@@ -7156,7 +7170,7 @@ tournamentView=function(t){
  return bar+html;
 };
 
-/* MBA V7.5.2 TEST */
+/* MBA V7.5.3 TEST */
 let mbaV751Focus=false;
 function mbaV751Fee(t,c){
  if(!t||!c)return null;
@@ -7168,7 +7182,7 @@ function mbaV751Collector(selected='',placeholder='Select committee member'){
 }
 function mbaV751PaymentForm(t,c){
  if(!canSeePayments()||!mba37CanTakePayment())return '';
- return `<div class="mba751-pay"><label>Court Fee <b data-mba751-fee>${esc(mbaV751Fee(t,c)==null?'Not set':money(mbaV751Fee(t,c)))}</b><input name="mba751Paid" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="Amount received" value=""></label><label class="choice"><input type="checkbox" name="mba751Tick"> Paid</label><span data-mba751-status class="payment-unpaid">NOT PAID</span></div>`;
+ return `<div class="mba751-pay"><label class="mba753-amount">Court Fee <b data-mba751-fee>${esc(mbaV751Fee(t,c)==null?'Not set':money(mbaV751Fee(t,c)))}</b><input name="mba751Paid" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="Amount received" value=""></label><label class="choice mba753-paid"><input type="checkbox" name="mba751Tick"> Paid</label><span data-mba751-status class="payment-unpaid">NOT PAID</span></div>`;
 }
 function mbaV751SyncFee(f,t,c){
  const a=f.elements.mba751Paid,k=f.elements.mba751Tick;if(!a||!k||!c)return;
@@ -7314,6 +7328,7 @@ async function mbaV752SaveMember(tid,kind,old,name){
  await update(cfg,data);
  if(active()?.id===tid){finance.config={...latest,...data};notice='Committee member '+(kind==='delete'?'deleted':'saved')+'.';render();}
  alert(kind==='delete'?'Committee member deleted.':'Committee member saved successfully.');
+ return true;
 }
 document.addEventListener('submit',e=>{
  const f=e.target.closest('form[data-mba752-member]');if(!f)return;
@@ -7329,6 +7344,43 @@ document.addEventListener('click',e=>{
 document.addEventListener('focusin',e=>{if(e.target.matches('input[name=mba751Paid],input[name=totalPaid]'))e.target.select();});
 document.addEventListener('click',e=>{if(e.target.matches('input[name=mba751Paid],input[name=totalPaid]')&&!e.target.dataset.mba752Focused){e.target.select();e.target.dataset.mba752Focused='yes';}});
 document.addEventListener('focusout',e=>{if(e.target.matches('input[name=mba751Paid],input[name=totalPaid]'))delete e.target.dataset.mba752Focused;});
+
+
+/* V7.5.3: add committee members directly beside the registration collector. */
+let mba753Adding=false;
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('[data-mba753-add]');if(!b)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ if(mba753Adding||!can('feesWrite'))return;
+ const f=b.closest('#mba-v7-register-form'),t=active();if(!f||!t||f.dataset.tid!==t.id)return;
+ const name=prompt('Enter committee member name:');if(name===null)return;
+ const member=name.trim();if(!member){alert('Enter a committee member name.');return;}
+ const saved={tid:t.id,cid:f.elements.categoryId.value,feeKey:f.dataset.mba751FeeKey,entered:f.dataset.mba752Entered,values:{}};
+ for(const k of ['player1','player2','birthYear1','birthYear2','mobile','club','contactName','mba751Paid','mba751Collector']){
+  if(f.elements[k])saved.values[k]=f.elements[k].value;
+ }
+ const optional=f.querySelector('.mba-v7-optional');saved.optional=!!optional?.open;
+ mba753Adding=true;b.disabled=true;
+ let ok=false;
+ try{ok=await mbaV752SaveMember(t.id,'add','',member)===true;}
+ catch(err){alert('Committee: '+errText(err));}
+ finally{
+  mba753Adding=false;if(b.isConnected)b.disabled=false;
+  const fresh=document.getElementById('mba-v7-register-form');
+  if(fresh&&active()?.id===saved.tid&&fresh.dataset.tid===saved.tid&&fresh.elements.categoryId.value===saved.cid){
+   for(const [k,v] of Object.entries(saved.values)){
+    const el=fresh.elements[k];if(!el)continue;
+    if(k==='mba751Paid'&&fresh.dataset.mba751FeeKey!==saved.feeKey)continue;
+    el.value=v;
+   }
+   if(fresh.dataset.mba751FeeKey===saved.feeKey)fresh.dataset.mba752Entered=saved.entered||'';
+   const details=fresh.querySelector('.mba-v7-optional');if(details)details.open=saved.optional;
+   if(ok&&fresh.elements.mba751Collector)fresh.elements.mba751Collector.value=member;
+   mbaV7SyncRegistration();
+   if(fresh.elements.mba751Collector&&!fresh.elements.mba751Collector.disabled)fresh.elements.mba751Collector.focus();
+  }
+ }
+},true);
 
 mbaV7InstallNavigation();
 mbaV71AddNavigationShortcuts();
