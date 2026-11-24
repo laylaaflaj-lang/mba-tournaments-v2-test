@@ -854,7 +854,7 @@ body.mba-v75-live-only>*:not(#mba-v75-live-root):not(script){display:none!import
 @media(max-width:400px){.mba-v75-two{grid-template-columns:1fr}.mba-v75-live-pair strong{font-size:43px}.mba-v75-categories{grid-template-columns:1fr 1fr}.mba-v75-live-body{padding:12px 10px}}
 
 </style>
-</head>
+<style>.mba751-pay{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px;border:1px solid #9bb4ce;border-radius:10px}.mba751-pay>label:first-child{flex:1;min-width:108px}.mba751-pay input[type=number]{width:100%;min-width:75px}.mba751-line{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}.mba751-pay [data-mba751-status]{font-size:.8rem;font-weight:bold}.mba-v74-actions{flex-wrap:wrap}.mba-v74-entry small{font-size:.75rem}.mba-v74-entry .payment-unpaid,.mba751-pay .payment-unpaid{color:#bd2035}</style></head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
 <main class="container">
@@ -1610,7 +1610,7 @@ function watchFinance(){
  finance={config:null,payments:{},overrides:{},expenses:{},transfers:{}};
  if(!t||!authUser)return;
  const p=`v3/finance/${t.id}`;
- function watch(part){const off=onValue(ref(db,p+'/'+part),snap=>{finance[part]=snap.val()|| (part==='config'?null:{});if(page==='finance'||page==='fixtures'||page==='registration'||page==='teams'||page==='tournaments'||page==='print')render()},e=>{document.getElementById('auth-message').textContent='Finance read: '+errText(e)});finListeners.push(off)}
+ function watch(part){const off=onValue(ref(db,p+'/'+part),snap=>{finance[part]=snap.val()|| (part==='config'?null:{});if(page==='finance'||page==='fixtures'||page==='registration'||page==='teams'||page==='tournaments'||page==='print'||page==='access')render()},e=>{document.getElementById('auth-message').textContent='Finance read: '+errText(e)});finListeners.push(off)}
  if(canSeePayments()||can('feesWrite')){watch('config');watch('overrides')}
  if(canSeePayments())watch('payments');
  if(canSeeExpenses())watch('expenses');
@@ -3498,7 +3498,7 @@ function mba37ReadSettings(fd,t){
  t.prizeWinner=mba37Num(fd,'mba37-winner-prize');
  t.prizeRunner=mba37Num(fd,'mba37-runner-prize');
  t.trophyWinner=fd.has('mba37-trophy-winner');t.trophyRunner=fd.has('mba37-trophy-runner');
- t.umpireInputMode=String(fd.get('mba37-umpire-mode')||'plus');
+ t.umpireInputMode=String(fd.get('mba37-umpire-mode')||'both');
  if(!['plus','tick','both'].includes(t.umpireInputMode))throw Error('Invalid umpire control');
 }
 const mba37OriginalTournament=tournamentView;
@@ -3515,7 +3515,7 @@ tournamentView=function(t){
  <label class="field">Runner-up cash prize (₹)<input type="number" min="0" step="0.01" name="mba37-runner-prize" value="${cash(n.prizeRunner)}" placeholder="Optional: 1000"></label></div>
  <label class="choice"><input type="checkbox" name="mba37-trophy-winner" ${n.trophyWinner?'checked':''}> Winner trophy</label>
  <label class="choice"><input type="checkbox" name="mba37-trophy-runner" ${n.trophyRunner?'checked':''}> Runner trophy</label>
- <label class="field">Umpire Score Input Mode<select name="mba37-umpire-mode">${choice('plus','+ button only (safe live default)',n.umpireInputMode||'plus')}${choice('tick','Tick grid only',n.umpireInputMode)}${choice('both','Both + and Tick grid',n.umpireInputMode)}</select></label>
+ <label class="field">Umpire Score Input Mode<select name="mba37-umpire-mode">${choice('plus','+ button only',n.umpireInputMode)}${choice('tick','Tick grid only',n.umpireInputMode)}${choice('both','Both + and Tick grid',n.umpireInputMode||'both')}</select></label>
  <p class="helper">Cash Prize Date removed. Fees/prizes/trophies are optional. Prize amounts appear as planned expenses until payout is recorded. Existing payouts are never overwritten.</p></div>`;
  const anchor='<div class="full actions"> <button class="btn primary" type="submit">Save Tournament</button>';
  return base.includes(anchor)?base.replace(anchor,markup+anchor):base;
@@ -4417,7 +4417,7 @@ function mba372RegistrationDraft(catId,entryId,fd){
  for(let i=0;i<next.length;i++)dteam.players.find(p=>p.id===entry.playerIds[i]).name=next[i];
  de.clubName=String(fd.get('club')||'').slice(0,80);
  const current=mba37PrivateItems[entryId]||{},privateValue={...current,categoryId:catId,club:de.clubName,
-  mobile:String(fd.get('mobile')||current.mobile||'').trim(),contactName:String(fd.get('contactName')||current.contactName||'').trim(),
+  mobile:String(fd.has('mobile')?fd.get('mobile'):(current.mobile||'')).trim(),contactName:String(fd.get('contactName')||current.contactName||'').trim(),
   createdBy:current.createdBy||authUser.uid,createdAt:current.createdAt||Date.now()};
  if(privateValue.mobile&&!/^[0-9+()\s-]{6,20}$/.test(privateValue.mobile))throw Error('Invalid private contact mobile.');
  if(mba372AgeMinimum(c)&&isSuper()){
@@ -6628,8 +6628,8 @@ function mbaV7QuickRegistration(t){
  const form=canEdit&&list.length?`<form id="mba-v7-register-form" data-tid="${esc(t.id)}" class="mba-v7-form">
   <label class="field"><span>1. Category / വിഭാഗം</span><select id="mba-v7-category" name="categoryId" required>${options}</select></label>
   <div class="mba-v7-input-row">
-   <label class="field"><span>2. Player 1 / കളിക്കാരൻ 1</span><input name="player1" maxlength="80" autocomplete="off" placeholder="First player's name" required></label>
-   <label class="field" id="mba-v7-player2-wrap"><span>Player 2 / കളിക്കാരൻ 2</span><input name="player2" maxlength="80" autocomplete="off" placeholder="Doubles partner"></label>
+   <label class="field"><span>2. Player 1 / കളിക്കാരൻ 1</span><input name="player1" maxlength="80" autocomplete="off" enterkeyhint="next" placeholder="First player's name" required></label>
+   <label class="field" id="mba-v7-player2-wrap"><span>Player 2 / കളിക്കാരൻ 2</span><input name="player2" maxlength="80" autocomplete="off" enterkeyhint="next" placeholder="Doubles partner"></label>
   </div>
   <div id="mba-v7-birth-section" class="mba-v7-birth">
    <div class="mba-v7-input-row"><label class="field"><span>Player 1 Birth Year</span><input name="birthYear1" type="number" min="1900" max="${eventYear}" inputmode="numeric" placeholder="e.g. 1981"></label>
@@ -6637,20 +6637,22 @@ function mbaV7QuickRegistration(t){
    <p id="mba-v7-age-status" class="mba-v7-age-status" aria-live="polite"></p>
    <small>Age is calculated as event year (${eventYear}) minus birth year for EACH player. Exact birthdays are not checked.</small>
   </div>
+  ${isSuper()?`<label class="field"><span>Mobile Number (Optional) · Private</span><input name="mobile" type="tel" inputmode="numeric" enterkeyhint="done" autocomplete="tel" maxlength="20" placeholder="Mobile number"></label>`:''}
+  ${mbaV751PaymentForm(t,choice)}
   <details class="mba-v7-optional"><summary>Optional: Club & Contact / ക്ലബ്ബും കോൺടാക്റ്റും</summary>
    <div class="mba-v7-input-row"><label class="field"><span>Club / Academy</span><input name="club" maxlength="80" placeholder="Optional"></label><label class="field"><span>Contact person</span><input name="contactName" maxlength="100" placeholder="Optional"></label></div>
-   ${isSuper()?`<label class="field"><span>Private mobile · Super Admin only</span><input name="mobile" inputmode="tel" maxlength="20" placeholder="Optional"></label>`:''}
+   ${mbaV751Collector()}
   </details>
   <button class="btn primary mba-v7-submit" type="submit">💾 Save Player / Pair</button>
-  <p class="helper" id="mba-v7-note">Quick Save adds one player or doubles pair. It does not record payment. Existing permissions and duplicate checks still apply.</p>
+  <p class="helper" id="mba-v7-note" hidden></p>
  </form>`:canEdit?'<p class="helper">No Singles/Doubles category yet. Use the preset buttons above or create a Category from More.</p>':'<p class="helper">Registration is view-only. Ask Super Admin for Teams + Categories + Tournament Edit access.</p>';
  const custom=canEdit?`<details class="mba-v7-optional mba-v7-custom"><summary>＋ Custom combined-age Doubles category</summary><form id="mba-v7-custom-age"><label class="field"><span>Minimum combined age</span><input name="minimum" type="number" min="1" max="220" value="110" required></label><button class="btn" type="submit">Create age category</button></form></details>`:'';
- return `<section class="card mba-v7-reg-card"><div class="mba-v7-reg-head"><div><h2>⚡ Easy Registration / എളുപ്പത്തിലുള്ള രജിസ്ട്രേഷൻ</h2><p class="helper">Choose a category, enter names, Save. 80+, 90+, 100+ are the combined ages of TWO doubles players.</p></div><b>${t.categories.reduce((sum,c)=>sum+c.entrants.filter(mba372EntryActive).length,0)} entries</b></div>
+ return `<section class="card mba-v7-reg-card"><div class="mba-v7-reg-head"><div><h2>⚡ Easy Registration / എളുപ്പത്തിലുള്ള രജിസ്ട്രേഷൻ</h2><small>${esc(t.name)}${t.date?` · ${esc(dateShow(t.date))}`:''}</small></div><b>${t.categories.reduce((sum,c)=>sum+c.entrants.filter(mba372EntryActive).length,0)} entries</b></div>
   <div class="mba-v7-presets" aria-label="Quick combined-age categories">${agePresets}</div>
   ${custom}
   ${form}
   <div id="mba-v73-registered-list" class="mba-v73-list" aria-live="polite">${mbaV73RegisteredTeams(t,choice?.id)}</div>
-  <div class="mba-v7-counts">${rows||'No registered categories yet'}</div>
+  <div class="actions"><button class="btn primary" type="button" data-mba751-nav="fixtures">Go to Fixtures →</button></div>
  </section>`;
 }
 
@@ -6728,7 +6730,7 @@ const mbaV7RegistrationPrevious=mba37RegistrationView;
 mba37RegistrationView=function(t){
  const previous=mbaV7RegistrationPrevious(t);
  if(!t)return previous;
- return mbaV7QuickRegistration(t)+mbaV7SuperPhonePanel(t)+`<details class="mba-v7-advanced"><summary>⚙ Advanced Registration, Edit, Bulk Import & History</summary><div class="mba-v7-advanced-inner">${previous}</div></details>`;
+ return mbaV7QuickRegistration(t)+`<details class="mba-v7-advanced"><summary>⚙ Advanced Registration, Edit, Bulk Import & History</summary><div class="mba-v7-advanced-inner">${previous}</div></details>`;
 };
 function mbaV7SyncRegistration(){
  const f=document.getElementById('mba-v7-register-form');if(!f)return;
@@ -6741,7 +6743,7 @@ function mbaV7SyncRegistration(){
  f.elements.birthYear1.required=!!age;f.elements.birthYear2.required=!!age;
  const locked=t.fixtures.some(m=>m.categoryId===c.id);
  const submit=f.querySelector('button[type=submit]');if(submit)submit.disabled=locked;
- const note=f.querySelector('#mba-v7-note');if(note)note.textContent=locked?'Draw already created: Quick Registration locked to protect fixtures. Use Advanced Registration for eligible re-entry.':'Quick Save adds one player or pair. No fee/payment is recorded. Existing safety checks apply.';
+ const note=f.querySelector('#mba-v7-note');if(note){note.hidden=!locked;note.textContent=locked?'Draw already created. Use Advanced Registration for eligible re-entry.':'';} mbaV751SyncFee(f,t,c);
  const status=f.querySelector('#mba-v7-age-status');if(!status)return;
  if(!age){status.textContent='';return}
  const sum=mbaV7AgeSum(f.elements.birthYear1.value,f.elements.birthYear2.value,mba372EventYear(t));
@@ -6777,11 +6779,16 @@ async function mbaV7SaveQuick(form){
  function field(name,value){const input=document.createElement('input');input.type='hidden';input.name=name;input.value=String(value??'');hidden.append(input)}
  field('categoryId',cat.id);field('eventType',type);
  field('players',(type==='singles'?p1:p1+' & '+p2)+(club?' | '+club:''));
- field('received',0);field('contactName',form.elements.contactName.value.trim()||p1);
+ const paid=Number(form.elements.mba751Paid?.value||0),fee=mbaV751Fee(t,cat);
+ if(!mba37Money(paid)||paid>0&&(fee==null||paid>fee))throw Error('Enter an amount within the configured fee.');
+ field('received',paid);field('contactName',form.elements.contactName.value.trim()||p1);
+ if(paid>0){field('receivedBy',form.elements.mba751Collector?.value||authUser.email||'Signed-in committee');field('mode','Cash');}
+ const beforeCount=cat.entrants.length;
  if(isSuper())field('mobile',form.elements.mobile.value.trim());
  if(age){field('birthYear1',years[0]);field('birthYear2',years[1]);}
  mbaV7SelectedCategories.set(t.id,cat.id);
- await mba37Register(hidden); // Reuse existing atomic DB write, duplicate and permission guards.
+ await mba37Register(hidden); // Existing atomic save.
+ if(active()?.id===t.id&&mbaV7Category(active(),cat.id)?.entrants.length>beforeCount){mbaV751Focus=true;render();}
 }
 // Keep the existing module-owned navigation events and validation functions intact.
 document.addEventListener('click',e=>{
@@ -6951,6 +6958,13 @@ function mbaV75QuickCreateForm(){
        <label class="field"><span>Score Cap (0 = No cap)</span><input type="number" name="cap" min="0" max="999" value="25"></label>
        <label class="field"><span>Win by 2</span><select name="winByTwo"><option value="yes">Yes</option><option value="no">No</option></select></label></div>
    </details>
+   <fieldset class="mba-v75-categories"><legend>Fee, Prize &amp; Umpire (optional)</legend>
+    <label class="field">Singles / league per-player fee (₹)<input name="mba37-fee" type="number" min="0" step=".01" inputmode="decimal" placeholder="Optional: 500"></label>
+    <label class="field">Knockout entry / pair fee (₹)<input name="pairFee" type="number" min="0" step=".01" inputmode="decimal" placeholder="Same as above if blank"></label>
+    <div class="mba-v75-two"><label class="field">Winner cash prize (₹)<input name="mba37-winner-prize" type="number" min="0" step=".01"></label><label class="field">Runner-up cash prize (₹)<input name="mba37-runner-prize" type="number" min="0" step=".01"></label></div>
+    <label><input type="checkbox" name="mba37-trophy-winner"> Winner trophy</label><label><input type="checkbox" name="mba37-trophy-runner"> Runner trophy</label>
+    <label class="field">Umpire Score Input Mode<select name="mba37-umpire-mode"><option value="both" selected>Both + and Tick grid</option><option value="plus">+ Button only</option><option value="tick">Tick grid only</option></select></label>
+   </fieldset>
    <div class="mba-v75-create-actions"><button type="submit" class="btn primary">✅ Create Tournament</button><button type="button" class="btn" data-mba-v75-cancel>Cancel</button></div>
   </form>
   <p class="mba-v75-tip">For Keralaotsavam, use the existing Keralaotsavam Quick Tournament option on Home.</p>
@@ -6974,7 +6988,7 @@ tournamentLibrary=function(t){
  }).join('');
  return `<section class="mba-v75-tour-list card"><div class="mba-v75-section-head"><h2>🏆 My Tournaments (${store.tournaments.length})</h2>
   ${isSuper()?'<button type="button" class="btn primary" data-mba-v75-new>＋ New Tournament</button>':''}</div>
-  <div class="mba-v75-tour-grid">${items}</div>
+  <div class="mba-v75-tour-grid">${items}</div><div class="actions"><button class="btn primary" type="button" data-mba751-nav="registration">Go to Registration →</button></div>
   <details class="mba-v75-detail"><summary>📋 Selected Tournament Details</summary>${tournamentDetailsPanel(t)}</details>
   <details class="mba-v75-detail"><summary>📜 History &amp; Scores</summary>${tournamentHistoryPanel(t)}</details>
  </section>`;
@@ -7003,6 +7017,9 @@ async function mbaV75SaveQuickTournament(form){
  const event=makeTournament({name,date,courts,format});
  event.rules={...defaultRules(),target,cutoff:cap===0?null:cap,winByTwo:fd.get('winByTwo')==='yes',bestOf:1};validateRules(event.rules);
  event.registrationMode='direct';
+ fd.set('mba37-play-type',keys.length===1&&keys[0]==='singles'?'singles':keys.length===1&&keys[0]!=='custom'?'doubles':'other');
+ mba37ReadSettings(fd,event);
+ event.registrationFeePerPair=mba37Num(fd,'pairFee')??event.registrationFeePerPlayer;
  const createdNames=new Set();
  for(const key of keys){
   const tuple=mbaV75CategoryChoices.find(c=>c[0]===key);
@@ -7013,8 +7030,8 @@ async function mbaV75SaveQuickTournament(form){
  }
  if(!confirm(`Create ${name} with ${event.categories.length} categories? Existing tournaments remain unchanged.`))return;
  await op(()=>{
-  store.tournaments.push(event);store.selected=event.id;page='registration';editor=null;
-  notice='New TEST tournament created. Register players and pairs.';
+  store.tournaments.push(event);store.selected=event.id;page='tournaments';editor=null;
+  notice='New TEST tournament created. Tap Go to Registration.';
  });
 }
 
@@ -7136,6 +7153,109 @@ tournamentView=function(t){
  const bar=`<div class="mba-v75-share-live"><button type="button" class="btn" data-mba-v75-live-open>👁 Open Live View Only</button><a class="btn" href="${esc(link)}" target="_blank" rel="noopener noreferrer">🔗 Viewer Link</a></div>`;
  return bar+html;
 };
+
+/* MBA V7.5.1 TEST */
+let mbaV751Focus=false;
+function mbaV751Fee(t,c){
+ if(!t||!c)return null;
+ const val=mba372EventFmt(t,c)==='knockout'?(finance.config?.feePerEntry??t.registrationFeePerPair??mba372FeeDefault(t)):mba372FeeDefault(t);
+ return val==null?null:Number(val)*(mba372EventFmt(t,c)==='league'&&mba37RegType(c)==='doubles'?2:1);
+}
+function mbaV751Collector(selected=''){
+ return `<label class="field">To Committee Member<select name="mba751Collector"><option value="">Optional · signed-in collector</option>${mba372Committee().map(x=>`<option value="${esc(x)}" ${x===selected?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`;
+}
+function mbaV751PaymentForm(t,c){
+ if(!canSeePayments()||!mba37CanTakePayment())return '';
+ return `<div class="mba751-pay"><label>Court Fee <b data-mba751-fee>${esc(mbaV751Fee(t,c)==null?'Not set':money(mbaV751Fee(t,c)))}</b><input name="mba751Paid" type="number" min="0" step=".01" inputmode="decimal" placeholder="Amount received" value="0"></label><label class="choice"><input type="checkbox" name="mba751Tick"> Paid</label><span data-mba751-status class="payment-unpaid">NOT PAID</span></div>`;
+}
+function mbaV751SyncFee(f,t,c){
+ const a=f.elements.mba751Paid,k=f.elements.mba751Tick;if(!a||!k||!c)return;
+ const fee=mbaV751Fee(t,c),key=c.id+'|'+fee;
+ if(f.dataset.mba751FeeKey!==key){f.dataset.mba751FeeKey=key;a.value='0';k.checked=false;}
+ a.disabled=k.disabled=fee==null||fee===0;if(fee!=null)a.max=String(fee);
+ const paid=Number(a.value)||0;k.checked=fee!=null&&fee>0&&paid===fee;
+ const label=f.querySelector('[data-mba751-fee]');if(label)label.textContent=fee==null?'Not set':money(fee);
+ const status=f.querySelector('[data-mba751-status]');if(status){status.textContent=fee==null?'FEE NOT SET':fee===0?'NO FEE':paid>=fee?'PAID':paid>0?'PARTIAL · Balance '+money(fee-paid):'NOT PAID';status.className=fee===0||paid>=fee&&fee!==null?'payment-paid':paid>0?'payment-partial':'payment-unpaid';}
+}
+function mbaV751PayInfo(t,c,e){
+ if(!canSeePayments())return null;
+ const rows=mba372FeeRows(t).filter(r=>r.entryId===e.id||r.kind==='player'&&e.playerIds.includes(r.primary));if(!rows.length||rows.some(r=>r.fee==null||r.ambiguous))return null;
+ return {rows,fee:rows.reduce((n,r)=>n+r.fee,0),paid:rows.reduce((n,r)=>n+r.paid,0)};
+}
+function mbaV751Status(p){
+ return !p?'':`<div class="mba751-line"><small>Paid ${esc(money(p.paid))} · Balance ${esc(money(Math.max(0,p.fee-p.paid)))}</small><b class="${p.paid>=p.fee?'payment-paid':p.paid>0?'payment-partial':'payment-unpaid'}">${p.fee===0?'NO FEE':p.paid>=p.fee?'PAID':p.paid>0?'PARTIAL':'NOT PAID'}</b></div>`;
+}
+mbaV73RegisteredTeams=function(t,catId){
+ const entries=t.categories.flatMap(c=>(c.entrants||[]).filter(mba372EntryActive).map(e=>({c,e}))).reverse();
+ const html=entries.map(({c,e})=>{
+  const key=esc(c.id+'|'+e.id),team=t.teams.find(x=>x.id===e.teamId),names=e.playerIds.map(pid=>team?.players.find(p=>p.id===pid)?.name||''),privateRec=isSuper()?mba37PrivateItems[e.id]||{}:{};
+  const editing=mbaV74Editing?.tid===t.id&&mbaV74Editing?.cid===c.id&&mbaV74Editing?.eid===e.id;
+  const canEdit=mba37CanRegister()&&!!team&&names.every(Boolean),p=mbaV751PayInfo(t,c,e),age=mba372AgeMinimum(c);
+  const fields=names.map((name,i)=>`<label>Player ${i+1}<input name="p${i}" value="${esc(name)}" maxlength="80" required></label>`).join('');
+  const form=editing&&canEdit?`<form data-mba751-edit="${key}" data-tid="${esc(t.id)}" class="mba-v74-inline-edit">${fields}
+   ${isSuper()?`<label>Mobile Number (Optional)<input name="mobile" type="tel" inputmode="numeric" value="${esc(privateRec.mobile||'')}" maxlength="20"></label>`:''}
+   ${age&&isSuper()?`<label>Player 1 Birth Year<input name="year1" type="number" required value="${esc(privateRec.birthYears?.[0]||'')}"></label><label>Player 2 Birth Year<input name="year2" type="number" required value="${esc(privateRec.birthYears?.[1]||'')}"></label>${privateRec.ageOverride?`<input type="hidden" name="ageOverride" value="on"><input type="hidden" name="overrideReason" value="${esc(privateRec.ageOverrideReason||'')}">`:''}`:''}
+   ${p&&mba37CanTakePayment()?`<label>Court Fee ${esc(money(p.fee))} · Total paid<input name="totalPaid" type="number" inputmode="decimal" min="0" max="${Math.max(p.fee,p.paid)}" step=".01" value="${p.paid}"></label>`:''}
+   <details class="mba-v7-optional"><summary>Optional: Club & Contact</summary><label>Club / Academy<input name="club" value="${esc(e.clubName||'')}"></label>${isSuper()?`<label>Contact Person<input name="contactName" value="${esc(privateRec.contactName||'')}"></label>`:''}${mbaV751Collector()}</details>
+   <div class="actions"><button type="submit" class="btn primary">Save Changes</button><button type="button" class="btn" data-mba-v74-cancel="${key}">Cancel</button></div></form>`:'';
+  return `<li class="mba-v74-entry"><small>${esc(t.name)} · ${esc(c.name)}${t.date?' · '+esc(dateShow(t.date)):''}</small><div class="mba-v74-row-heading"><b>${esc(entryLabel(t,c,e.id))}</b>${canEdit?`<span class="mba-v74-actions"><button type="button" class="btn mba-v74-edit-btn" data-mba-v74-${editing?'cancel':'open'}="${key}">${editing?'Cancel':'Edit'}</button><button type="button" class="btn danger-outline" data-mba751-delete="${key}">Delete</button></span>`:''}</div>${mbaV751Status(p)}${form}</li>`;
+ }).join('');
+ return `<div class="mba-v73-list-head"><strong>Registered Players / Teams</strong><span>${entries.length} saved</span></div>${html?`<ol class="mba-v73-rows">${html}</ol>`:'<p>No registrations yet.</p>'}`;
+};
+async function mbaV751Edit(f){
+ const t=active(),[cid,eid]=f.dataset.mba751Edit.split('|'),c=t?.categories.find(x=>x.id===cid),e=c?.entrants.find(x=>x.id===eid);
+ if(!t||!e||t.id!==f.dataset.tid||!mba37CanRegister()||writePending)throw Error('Registration changed. Refresh.');
+ const fd=new FormData(f),p=mbaV751PayInfo(t,c,e),draft=mba372RegistrationDraft(cid,eid,fd),patch=patchesForMutation(store,draft.after);
+ if(isSuper())patch['v3/privateRegistrations/'+t.id+'/'+eid]=draft.privateValue;
+ if(fd.has('totalPaid')){
+  const target=Number(fd.get('totalPaid'));if(!p||!mba37CanTakePayment()||!mba37Money(target)||target>Math.max(p.fee,p.paid))throw Error('Invalid payment.');
+  let delta=Math.round((target-p.paid)*100)/100;
+  if(delta!==0){
+   const latest=(await get(ref(db,'v3/finance/'+t.id+'/payments'))).val()||{};
+   const normalize=o=>JSON.stringify(Object.entries(o||{}).sort(([a],[b])=>a.localeCompare(b)));
+   if(normalize(latest)!==normalize(finance.payments))throw Error('Payments changed. Refresh before editing.');
+   for(const row of p.rows){
+    const part=Math.min(Math.abs(delta),delta>0?Math.max(0,row.fee-row.paid):Math.max(0,row.paid));if(part<=0)continue;
+    const amount=Math.round(part*100)/100,kind=delta>0?'payment':'refund';
+    patch['v3/finance/'+t.id+'/payments/'+uid('receipt')]={playerId:row.primary,chargeId:row.id,entryId:row.entryId||'',categoryId:row.categoryId||'',kind,amount,mode:'Cash',receivedBy:String(fd.get('mba751Collector')||authUser.email||'Signed-in committee'),date:today(),reference:'',notes:'Registration correction',createdBy:authUser.uid,createdByEmail:authUser.email||'',createdAt:Date.now()};
+    delta=Math.round((delta+(kind==='refund'?amount:-amount))*100)/100;
+   }
+   if(delta!==0)throw Error('Unable to reconcile payment. Use Finance.');
+  }
+ }
+ if(!confirm('Save registration changes? Payment changes are recorded as adjustments. Existing scores stay unchanged.'))return;
+ const live=await get(ref(db,'v3/tournaments/'+t.id+'/categories/'+cid));
+ if(JSON.stringify(live.val()?.entrants||[])!==JSON.stringify(c.entrants||[]))throw Error('Registration changed on another device. Refresh.');
+ if(Object.keys(patch).length){writePending=true;try{await update(ref(db),patch)}finally{writePending=false;}}
+ mbaV74Editing=null;notice='Registration updated.';render();
+}
+const mba751OldAccess=accessView;
+accessView=function(){
+ const base=mba751OldAccess(),t=active();if(!isSuper()||!t)return base;
+ return base+card('Committee Members · '+esc(t.name),`<form data-mba372-committee class="sub-form"><label>Names (one per line)<textarea name="names" rows="4">${esc(mba372Committee().join('\n'))}</textarea></label><button type="submit" class="btn primary">Save Committee Members</button></form>`);
+};
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-mba751-nav],[data-mba751-delete]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
+ if(b.dataset.mba751Nav){document.querySelector('nav button[data-page="'+b.dataset.mba751Nav+'"]')?.click();return;}
+ if(!mba37CanRegister())return;const [cid,eid]=b.dataset.mba751Delete.split('|');mba372SetRegistrationStatus(cid,eid,'deleted').catch(err=>alert(errText(err)));
+},true);
+document.addEventListener('submit',e=>{
+ const f=e.target.closest('form[data-mba751-edit]');if(!f)return;e.preventDefault();e.stopImmediatePropagation();if(f.dataset.busy)return;f.dataset.busy='1';mbaV751Edit(f).catch(err=>alert(errText(err))).finally(()=>{delete f.dataset.busy;});
+},true);
+document.addEventListener('input',e=>{
+ const f=e.target.closest('#mba-v7-register-form');if(!f||e.target.name!=='mba751Paid')return;mbaV751SyncFee(f,active(),mbaV7Category(active(),f.elements.categoryId.value));
+},true);
+document.addEventListener('change',e=>{
+ const f=e.target.closest('#mba-v7-register-form');if(!f||e.target.name!=='mba751Tick')return;
+ const c=mbaV7Category(active(),f.elements.categoryId.value);f.elements.mba751Paid.value=e.target.checked?String(mbaV751Fee(active(),c)||0):'0';mbaV751SyncFee(f,active(),c);
+},true);
+document.addEventListener('keydown',e=>{
+ const f=e.target.closest('#mba-v7-register-form');if(!f||e.key!=='Enter'||e.isComposing||e.target.tagName!=='INPUT'||e.target.type==='checkbox')return;
+ const ordered=['player1','player2','birthYear1','birthYear2','mobile'].map(k=>f.elements[k]).filter(x=>x&&!x.disabled&&x.getClientRects().length);
+ const i=ordered.indexOf(e.target);if(i<0&&e.target.name!=='mba751Paid')return;e.preventDefault();if(i>=0&&i<ordered.length-1){ordered[i+1].focus();return;}f.requestSubmit();
+},true);
+const mba751PriorRender=render;
+render=function(){mba751PriorRender();if(mbaV751Focus&&page==='registration'){mbaV751Focus=false;requestAnimationFrame(()=>document.querySelector('#mba-v7-register-form [name=player1]')?.focus());}};
 
 mbaV7InstallNavigation();
 mbaV71AddNavigationShortcuts();
