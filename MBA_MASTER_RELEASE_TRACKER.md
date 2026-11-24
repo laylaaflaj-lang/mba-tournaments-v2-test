@@ -78,3 +78,9 @@ Freeze approved TEST → complete P0 verification → prepare Production-targete
 - Existing Production Firebase configuration copied exactly from existing Production source. TEST project/link references removed; Keralaotsavam QR generated from Production app link. Existing Production manifest and assets preserved. JavaScript syntax and source readback checked; live browser/QR/Firebase behavior not yet verified.
 - Production main remains unchanged. No Firebase database/rules changes or data migration made.
 - BLOCKED before deployment: obtain actual current Production and TEST RTDB rules, backup Production database privately, audit permissions and verify cross-role behavior. The Production repository has no database.rules.json or firebase.json at its root. GitHub access does not grant Firebase console access.
+
+### Rules review progress — 25 November 2026
+- Production data export completed per owner; not independently restored or inspected.
+- Production Rules pasted into conversation; complete-looking but exact exported JSON backup still requested.
+- TEST Rules exported as a JSON file and parsed successfully. Source review identified missing mobileRead leaf authorization and permission differences between environments; do not replace Production rules wholesale with TEST rules.
+- Narrow TEST mobile-read rules draft generated offline; not published and not emulator-verified. Production rules candidate and full cross-role regression remain pending. No production deployment or rules changes.
