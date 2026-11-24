@@ -868,7 +868,7 @@ body.mba-v75-live-only>*:not(#mba-v75-live-root):not(script){display:none!import
 .mba753-trophy{display:flex;align-items:center;gap:7px;font-weight:700;min-height:36px}
 .mba753-trophy input{width:20px;height:20px;flex:none}
 @media(max-width:500px){.mba753-prizes{grid-template-columns:1fr}}
-</style></head>
+</style><style>.mba754-contact{display:block;overflow-wrap:anywhere;line-height:1.35;margin:4px 0;font-size:.8rem}</style></head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
 <main class="container">
@@ -1552,6 +1552,7 @@ const permissionsList=[
  ['financeWrite','Record expenses and transfers (no full dashboard)'],
  ['feesWrite','Set ground fee and individual waivers'],
  ['financeDashboardRead','View FULL tournament income, expenses, profit & collector dashboard (Super Admin grants only)'],
+ ['mobileRead','Show Mobile Number — assigned tournaments, read only'],
  ['usersWrite','Manage users / permissions']
 ];
 const mbaV372RoleLabels={viewer:'Viewer',custom:'Custom',scorer:'Scorer',team_admin:'Team Admin',payment_manager:'Payment Manager',finance_manager:'Finance Manager',admin:'Admin',super:'Super Admin'};
@@ -1911,7 +1912,7 @@ function accessView(){if(!isSuper())return card('User Roles','<p>Only Super Admi
  <label class="field"><span>Role Preset (automatically fills rights; you can customize them)</span><select name="role" id="role-preset">${Object.keys(rolePresets).map(role=>`<option value="${esc(role)}" ${existing.role===role?'selected':''}>${esc(mbaV372RoleLabels[role]||role)}</option>`).join('')}</select></label>
  <label class="choice"><input name="active" type="checkbox" ${existing.active===false?'':'checked'}> Account role active</label>
  <label class="field"><span>🖨 A4 Print / Print Center — Show or Hide for this user</span><select name="printAccess"><option value="hide" ${existing.permissions?.printView===true?'':'selected'}>HIDE — default (no print menu)</option><option value="show" ${existing.permissions?.printView===true?'selected':''}>SHOW — allow printing</option></select><small class="helper">This affects only this user's print buttons and menu. Super Admin always has Print access. Viewers cannot access private data through printing.</small></label>
- <div class="checklist"><details class="mba-perm-group mba-perm-collapsible" open><summary>🏸 Scoring</summary><div class="mba-perm-options">${permissionsList.filter(([key])=>['scoresWrite','umpireEdit','umpireDelete'].includes(key)).map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div></details><details class="mba-perm-group mba-perm-collapsible" open><summary>🏆 Tournaments & Teams</summary><div class="mba-perm-options">${permissionsList.filter(([key])=>['teamsWrite','categoriesWrite','fixturesWrite','settingsWrite','tournamentWrite'].includes(key)).map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div></details><details class="mba-perm-group mba-perm-collapsible" open><summary>💰 Finance</summary><div class="mba-perm-options">${permissionsList.filter(([key])=>['paymentsRead','paymentsWrite','financeRead','financeWrite','feesWrite','financeDashboardRead'].includes(key)).map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div></details><details class="mba-perm-group mba-perm-collapsible" open><summary>🛡 User Management</summary><div class="mba-perm-options">${permissionsList.filter(([key])=>['usersWrite'].includes(key)).map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div></details></div>
+ <div class="checklist"><details class="mba-perm-group mba-perm-collapsible" open><summary>🏸 Scoring</summary><div class="mba-perm-options">${permissionsList.filter(([key])=>['scoresWrite','umpireEdit','umpireDelete'].includes(key)).map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div></details><details class="mba-perm-group mba-perm-collapsible" open><summary>🏆 Tournaments & Teams</summary><div class="mba-perm-options">${permissionsList.filter(([key])=>['teamsWrite','categoriesWrite','fixturesWrite','settingsWrite','tournamentWrite'].includes(key)).map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div></details><details class="mba-perm-group mba-perm-collapsible" open><summary>💰 Finance</summary><div class="mba-perm-options">${permissionsList.filter(([key])=>['paymentsRead','paymentsWrite','financeRead','financeWrite','feesWrite','financeDashboardRead'].includes(key)).map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div></details><details class="mba-perm-group mba-perm-collapsible" open><summary>🛡 User Management</summary><div class="mba-perm-options">${permissionsList.filter(([key])=>['mobileRead','usersWrite'].includes(key)).map(([key,label])=>`<label class="choice"><input name="perm" type="checkbox" value="${esc(key)}" ${existing.permissions?.[key]?'checked':''}> ${esc(label)}</label>`).join('')}</div></details></div>
  <section class="full"><h4>🏆 Per-Tournament View / Edit Access</h4><p class="scope-help"><b>IMPORTANT:</b> For each permitted tournament, tick View to see it and Edit to change scores, teams or finance entries. Selecting Admin or Finance Manager alone will NOT grant tournament access. Only Super Admin can change this. Changes update online after Save.</p>
  <div class="scope-grid">${store.tournaments.map(t=>{const scope=selectedScopes[t.id]||{};return `<div class="scope-line"><b>${esc(t.name)}</b><label class="choice"><input type="checkbox" name="scopeView" value="${esc(t.id)}" ${scope.view||scope.edit?'checked':''}> View</label><label class="choice"><input type="checkbox" name="scopeEdit" value="${esc(t.id)}" ${scope.edit?'checked':''}> Edit</label></div>`}).join('')||'<p>No tournaments yet</p>'}</div></section>
  <div class="actions"><button type="button" data-action="new-access-user" class="btn">➕ Assign Different User</button><button type="button" data-action="apply-role-preset" class="btn">Reset Rights to Selected Role</button><button class="btn primary" type="submit">Save Only This User</button></div><details class="mba-control-help"><summary>ℹ️ How do these buttons work? / ഉപയോഗം</summary><p><b>Assign Different User:</b> Clear the editor and enter another person's UID.</p><p><b>Reset Rights:</b> Fill the checkboxes from the selected Role Preset; this is not saved until you press Save.</p><p><b>Save Only This User:</b> Update only the UID currently being edited.</p></details>
@@ -1919,7 +1920,8 @@ function accessView(){if(!isSuper())return card('User Roles','<p>Only Super Admi
  const bulkPanel=`<section class="mba-bulk-access noprint"><h3>👥 Bulk User Management</h3><details class="mba-control-help"><summary>ℹ️ What do these buttons do? / ബട്ടണുകളുടെ ഉപയോഗം</summary><p><b>Select / Clear All:</b> Mark or unmark non-Super users.</p><p><b>Add / Remove Permission:</b> Give or revoke the selected right for checked users. Tournament View/Edit scope is managed separately under Edit User.</p><p><b>Delete Selected Access:</b> Revoke access for checked users only.</p><p><b>Delete All Non-Super Access:</b> Revoke managed access for every non-Super user, after two confirmations. It does not delete Firebase login accounts.</p></details><p class="mba-bulk-note">Select the checkboxes in the Users list above. The original Super Admin and Super roles are protected. Changes affect only access records, not Firebase Authentication accounts.</p><div class="mba-bulk-tools"><button type="button" class="btn" data-action="mba-bulk-select-all">☑ Select / Clear All</button><select id="mba-bulk-perm" aria-label="Permission to add or remove">${[
  {name:'🏸 Scoring',keys:['scoresWrite','umpireEdit','umpireDelete']},
  {name:'🏆 Tournaments & Teams',keys:['teamsWrite','categoriesWrite','fixturesWrite','settingsWrite']},
- {name:'💰 Payments & Finance',keys:['paymentsRead','paymentsWrite','financeRead','financeWrite','feesWrite','financeDashboardRead']}
+ {name:'💰 Payments & Finance',keys:['paymentsRead','paymentsWrite','financeRead','financeWrite','feesWrite','financeDashboardRead']},
+ {name:'🔒 Private Contacts',keys:['mobileRead']}
 ].map(group=>`<optgroup label="${group.name}">${permissionsList.filter(([key])=>group.keys.includes(key)).map(([key,label])=>`<option value="${esc(key)}">${esc(label)}</option>`).join('')}</optgroup>`).join('')}<optgroup label="🖨 Printing"><option value="printView">Allow A4 Print / Print Center</option></optgroup></select><button type="button" class="btn primary" data-action="mba-bulk-add">+ Add Permission</button><button type="button" class="btn" data-action="mba-bulk-remove">− Remove Permission</button></div><div class="mba-bulk-tools"><button type="button" class="btn danger-outline" data-action="mba-bulk-delete">Delete Selected Access</button><button type="button" class="btn danger-outline" data-action="mba-bulk-delete-all">Delete All Non-Super Access</button></div><p class="mba-bulk-note">Role and tournament View/Edit scopes can still be set per user. Granting an edit permission to a Viewer automatically switches their role to Custom, but does not assign tournament scope. Deletion removes managed access and tournament scope, not login accounts.</p></section>`;
  return card('Super Admin · User & Roles Dashboard',`<p class="helper"><b>One UID = one account.</b> Saving the selected UID must never change another person’s permissions. Use <b>Assign Different User</b> before entering the next person.</p><details class="mba-pending-requests"><summary>📨 Pending Access Requests</summary><div class="scroll"><table><tbody>${req||'<tr><td>No pending requests</td></tr>'}</tbody></table></div></details><div class="mba-roles-top"><h3>Users with Explicit Permissions</h3><button class="btn primary" type="button" data-action="new-access-user">＋ Add User</button></div><p class="helper">Tap a user to expand Role, Permissions, Tournament Access and Edit. Use the checkbox for bulk actions.</p><div class="mba-user-list">${list||'<p class="helper">No managed users yet</p>'}</div><details class="mba-user-editor" id="mba-user-editor" ${editingExisting?'open':''}><summary>✍️ Add / Edit a User</summary>${form}</details><details class="mba-bulk-panel"><summary>⚙ Bulk Actions · Multiple Users</summary>${bulkPanel}</details>`);
 }
@@ -6686,7 +6688,7 @@ function mbaV7SuperPhonePanel(t){
  }).join('');
  const value=current?String(mba37PrivateItems[current.e.id]?.mobile||''):'';
  return `<details class="mba-v7-advanced mba-v7-phone-editor"><summary>🔒 Super Admin · Player Edit · Mobile Number</summary>
-  <div class="mba-v7-advanced-inner"><p class="helper">Only Super Admin can VIEW, ADD, CHANGE or REMOVE a phone number. Other registration users do not need a number.</p>
+  <div class="mba-v7-advanced-inner"><p class="helper">Only Super Admin can add, change or remove a phone number. A user with Show Mobile Number and assigned tournament access may view the number only.</p>
   ${entries.length?`<form id="mba-v7-phone-form" data-tid="${esc(t.id)}" class="sub-form">
    <label class="field"><span>Player / Pair / Category</span><select id="mba-v7-phone-entry" name="entry">${opts}</select></label>
    <label class="field"><span>Private mobile · Super Admin only</span><input id="mba-v7-phone-number" name="mobile" value="${esc(value)}" type="tel" inputmode="tel" autocomplete="off" maxlength="20" placeholder="Add mobile later"></label>
@@ -6712,7 +6714,7 @@ async function mbaV7SaveSuperPhone(f){
  if(!entry)throw Error('Player/Pair entry not found. Refresh.');
  const value=String(f.elements.mobile.value||'').trim();
  if(value&&!/^[0-9+()\s-]{6,20}$/.test(value))throw Error('Enter a valid mobile number (6–20 characters), or leave blank.');
- if(!confirm((value?'Save':'Remove')+' private mobile for '+entryLabel(t,c,eid)+'? Only Super Admin will see it.'))return;
+ if(!confirm((value?'Save':'Remove')+' private mobile for '+entryLabel(t,c,eid)+'? Only Super Admin and explicitly permitted contact viewers can see it.'))return;
  const now=Date.now(),uidAtStart=authUser.uid,tid=t.id;
  const node=ref(db,'v3/privateRegistrations/'+tid+'/'+eid);
  const result=await runTransaction(node,current=>{
@@ -7170,7 +7172,7 @@ tournamentView=function(t){
  return bar+html;
 };
 
-/* MBA V7.5.3 TEST */
+/* MBA V7.5.4 TEST */
 let mbaV751Focus=false;
 function mbaV751Fee(t,c){
  if(!t||!c)return null;
@@ -7214,7 +7216,7 @@ mbaV73RegisteredTeams=function(t,catId){
    ${p&&mba37CanTakePayment()?`<label>Court Fee ${esc(money(p.fee))} · Total paid<input name="totalPaid" type="text" inputmode="decimal" autocomplete="off" value="${p.paid||''}"></label>`:''}
    <details class="mba-v7-optional"><summary>Optional: Club & Contact</summary><label>Club / Academy<input name="club" value="${esc(e.clubName||'')}"></label>${isSuper()?`<label>Contact Person<input name="contactName" value="${esc(privateRec.contactName||'')}"></label>`:''}</details>${p&&mba37CanTakePayment()?`<small>Current collector: ${esc(mbaV752Owners(p).join(', ')||'No payment')}</small>${mbaV751Collector('','Keep current / correct collector')}`:''}
    <div class="actions"><button type="submit" class="btn primary">Save Changes</button><button type="button" class="btn" data-mba-v74-cancel="${key}">Cancel</button></div></form>`:'';
-  return `<li class="mba-v74-entry"><small>${esc(t.name)} · ${esc(c.name)}${t.date?' · '+esc(dateShow(t.date)):''}</small><div class="mba-v74-row-heading"><b>${esc(entryLabel(t,c,e.id))}</b>${canEdit?`<span class="mba-v74-actions"><button type="button" class="btn mba-v74-edit-btn" data-mba-v74-${editing?'cancel':'open'}="${key}">${editing?'Cancel':'Edit'}</button><button type="button" class="btn danger-outline" data-mba751-delete="${key}">Delete</button></span>`:''}</div>${mbaV751Status(p)}${form}</li>`;
+  return `<li class="mba-v74-entry"><small>${esc(t.name)} · ${esc(c.name)}${t.date?' · '+esc(dateShow(t.date)):''}</small><div class="mba-v74-row-heading"><b>${esc(entryLabel(t,c,e.id))}</b>${canEdit?`<span class="mba-v74-actions"><button type="button" class="btn mba-v74-edit-btn" data-mba-v74-${editing?'cancel':'open'}="${key}">${editing?'Cancel':'Edit'}</button><button type="button" class="btn danger-outline" data-mba751-delete="${key}">Delete</button></span>`:''}</div>${mba754CardDetails(t,e,p)}${mbaV751Status(p)}${form}</li>`;
  }).join('');
  return `<div class="mba-v73-list-head"><strong>Registered Players / Teams</strong><span>${entries.length} saved</span></div>${html?`<ol class="mba-v73-rows">${html}</ol>`:'<p>No registrations yet.</p>'}`;
 };
@@ -7381,6 +7383,67 @@ document.addEventListener('click',async e=>{
   }
  }
 },true);
+
+
+/* V7.5.4: mobileRead is a read-only privilege, scoped to assigned tournaments.
+   Never subscribe to a private-registration parent as a delegated user. */
+const mba754MobileReads=new Map(),mba754MobileValues=new Map();
+let mba754Scope='';
+function mba754CanMobile(t){
+ if(!t||!authUser||!remoteReady||readError||mbaV75LiveRequested())return false;
+ if(isSuper())return true;
+ const scope=userTournamentScopes[t.id];
+ return accessRecord?.active===true&&accessRecord.role!=='viewer'&&accessRecord.permissions?.mobileRead===true&&(scope?.view===true||scope?.edit===true);
+}
+function mba754CardDetails(t,e,p){
+ if(mbaV75LiveRequested())return '';
+ const owners=p?mbaV752Owners(p):[];
+ let html='';
+ if(mba754CanMobile(t)){
+  const number=isSuper()?mba37PrivateItems[e.id]?.mobile:mba754MobileValues.get(e.id);
+  const value=typeof number==='string'&&number.trim()?number:'';
+  html+='<small class="mba754-contact" data-mba754-mobile="'+esc(e.id)+'">'+(value?'Mobile: '+esc(value):isSuper()?'Mobile: Not recorded':'Mobile: —')+'</small>';
+ }
+ if(p&&canSeePayments())html+='<small class="mba754-contact">Collected by: '+esc(owners.join(', ')||(p.paid>0?'Not attributed':'—'))+'</small>';
+ return html;
+}
+function mba754ClearMobile(){
+ for(const stop of mba754MobileReads.values()){try{stop()}catch{}}
+ mba754MobileReads.clear();mba754MobileValues.clear();mba754Scope='';
+}
+function mba754ShowMobile(eid,denied=false){
+ const t=active();
+ if(!mba754CanMobile(t)||page!=='registration'||isSuper())return;
+ const number=mba754MobileValues.get(eid);
+ for(const el of document.querySelectorAll('[data-mba754-mobile]')){
+  if(el.dataset.mba754Mobile!==eid)continue;
+  el.textContent=denied?'Mobile: Access unavailable':number?'Mobile: '+number:'Mobile: Not recorded';
+ }
+}
+function mba754SyncMobile(){
+ const t=active();
+ if(page!=='registration'||!mba754CanMobile(t)||isSuper()){mba754ClearMobile();return;}
+ const scope=authUser.uid+'|'+t.id;
+ if(mba754Scope!==scope){mba754ClearMobile();mba754Scope=scope;}
+ const ids=new Set(t.categories.flatMap(c=>(c.entrants||[]).filter(mba372EntryActive).map(e=>e.id)));
+ for(const [eid,stop] of mba754MobileReads)if(!ids.has(eid)){stop();mba754MobileReads.delete(eid);mba754MobileValues.delete(eid);}
+ for(const eid of ids){
+  if(mba754MobileReads.has(eid)){if(mba754MobileValues.has(eid))mba754ShowMobile(eid);continue;}
+  const stop=onValue(ref(db,'v3/privateRegistrations/'+t.id+'/'+eid+'/mobile'),snap=>{
+   if(mba754Scope!==scope||!mba754CanMobile(active())||active()?.id!==t.id)return;
+   const v=snap.val();
+   mba754MobileValues.set(eid,typeof v==='string'&&/^[0-9+()\s-]{6,20}$/.test(v)?v:'');
+   mba754ShowMobile(eid);
+  },err=>{
+   if(mba754Scope!==scope)return;
+   mba754MobileValues.delete(eid);mba754ShowMobile(eid,true);
+   console.warn('Mobile read unavailable:',errText(err));
+  });
+  mba754MobileReads.set(eid,stop);
+ }
+}
+const mba754PreviousRender=render;
+render=function(){mba754PreviousRender();mba754SyncMobile();};
 
 mbaV7InstallNavigation();
 mbaV71AddNavigationShortcuts();
