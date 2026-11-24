@@ -1786,20 +1786,23 @@ function patchesForMutation(before,after){
  return patches;
 }
 async function op(fn){
- if(!allowedToEdit()){alert('No editing access for this tournament. Ask Super Admin for permission.');return}
- if(writePending){alert('Previous save still pending.');return}
- const previous=deep(store);
+ if(!allowedToEdit()){mba756SaveDialog('error','No editing access','Ask Super Admin for permission.');return false}
+ if(writePending){mba756SaveDialog('warning','Save in progress','Wait until the previous save is complete.');return false}
+ const previous=deep(store),saveUid=authUser?.uid;
+ let committed=false,complete=false,summary=null,problem='',refreshFailed=false;
  try{fn();if(can('teamsWrite'))store.playerLibrary=libraryNames();const patches=patchesForMutation(previous,store);
-  if(!Object.keys(patches).length){render();return}
-  writePending=true;notice='Saving to Production Firebase…';render();
+  if(!Object.keys(patches).length){render();return false}
+  summary=mba758MutationSummary(previous,store,patches);
+  writePending=true;notice='Saving to TEST Firebase…';
+  mba756SaveDialog('pending','Saving…',summary.title+' — saving to TEST Firebase.');render();
   const changed=Object.entries(patches);
   if(changed.length===1&&/v3\/tournaments\/[^/]+\/results\/[^/]+$/.test(changed[0][0])){
     const key=changed[0][0],parts=key.split('/'),orig=previous.tournaments.find(t=>t.id===parts[2])?.results?.[parts[4]]??null;
     const tx=await runTransaction(ref(db,key),current=>eq(current??null,orig)?changed[0][1]:undefined,{applyLocally:false});
     if(!tx.committed)throw Error('Another device updated the same match. Latest result loaded; please review then retry.');
   }else await update(ref(db),patches);
+  committed=true;
   if(isSuper()){
-    const existingIds=new Set(store.tournaments.map(t=>t.id));
     const catalogPatch={};for(const id of Object.keys(publicTournaments)){
      const current=store.tournaments.find(t=>t.id===id);
      if(!current)catalogPatch['v3/publicTournaments/'+id]=null;
@@ -1807,12 +1810,18 @@ async function op(fn){
     }
     if(Object.keys(catalogPatch).length)await update(ref(db),catalogPatch);
    }
-   notice='Saved online to TEST Firebase.';
- }catch(e){store=previous;notice='Not saved: '+errText(e);alert(notice)}finally{
+   complete=true;notice='Saved online to TEST Firebase.';
+ }catch(e){if(!committed)store=previous;problem=errText(e);notice=committed?'Main changes saved; catalog update incomplete.':'Save not confirmed: '+problem}
+ finally{
   writePending=false;
-  try{const updated=await get(ref(db,'v3/tournaments'));setCloud(updated.val())}catch{render()}
+  try{const updated=await get(ref(db,'v3/tournaments'));setCloud(updated.val())}catch{refreshFailed=true;render()}
  }
  render();
+ if(authUser?.uid!==saveUid){mba756CloseDialog();return complete}
+ if(complete)mba756SaveDialog('success',summary.title,'Saved to TEST Firebase.',summary.rows,null,refreshFailed?'Saved online. Refresh the list to see the latest changes.':summary.note||'');
+ else if(committed)mba756SaveDialog('warning','Saved — follow-up incomplete','Main changes were saved, but a related update failed. '+problem,summary?.rows||[],null,'Refresh and review before retrying.');
+ else mba756SaveDialog('error','Save not confirmed',problem||'Check the saved records before retrying.');
+ return complete;
 }
 function wireAuth(){
  onAuthStateChanged(auth,u=>{clearAccess();beginSession(u)});
@@ -1931,7 +1940,7 @@ function accessView(){if(!isSuper())return card('User Roles','<p>Only Super Admi
  const editingExisting=!!selected;
  const activePermissions=Object.entries(existing.permissions||{}).filter(([,v])=>v).map(([k])=>k);
  const userFormIntro=editingExisting?`<div class="notice"><b>Editing existing account:</b> ${esc(existing.email||selected)}<br><small>UID: ${esc(selected)} — locked to protect this user's role.</small></div>`:`<div class="notice"><b>Adding a different account</b><br><small>Paste that person's own Firebase UID. An email address is only a label; it does not identify the account.</small></div>`;
- const form=`<form data-form="access" class="sub-form access-panel"><h3>Assign or Revoke User Permissions</h3><small class="mba756-version">V7.5.7 TEST · Save confirmation</small>
+ const form=`<form data-form="access" class="sub-form access-panel"><h3>Assign or Revoke User Permissions</h3><small class="mba756-version">V7.5.8 TEST · Save confirmation</small>
  ${userFormIntro}
  ${field('Firebase User UID (from their Copy UID button)','userUid',selected,'text',editingExisting?'required readonly maxlength="128"':'required maxlength="128" autocapitalize="off" spellcheck="false"')}
  ${field('User email (label)','userEmail',existing.email||accessRequests[selected]?.email||'','email','maxlength="160"')}
@@ -2970,7 +2979,8 @@ async function mbaFinishUmpire(){
  const u={...mbaUmpire},t=active(),m=t?.fixtures.find(x=>x.id===u.matchId);if(!m||t.id!==u.tournamentId)throw Error('The tournament or match changed.');
  const w=scoreWinner({a:u.a,b:u.b},effectiveRules(t,lookup(t,m.categoryId),m));
  if(!w)throw Error('Finish the match according to its scoring rules.');if(t.results[u.matchId]&&t.results[u.matchId].mode!=='live'&&!mba37CanEditSaved())throw Error('Super Admin did not grant permission to EDIT a saved score.');
- if(!confirm('Save '+u.a+' – '+u.b+' as the FINAL result? Points Table will update automatically.'))return;
+ if(!await mba757Ask('Confirm Final Score','Save this final result? Points Table will update automatically.',mba758ScoreRows(t,m,{a:u.a,b:u.b})))return;
+ if(active()?.id!==t.id||!mbaUmpire||mbaUmpire.matchId!==u.matchId)throw Error('Match changed. Reopen score.');
  const btn=document.getElementById('mba-umpire-final');if(btn)btn.disabled=true;
  if(t?.keralaotsavam && !isSuper()){
   try{await mbaKSafeScorerFinalize(u)}finally{if(btn?.isConnected)btn.disabled=false}
@@ -6591,6 +6601,7 @@ async function mbaKSafeScorerFinalize(u){
  notice='Saved online to TEST Firebase.';
  try{sessionStorage.removeItem(mbaDraftKey(u.tournamentId,u.matchId))}catch{}
  mbaUmpire=null;mbaRenderUmpire();render();
+ mba756SaveDialog('success','Score Successfully Saved!','Final score saved to TEST Firebase.',mba758ScoreRows(t,m,{a:u.a,b:u.b}),null,'Results and standings update using the saved score.');
 }
 
 /* App QR is only on the main Tournaments tab; printed QR links to public TEST site.
@@ -7120,7 +7131,8 @@ async function mbaV75SaveQuickTournament(form){
   const c=addCategory(event,label,{format});c.playType=playType;c.playersPerSide=playType==='singles'?1:2;
   if(age)c.ageMinimum=age;
  }
- if(!confirm(`Create ${name} with ${event.categories.length} categories? Existing tournaments remain unchanged.`))return;
+ if(!await mba757Ask('Confirm Tournament Creation','Create this tournament? Existing tournaments remain unchanged.',[['Tournament',name],['Date',dateShow(date)],['Format',format],['Courts',String(courts)],['Categories',event.categories.map(c=>c.name).join(', ')]]))return;
+ if(!isSuper()||writePending)throw Error('Permission or save status changed. Reopen creation form.');
  await op(()=>{
   store.tournaments.push(event);store.selected=event.id;page='tournaments';editor=null;
   notice='New TEST tournament created. Tap Go to Registration.';
@@ -7226,7 +7238,7 @@ document.addEventListener('submit',ev=>{
  ev.preventDefault();ev.stopImmediatePropagation();
  if(f.dataset.busy)return;
  f.dataset.busy='1';const b=f.querySelector('button[type="submit"]');if(b)b.disabled=true;
- mbaV75SaveQuickTournament(f).catch(err=>alert('Quick Tournament: '+errText(err))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false});
+ mbaV75SaveQuickTournament(f).catch(err=>mba756SaveDialog('error','Tournament not created',errText(err))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false});
 },true);
 document.addEventListener('change',ev=>{
  if(ev.target?.name==='category'&&ev.target.closest('#mba-v75-quick-create')){
@@ -7246,7 +7258,7 @@ tournamentView=function(t){
  return bar+html;
 };
 
-/* MBA V7.5.7 TEST */
+/* MBA V7.5.8 TEST */
 let mbaV751Focus=false;
 function mbaV751Fee(t,c){
  if(!t||!c)return null;
@@ -7314,7 +7326,7 @@ async function mbaV751Edit(f){
  const live=await get(ref(db,'v3/tournaments/'+t.id+'/categories/'+cid));
  if(JSON.stringify(live.val()?.entrants||[])!==JSON.stringify(c.entrants||[]))throw Error('Registration changed on another device. Refresh.');
  if(Object.keys(patch).length){writePending=true;try{await update(ref(db),patch)}finally{writePending=false;}}
- mbaV74Editing=null;notice='Registration updated.';render();alert('Registration changes saved successfully.');
+ mbaV74Editing=null;notice='Registration updated.';render();mba756SaveDialog('success','Registration Successfully Updated!','Registration changes saved to Firebase.',[['Tournament',t.name],['Category',c.name],...e.playerIds.map((_,i)=>['Player '+(i+1),String(fd.get('p'+i)||'')])],null,'Existing scores remain unchanged.');
 }
 const mba751OldAccess=accessView;
 accessView=function(){
@@ -7403,7 +7415,7 @@ async function mbaV752SaveMember(tid,kind,old,name){
  const fee=latest.feePerPlayer??t.registrationFeePerPlayer;if(fee!=null)data.feePerPlayer=Number(fee);
  await update(cfg,data);
  if(active()?.id===tid){finance.config={...latest,...data};notice='Committee member '+(kind==='delete'?'deleted':'saved')+'.';render();}
- alert(kind==='delete'?'Committee member deleted.':'Committee member saved successfully.');
+ mba756SaveDialog('success',kind==='delete'?'Committee Member Removed!':'Committee Member Successfully Saved!','Committee changes saved to Firebase.',[['Tournament',t.name],['Member',kind==='delete'?old:name]],null,'Previous receipts are retained.');
  return true;
 }
 document.addEventListener('submit',e=>{
@@ -7565,10 +7577,47 @@ function mba756SaveDialog(state,heading,message,rows=[],permissions=[],note=''){
  d.innerHTML='<div class="mba756-dialog-body"><div class="mba756-symbol" aria-hidden="true">'+symbol+'</div><h2 id="mba756-save-title">'+esc(heading)+'</h2><p class="mba756-message" role="status">'+esc(message)+'</p>'+
  (rows.length?'<dl>'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd class="'+(k==='Payment Status'?'mba757-status '+(v==='PAID'||v==='NO FEE'?'paid':v==='PARTIAL'?'partial':'unpaid'):'')+'">'+esc(v)+'</dd></div>').join('')+'</dl>':'')+
  (state==='success'&&rows.length&&permissions!==null?'<h3>Saved permissions</h3><ul>'+ (permissions.length?permissions.map(p=>'<li>✓ '+esc(p)+'</li>').join(''):'<li>No permissions selected</li>')+'</ul>':'')+
- (note?'<p class="mba756-note">'+esc(note)+'</p>':'')+'<small class="mba756-version">V7.5.7 TEST</small>'+
+ (note?'<p class="mba756-note">'+esc(note)+'</p>':'')+'<small class="mba756-version">V7.5.8 TEST</small>'+
  (state==='pending'?'':state==='confirm'?'<div class="mba757-actions"><button type="button" class="mba757-cancel" data-mba756-ok>Cancel</button><button type="button" class="mba756-ok" data-mba757-confirm>Confirm &amp; Save</button></div>':'<button type="button" class="mba756-ok" data-mba756-ok>OK</button>')+'</div>';
  if(!d.open){try{d.showModal()}catch{d.setAttribute('open','');d.classList.add('mba756-fallback');}}
  if(state!=='pending')d.querySelector('[data-mba756-ok]')?.focus();
+}
+
+
+function mba758ScoreRows(t,m,result){
+ const rows=[['Tournament',t.name],['Category',lookup(t,m.categoryId)?.name||'—'],['Court',String(m.court||'—')]];
+ const names=participants(t,m);rows.push(['Side A',names[0]],['Side B',names[1]]);
+ if(result&&result.mode!=='live'){
+  const w=scoreWinner(result,effectiveRules(t,lookup(t,m.categoryId),m));
+  rows.push(['Final Score',result.mode==='winner'?'Winner only':String(result.a)+' – '+String(result.b)]);
+  if(w)rows.push(['Winner',names[w==='a'?0:1]]);
+ }
+ return rows;
+}
+function mba758MutationSummary(before,after,patches){
+ const paths=Object.entries(patches).filter(([key])=>key.startsWith('v3/tournaments/')).map(([key,value])=>({p:key.split('/'),value}));
+ const tid=paths[0]?.p[2],old=before.tournaments.find(t=>t.id===tid),t=after.tournaments.find(t=>t.id===tid);
+ if(t&&!old)return {title:'Tournament Successfully Created!',rows:[['Tournament',t.name],['Date',t.date?dateShow(t.date):'Not set'],['Format',t.format==='league'?'League':t.format==='knockout'?'Knockout':String(t.format)],['Courts',String(t.courts)],['Categories',t.categories.map(c=>c.name).join(', ')||'None'],['Target Score',String(t.rules?.target??'—')]],note:'Ready for player registration.'};
+ if(old&&!t)return {title:'Tournament Deleted',rows:[['Tournament',old.name]],note:'The selected tournament was removed.'};
+ const scores=paths.filter(x=>x.p[3]==='results'&&x.value?.mode!=='live');
+ if(t&&scores.length===1){
+  const x=scores[0],m=t.fixtures.find(m=>m.id===x.p[4])||old?.fixtures.find(m=>m.id===x.p[4]);
+  if(m){const edited=old?.results?.[m.id]&&old.results[m.id].mode!=='live';
+   return {title:x.value?(edited?'Score Successfully Updated!':'Score Successfully Saved!'):'Score Deleted',rows:mba758ScoreRows(t,m,x.value),note:x.value?'Results and standings update using the saved score.':'The selected result was removed.'};
+  }
+ }
+ if(t&&scores.length>1)return {title:'Results Successfully Updated!',rows:[['Tournament',t.name],['Result records changed',String(scores.length)]]};
+ const fixtures=paths.filter(x=>x.p[3]==='fixtures');
+ if(t&&fixtures.length){
+  const categories=[...new Set(fixtures.map(x=>x.value?.categoryId||old?.fixtures.find(m=>m.id===x.p[4])?.categoryId).filter(Boolean))];
+  const matches=t.fixtures.filter(m=>categories.includes(m.categoryId)),added=fixtures.filter(x=>x.value&&!old?.fixtures.some(m=>m.id===x.p[4])).length;
+  return {title:fixtures.every(x=>!x.value)?'Fixtures Successfully Cleared!':added?'Fixtures Successfully Generated!':'Fixtures Successfully Updated!',rows:[['Tournament',t.name],['Categories',categories.map(id=>lookup(t,id)?.name||'').filter(Boolean).join(', ')||'—'],['Matches in selected categories',String(matches.length)],['League matches',String(matches.filter(m=>m.stage==='league').length)],['Knockout matches',String(matches.filter(m=>m.stage==='knockout').length)],['Courts',String(t.courts)]],note:'Saved fixtures are available in the Fixtures tab.'};
+ }
+ const rows=t?[['Tournament',t.name]]:[];
+ if(paths.some(x=>x.p[3]==='meta'))return {title:'Tournament Settings Saved!',rows};
+ if(paths.some(x=>x.p[3]==='teams'))return {title:'Teams Successfully Updated!',rows};
+ if(paths.some(x=>x.p[3]==='categories'))return {title:'Category Successfully Updated!',rows};
+ return {title:'Successfully Saved!',rows};
 }
 
 mbaV7InstallNavigation();
