@@ -3670,7 +3670,7 @@ async function mba37Register(form){
  });
  if(remaining>0)throw Error('Collected amount exceeds configured player fee; record extra separately in Finance.');
  patch['v3/tournaments/'+t.id+'/categories/'+cat.id]=cat;
- if(!confirm('Register '+entries.length+' entry/entries in '+cat.name+'? '+(received?money(received)+' will be recorded in Finance.':'No payment will be recorded.')))return;
+ if(!confirm('Register '+entries.length+' entry/entries in '+cat.name+'? '+(received?money(received)+' received by '+receivedBy+' will be recorded in Finance.':'No payment will be recorded.')))return;
  const live=await get(ref(db,'v3/tournaments/'+t.id+'/categories/'+cat.id));
  const liveValue=live.val();if(c){
   const pack=x=>JSON.stringify({id:x?.id,name:x?.name,format:x?.format||null,groups:Object.values(x?.groups||{}),entrants:Object.values(x?.entrants||{}),rules:x?.rules||null,playType:x?.playType||null,playersPerSide:x?.playersPerSide||null});
@@ -4255,7 +4255,7 @@ financeView=function(t){
  }else html+='<p class="helper">Only explicitly granted finance functions are shown. Full accounts and profit are private.</p>';
  html+='</section>';
  if(can('feesWrite'))html+=card('Tournament Fee Settings',`<form data-form="fin-fee" class="sub-form finance-edit"><label class="field"><span>Default fee (₹) per charge unit: League player / Knockout entry</span><input type="number" name="fee" required min="0" step="0.01" value="${esc(mba372FeeDefault(t)??'')}"></label><button class="btn primary" type="submit">Save Default Fee</button><p class="helper">A fee of ₹0 displays NO FEE. Each registration's special fee can be set below.</p></form>`);
- if((can('feesWrite')||can('paymentsWrite'))&&showPay)html+=card('Committee Members · Collectors',`<p class="helper">Save committee names once. Use the dropdown when collecting payments.</p><form data-mba372-committee><label class="field"><span>One name per line</span><textarea name="names" rows="4" ${can('feesWrite')?'':'readonly'}>${esc(mba372Committee().join('\n'))}</textarea></label>${can('feesWrite')?'<button type="submit" class="btn primary">Save Committee Names</button>':'<p class="helper">Ask the fee manager to edit committee names.</p>'}</form>`);
+ if((can('feesWrite')||can('paymentsWrite'))&&showPay)html+=mbaV752CommitteePanel(t);
  if(showPay){html+=mba372FeeCard(t);
   if(can('paymentsWrite'))html+=card('Manual Receipt / Refund',mba372ChargeForm(t));
   const rows=receipts().sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).map(x=>`<tr><td>${esc(x.date||'')}</td><td>${esc(mba372FeeRows(t).find(r=>r.id===x.chargeId)?.name||playersOf(t).find(p=>p.id===x.playerId)?.name||'Legacy / deleted registration')}</td><td>${x.kind==='refund'?'-':''}${money(x.amount)}</td><td>${esc(x.mode||'')}</td><td>${esc(x.receivedBy||'')}</td><td>${esc(x.createdByEmail||'')}</td></tr>`).join('');
@@ -6639,10 +6639,10 @@ function mbaV7QuickRegistration(t){
   </div>
   ${isSuper()?`<label class="field"><span>Mobile Number (Optional) · Private</span><input name="mobile" type="tel" inputmode="numeric" enterkeyhint="done" autocomplete="tel" maxlength="20" placeholder="Mobile number"></label>`:''}
   ${mbaV751PaymentForm(t,choice)}
+   ${canSeePayments()&&mba37CanTakePayment()?mbaV751Collector():''}
   <details class="mba-v7-optional"><summary>Optional: Club & Contact / ക്ലബ്ബും കോൺടാക്റ്റും</summary>
    <div class="mba-v7-input-row"><label class="field"><span>Club / Academy</span><input name="club" maxlength="80" placeholder="Optional"></label><label class="field"><span>Contact person</span><input name="contactName" maxlength="100" placeholder="Optional"></label></div>
-   ${mbaV751Collector()}
-  </details>
+   </details>
   <button class="btn primary mba-v7-submit" type="submit">💾 Save Player / Pair</button>
   <p class="helper" id="mba-v7-note" hidden></p>
  </form>`:canEdit?'<p class="helper">No Singles/Doubles category yet. Use the preset buttons above or create a Category from More.</p>':'<p class="helper">Registration is view-only. Ask Super Admin for Teams + Categories + Tournament Edit access.</p>';
@@ -6652,7 +6652,8 @@ function mbaV7QuickRegistration(t){
   ${custom}
   ${form}
   <div id="mba-v73-registered-list" class="mba-v73-list" aria-live="polite">${mbaV73RegisteredTeams(t,choice?.id)}</div>
-  <div class="actions"><button class="btn primary" type="button" data-mba751-nav="fixtures">Go to Fixtures →</button></div>
+  ${can('feesWrite')?mbaV752CommitteePanel(t):''}
+<div class="actions"><button class="btn primary" type="button" data-mba751-nav="fixtures">Go to Fixtures →</button></div>
  </section>`;
 }
 
@@ -6779,10 +6780,11 @@ async function mbaV7SaveQuick(form){
  function field(name,value){const input=document.createElement('input');input.type='hidden';input.name=name;input.value=String(value??'');hidden.append(input)}
  field('categoryId',cat.id);field('eventType',type);
  field('players',(type==='singles'?p1:p1+' & '+p2)+(club?' | '+club:''));
- const paid=Number(form.elements.mba751Paid?.value||0),fee=mbaV751Fee(t,cat);
+ const paid=form.dataset.mba752Entered==='yes'?Number(form.elements.mba751Paid?.value||0):0,fee=mbaV751Fee(t,cat);
+ if(form.dataset.mba752Entered==='yes'&&!mbaV752Valid(form.elements.mba751Paid?.value))throw Error('Enter a valid amount (up to two decimals).');
  if(!mba37Money(paid)||paid>0&&(fee==null||paid>fee))throw Error('Enter an amount within the configured fee.');
  field('received',paid);field('contactName',form.elements.contactName.value.trim()||p1);
- if(paid>0){field('receivedBy',form.elements.mba751Collector?.value||authUser.email||'Signed-in committee');field('mode','Cash');}
+ if(paid>0){const who=form.elements.mba751Collector?.value;if(mba372Committee().length&&!who)throw Error('Select the committee member who received the payment.');field('receivedBy',who||authUser.email||'Signed-in committee');field('mode','Cash');}
  const beforeCount=cat.entrants.length;
  if(isSuper())field('mobile',form.elements.mobile.value.trim());
  if(age){field('birthYear1',years[0]);field('birthYear2',years[1]);}
@@ -7154,28 +7156,28 @@ tournamentView=function(t){
  return bar+html;
 };
 
-/* MBA V7.5.1 TEST */
+/* MBA V7.5.2 TEST */
 let mbaV751Focus=false;
 function mbaV751Fee(t,c){
  if(!t||!c)return null;
  const val=mba372EventFmt(t,c)==='knockout'?(finance.config?.feePerEntry??t.registrationFeePerPair??mba372FeeDefault(t)):mba372FeeDefault(t);
  return val==null?null:Number(val)*(mba372EventFmt(t,c)==='league'&&mba37RegType(c)==='doubles'?2:1);
 }
-function mbaV751Collector(selected=''){
- return `<label class="field">To Committee Member<select name="mba751Collector"><option value="">Optional · signed-in collector</option>${mba372Committee().map(x=>`<option value="${esc(x)}" ${x===selected?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`;
+function mbaV751Collector(selected='',placeholder='Select committee member'){
+ return `<label class="field">To Committee Member<select name="mba751Collector"><option value="">${esc(placeholder)}</option>${mba372Committee().map(x=>`<option value="${esc(x)}" ${x===selected?'selected':''}>${esc(x)}</option>`).join('')}</select></label>`;
 }
 function mbaV751PaymentForm(t,c){
  if(!canSeePayments()||!mba37CanTakePayment())return '';
- return `<div class="mba751-pay"><label>Court Fee <b data-mba751-fee>${esc(mbaV751Fee(t,c)==null?'Not set':money(mbaV751Fee(t,c)))}</b><input name="mba751Paid" type="number" min="0" step=".01" inputmode="decimal" placeholder="Amount received" value="0"></label><label class="choice"><input type="checkbox" name="mba751Tick"> Paid</label><span data-mba751-status class="payment-unpaid">NOT PAID</span></div>`;
+ return `<div class="mba751-pay"><label>Court Fee <b data-mba751-fee>${esc(mbaV751Fee(t,c)==null?'Not set':money(mbaV751Fee(t,c)))}</b><input name="mba751Paid" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="next" placeholder="Amount received" value=""></label><label class="choice"><input type="checkbox" name="mba751Tick"> Paid</label><span data-mba751-status class="payment-unpaid">NOT PAID</span></div>`;
 }
 function mbaV751SyncFee(f,t,c){
  const a=f.elements.mba751Paid,k=f.elements.mba751Tick;if(!a||!k||!c)return;
  const fee=mbaV751Fee(t,c),key=c.id+'|'+fee;
- if(f.dataset.mba751FeeKey!==key){f.dataset.mba751FeeKey=key;a.value='0';k.checked=false;}
- a.disabled=k.disabled=fee==null||fee===0;if(fee!=null)a.max=String(fee);
- const paid=Number(a.value)||0;k.checked=fee!=null&&fee>0&&paid===fee;
+ if(f.dataset.mba751FeeKey!==key){f.dataset.mba751FeeKey=key;a.value=fee>0?String(fee):'';f.dataset.mba752Entered='';k.checked=false;}
+ a.disabled=k.disabled=fee==null||fee===0||t.fixtures.some(m=>m.categoryId===c.id);if(f.elements.mba751Collector)f.elements.mba751Collector.disabled=a.disabled;
+ const paid=f.dataset.mba752Entered==='yes'?Number(a.value||0):0;const valid=mbaV752Valid(a.value)&&(fee==null||Number(a.value||0)<=fee);k.checked=valid&&fee!=null&&fee>0&&paid===fee;
  const label=f.querySelector('[data-mba751-fee]');if(label)label.textContent=fee==null?'Not set':money(fee);
- const status=f.querySelector('[data-mba751-status]');if(status){status.textContent=fee==null?'FEE NOT SET':fee===0?'NO FEE':paid>=fee?'PAID':paid>0?'PARTIAL · Balance '+money(fee-paid):'NOT PAID';status.className=fee===0||paid>=fee&&fee!==null?'payment-paid':paid>0?'payment-partial':'payment-unpaid';}
+ const status=f.querySelector('[data-mba751-status]');if(status){status.textContent=fee==null?'FEE NOT SET':fee===0?'NO FEE':!valid?'INVALID AMOUNT':paid>=fee?'PAID':paid>0?'PARTIAL · Balance '+money(fee-paid):'NOT PAID · tick Paid or enter amount';status.className=fee===0||valid&&paid>=fee&&fee!==null?'payment-paid':valid&&paid>0?'payment-partial':'payment-unpaid';}
 }
 function mbaV751PayInfo(t,c,e){
  if(!canSeePayments())return null;
@@ -7195,8 +7197,8 @@ mbaV73RegisteredTeams=function(t,catId){
   const form=editing&&canEdit?`<form data-mba751-edit="${key}" data-tid="${esc(t.id)}" class="mba-v74-inline-edit">${fields}
    ${isSuper()?`<label>Mobile Number (Optional)<input name="mobile" type="tel" inputmode="numeric" value="${esc(privateRec.mobile||'')}" maxlength="20"></label>`:''}
    ${age&&isSuper()?`<label>Player 1 Birth Year<input name="year1" type="number" required value="${esc(privateRec.birthYears?.[0]||'')}"></label><label>Player 2 Birth Year<input name="year2" type="number" required value="${esc(privateRec.birthYears?.[1]||'')}"></label>${privateRec.ageOverride?`<input type="hidden" name="ageOverride" value="on"><input type="hidden" name="overrideReason" value="${esc(privateRec.ageOverrideReason||'')}">`:''}`:''}
-   ${p&&mba37CanTakePayment()?`<label>Court Fee ${esc(money(p.fee))} · Total paid<input name="totalPaid" type="number" inputmode="decimal" min="0" max="${Math.max(p.fee,p.paid)}" step=".01" value="${p.paid}"></label>`:''}
-   <details class="mba-v7-optional"><summary>Optional: Club & Contact</summary><label>Club / Academy<input name="club" value="${esc(e.clubName||'')}"></label>${isSuper()?`<label>Contact Person<input name="contactName" value="${esc(privateRec.contactName||'')}"></label>`:''}${mbaV751Collector()}</details>
+   ${p&&mba37CanTakePayment()?`<label>Court Fee ${esc(money(p.fee))} · Total paid<input name="totalPaid" type="text" inputmode="decimal" autocomplete="off" value="${p.paid||''}"></label>`:''}
+   <details class="mba-v7-optional"><summary>Optional: Club & Contact</summary><label>Club / Academy<input name="club" value="${esc(e.clubName||'')}"></label>${isSuper()?`<label>Contact Person<input name="contactName" value="${esc(privateRec.contactName||'')}"></label>`:''}</details>${p&&mba37CanTakePayment()?`<small>Current collector: ${esc(mbaV752Owners(p).join(', ')||'No payment')}</small>${mbaV751Collector('','Keep current / correct collector')}`:''}
    <div class="actions"><button type="submit" class="btn primary">Save Changes</button><button type="button" class="btn" data-mba-v74-cancel="${key}">Cancel</button></div></form>`:'';
   return `<li class="mba-v74-entry"><small>${esc(t.name)} · ${esc(c.name)}${t.date?' · '+esc(dateShow(t.date)):''}</small><div class="mba-v74-row-heading"><b>${esc(entryLabel(t,c,e.id))}</b>${canEdit?`<span class="mba-v74-actions"><button type="button" class="btn mba-v74-edit-btn" data-mba-v74-${editing?'cancel':'open'}="${key}">${editing?'Cancel':'Edit'}</button><button type="button" class="btn danger-outline" data-mba751-delete="${key}">Delete</button></span>`:''}</div>${mbaV751Status(p)}${form}</li>`;
  }).join('');
@@ -7208,31 +7210,26 @@ async function mbaV751Edit(f){
  const fd=new FormData(f),p=mbaV751PayInfo(t,c,e),draft=mba372RegistrationDraft(cid,eid,fd),patch=patchesForMutation(store,draft.after);
  if(isSuper())patch['v3/privateRegistrations/'+t.id+'/'+eid]=draft.privateValue;
  if(fd.has('totalPaid')){
-  const target=Number(fd.get('totalPaid'));if(!p||!mba37CanTakePayment()||!mba37Money(target)||target>Math.max(p.fee,p.paid))throw Error('Invalid payment.');
-  let delta=Math.round((target-p.paid)*100)/100;
-  if(delta!==0){
+  const target=Number(fd.get('totalPaid')),selected=String(fd.get('mba751Collector')||'');
+  if(!p||!mba37CanTakePayment()||!mbaV752Valid(fd.get('totalPaid'))||target>Math.max(p.fee,p.paid))throw Error('Invalid payment.');
+  if(selected&&!mba372Committee().includes(selected))throw Error('Committee member changed. Refresh.');
+  if(target!==p.paid||selected){
    const latest=(await get(ref(db,'v3/finance/'+t.id+'/payments'))).val()||{};
    const normalize=o=>JSON.stringify(Object.entries(o||{}).sort(([a],[b])=>a.localeCompare(b)));
    if(normalize(latest)!==normalize(finance.payments))throw Error('Payments changed. Refresh before editing.');
-   for(const row of p.rows){
-    const part=Math.min(Math.abs(delta),delta>0?Math.max(0,row.fee-row.paid):Math.max(0,row.paid));if(part<=0)continue;
-    const amount=Math.round(part*100)/100,kind=delta>0?'payment':'refund';
-    patch['v3/finance/'+t.id+'/payments/'+uid('receipt')]={playerId:row.primary,chargeId:row.id,entryId:row.entryId||'',categoryId:row.categoryId||'',kind,amount,mode:'Cash',receivedBy:String(fd.get('mba751Collector')||authUser.email||'Signed-in committee'),date:today(),reference:'',notes:'Registration correction',createdBy:authUser.uid,createdByEmail:authUser.email||'',createdAt:Date.now()};
-    delta=Math.round((delta+(kind==='refund'?amount:-amount))*100)/100;
-   }
-   if(delta!==0)throw Error('Unable to reconcile payment. Use Finance.');
+   mbaV752Adjust(t,p,target,selected,patch);
   }
  }
- if(!confirm('Save registration changes? Payment changes are recorded as adjustments. Existing scores stay unchanged.'))return;
+ if(!confirm('Save registration changes? '+(fd.get('mba751Collector')?'Reattribute payment to '+fd.get('mba751Collector')+'? ':'')+'Payment corrections are recorded as adjustments. Existing scores stay unchanged.'))return;
  const live=await get(ref(db,'v3/tournaments/'+t.id+'/categories/'+cid));
  if(JSON.stringify(live.val()?.entrants||[])!==JSON.stringify(c.entrants||[]))throw Error('Registration changed on another device. Refresh.');
  if(Object.keys(patch).length){writePending=true;try{await update(ref(db),patch)}finally{writePending=false;}}
- mbaV74Editing=null;notice='Registration updated.';render();
+ mbaV74Editing=null;notice='Registration updated.';render();alert('Registration changes saved successfully.');
 }
 const mba751OldAccess=accessView;
 accessView=function(){
  const base=mba751OldAccess(),t=active();if(!isSuper()||!t)return base;
- return base+card('Committee Members · '+esc(t.name),`<form data-mba372-committee class="sub-form"><label>Names (one per line)<textarea name="names" rows="4">${esc(mba372Committee().join('\n'))}</textarea></label><button type="submit" class="btn primary">Save Committee Members</button></form>`);
+ return base+mbaV752CommitteePanel(t);
 };
 document.addEventListener('click',e=>{
  const b=e.target.closest('[data-mba751-nav],[data-mba751-delete]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();
@@ -7243,19 +7240,95 @@ document.addEventListener('submit',e=>{
  const f=e.target.closest('form[data-mba751-edit]');if(!f)return;e.preventDefault();e.stopImmediatePropagation();if(f.dataset.busy)return;f.dataset.busy='1';mbaV751Edit(f).catch(err=>alert(errText(err))).finally(()=>{delete f.dataset.busy;});
 },true);
 document.addEventListener('input',e=>{
- const f=e.target.closest('#mba-v7-register-form');if(!f||e.target.name!=='mba751Paid')return;mbaV751SyncFee(f,active(),mbaV7Category(active(),f.elements.categoryId.value));
+ const f=e.target.closest('#mba-v7-register-form');if(!f||e.target.name!=='mba751Paid')return;f.dataset.mba752Entered='yes';mbaV751SyncFee(f,active(),mbaV7Category(active(),f.elements.categoryId.value));
 },true);
 document.addEventListener('change',e=>{
  const f=e.target.closest('#mba-v7-register-form');if(!f||e.target.name!=='mba751Tick')return;
- const c=mbaV7Category(active(),f.elements.categoryId.value);f.elements.mba751Paid.value=e.target.checked?String(mbaV751Fee(active(),c)||0):'0';mbaV751SyncFee(f,active(),c);
+ const c=mbaV7Category(active(),f.elements.categoryId.value);f.elements.mba751Paid.value=e.target.checked?String(mbaV751Fee(active(),c)||''):'';f.dataset.mba752Entered=e.target.checked?'yes':'';mbaV751SyncFee(f,active(),c);
 },true);
 document.addEventListener('keydown',e=>{
  const f=e.target.closest('#mba-v7-register-form');if(!f||e.key!=='Enter'||e.isComposing||e.target.tagName!=='INPUT'||e.target.type==='checkbox')return;
- const ordered=['player1','player2','birthYear1','birthYear2','mobile'].map(k=>f.elements[k]).filter(x=>x&&!x.disabled&&x.getClientRects().length);
+ const ordered=['player1','player2','birthYear1','birthYear2','mobile','mba751Paid','mba751Collector'].map(k=>f.elements[k]).filter(x=>x&&!x.disabled&&x.getClientRects().length);
  const i=ordered.indexOf(e.target);if(i<0&&e.target.name!=='mba751Paid')return;e.preventDefault();if(i>=0&&i<ordered.length-1){ordered[i+1].focus();return;}f.requestSubmit();
 },true);
 const mba751PriorRender=render;
 render=function(){mba751PriorRender();if(mbaV751Focus&&page==='registration'){mbaV751Focus=false;requestAnimationFrame(()=>document.querySelector('#mba-v7-register-form [name=player1]')?.focus());}};
+
+
+const mbaV752Valid=v=>/^(?:\d+(?:\.\d{0,2})?|\.\d{1,2})?$/.test(String(v??'').trim())&&mba37Money(String(v??'').trim());
+function mbaV752RowOwners(row){
+ const rows=mba372FeeRows(active()),map=new Map();
+ for(const r of receipts()){
+  const match=r.chargeId?r.chargeId===row.id:r.entryId?r.entryId===row.entryId:row.playerIds.includes(r.playerId)&&rows.filter(x=>x.playerIds.includes(r.playerId)).length===1;
+  if(!match)continue;
+  const name=String(r.receivedBy||'Not specified'),mode=String(r.mode||'Cash'),key=JSON.stringify([name,mode]);
+  const v=map.get(key)||{name,mode,cents:0};v.cents+=Math.round(mba372Signed(r)*100);map.set(key,v);
+ }
+ return [...map.values()].filter(x=>x.cents!==0);
+}
+function mbaV752Owners(p){return [...new Set(p.rows.flatMap(row=>mbaV752RowOwners(row).filter(x=>x.cents>0).map(x=>x.name)))];}
+function mbaV752Adjust(t,p,target,selected,patch){
+ let delta=Math.round((target-p.paid)*100);
+ if(delta>0&&!selected&&mba372Committee().length)throw Error('Select the committee member who collected the additional amount.');
+ const add=(row,name,mode,kind,cents,notes)=>{
+  if(cents<=0)return;
+  patch['v3/finance/'+t.id+'/payments/'+uid('receipt')]={playerId:row.primary,chargeId:row.id,entryId:row.entryId||'',categoryId:row.categoryId||'',kind,amount:cents/100,mode,receivedBy:name,date:today(),reference:'',notes,createdBy:authUser.uid,createdByEmail:authUser.email||'',createdAt:Date.now()};
+ };
+ for(const row of p.rows){
+  const owners=mbaV752RowOwners(row);
+  if(owners.some(x=>x.cents<0)||owners.reduce((n,x)=>n+x.cents,0)!==Math.round(row.paid*100))throw Error('Collector history needs reconciliation in Finance.');
+  for(const owner of owners){
+   if(delta<0){const n=Math.min(-delta,owner.cents);add(row,owner.name,owner.mode,'refund',n,'Registration amount correction');owner.cents-=n;delta+=n;}
+   if(selected&&selected!==owner.name&&owner.cents>0){
+    add(row,owner.name,owner.mode,'refund',owner.cents,'Collector correction: reverse attribution, no physical refund');
+    add(row,selected,owner.mode,'payment',owner.cents,'Collector correction: reattribute payment');
+   }
+  }
+  if(delta>0){const n=Math.min(delta,Math.max(0,Math.round((row.fee-row.paid)*100)));add(row,selected||authUser.email||'Signed-in committee','Cash','payment',n,'Registration amount correction');delta-=n;}
+ }
+ if(delta!==0)throw Error('Unable to reconcile payment. Use Finance.');
+}
+function mbaV752CommitteePanel(t){
+ if(!t||(!can('feesWrite')&&!canSeePayments()))return '';
+ const names=mba372Committee(),editable=can('feesWrite')&&editScope(t.id),showTotals=canFullFinance(),totals=new Map();
+ if(showTotals)for(const r of receipts()){const n=String(r.receivedBy||'Not specified').trim();totals.set(n,(totals.get(n)||0)+mba372Signed(r));}
+ const rows=names.map(n=>'<li class="mba-v74-entry"><div class="mba-v74-row-heading"><b>'+esc(n)+'</b>'+(showTotals?'<strong>'+esc(money(totals.get(n)||0))+'</strong>':'')+'</div>'+(editable?'<form data-mba752-member="edit" data-tid="'+esc(t.id)+'" data-old="'+esc(n)+'" class="sub-form"><label class="field">Edit name<input name="member" value="'+esc(n)+'" required maxlength="100"></label><div class="actions"><button type="submit" class="btn primary">Save</button><button type="button" class="btn danger-outline" data-mba752-remove="'+esc(n)+'" data-tid="'+esc(t.id)+'">Delete</button></div></form>':'')+'</li>').join('');
+ const history=[...totals].filter(([n])=>!names.includes(n)).map(([n,v])=>'<li>'+esc(n)+' · '+esc(money(v))+'</li>').join('');
+ return '<section class="card"><h2>Committee Members · '+esc(t.name)+'</h2>'+(showTotals?'<small>Net registration money collected</small>':'')+(editable?'<form class="sub-form" data-mba752-member="add" data-tid="'+esc(t.id)+'"><label class="field">Committee member name<input name="member" required maxlength="100" autocomplete="off" placeholder="Enter name"></label><button type="submit" class="btn primary">Save Member</button></form>':'')+'<div class="mba-v73-list"><div class="mba-v73-list-head"><strong>Saved Members</strong><span>'+names.length+' saved</span></div><ol class="mba-v73-rows">'+(rows||'<li>No members yet.</li>')+'</ol></div>'+(history?'<details><summary>Historical collectors</summary><ul>'+history+'</ul></details>':'')+'</section>';
+}
+async function mbaV752SaveMember(tid,kind,old,name){
+ const t=active();if(!t||t.id!==tid||!can('feesWrite')||!editScope(tid))throw Error('Fee manager permission required.');
+ const cfg=ref(db,'v3/finance/'+tid+'/config'),current=(await get(cfg)).val()||{};
+ const names=Array.isArray(current.committeeMembers)?current.committeeMembers.filter(x=>typeof x==='string'&&x.trim()):[];
+ if(kind!=='add'&&!names.includes(old))throw Error('Member changed. Refresh.');
+ if(kind!=='delete'&&(!name||name.length>100||names.some(x=>x!==old&&x.toLowerCase()===name.toLowerCase())))throw Error('Enter a unique committee name.');
+ if(kind==='edit'&&old===name){alert('No changes to save.');return;}
+ const next=kind==='delete'?names.filter(x=>x!==old):kind==='edit'?names.map(x=>x===old?name:x):[...names,name];
+ if(next.length>75)throw Error('Maximum 75 members.');
+ if(!confirm(kind==='add'?'Save committee member '+name+'?':kind==='edit'?'Rename '+old+' to '+name+'? Old receipts keep original name.':'Delete '+old+' from dropdown? Old receipts stay unchanged.'))return;
+ if(active()?.id!==tid||!can('feesWrite'))throw Error('Tournament changed.');
+ const latest=(await get(cfg)).val()||{};
+ if(JSON.stringify(latest.committeeMembers||[])!==JSON.stringify(current.committeeMembers||[]))throw Error('Committee changed. Refresh and retry.');
+ const data={committeeMembers:next.length?next:null,updatedAt:Date.now(),updatedBy:authUser.uid};
+ const fee=latest.feePerPlayer??t.registrationFeePerPlayer;if(fee!=null)data.feePerPlayer=Number(fee);
+ await update(cfg,data);
+ if(active()?.id===tid){finance.config={...latest,...data};notice='Committee member '+(kind==='delete'?'deleted':'saved')+'.';render();}
+ alert(kind==='delete'?'Committee member deleted.':'Committee member saved successfully.');
+}
+document.addEventListener('submit',e=>{
+ const f=e.target.closest('form[data-mba752-member]');if(!f)return;
+ e.preventDefault();e.stopImmediatePropagation();if(f.dataset.busy)return;
+ f.dataset.busy='yes';const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
+ mbaV752SaveMember(f.dataset.tid,f.dataset.mba752Member,f.dataset.old||'',String(f.elements.member.value||'').trim()).catch(err=>alert('Committee: '+errText(err))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false;});
+},true);
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-mba752-remove]');if(!b)return;
+ e.preventDefault();e.stopImmediatePropagation();if(b.disabled)return;b.disabled=true;
+ mbaV752SaveMember(b.dataset.tid,'delete',b.dataset.mba752Remove,'').catch(err=>alert('Committee: '+errText(err))).finally(()=>{if(b.isConnected)b.disabled=false;});
+},true);
+document.addEventListener('focusin',e=>{if(e.target.matches('input[name=mba751Paid],input[name=totalPaid]'))e.target.select();});
+document.addEventListener('click',e=>{if(e.target.matches('input[name=mba751Paid],input[name=totalPaid]')&&!e.target.dataset.mba752Focused){e.target.select();e.target.dataset.mba752Focused='yes';}});
+document.addEventListener('focusout',e=>{if(e.target.matches('input[name=mba751Paid],input[name=totalPaid]'))delete e.target.dataset.mba752Focused;});
 
 mbaV7InstallNavigation();
 mbaV71AddNavigationShortcuts();
