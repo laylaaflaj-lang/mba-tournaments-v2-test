@@ -70,3 +70,11 @@ This is a frozen candidate, not a Production deployment. The app retains the TES
 
 ## Release sequence
 Freeze approved TEST → complete P0 verification → prepare Production-targeted source and rules diff → approval and backups → deploy → smoke test → release record and rollback plan. Do not claim a final Production release until deployment and verification succeed.
+
+## 6. Production preparation — 25 November 2026
+- Production repository scoped access verified (push allowed). TEST access retained.
+- Production main source backup branch: `backup-before-v7-6-20261125`; index blob `6e74090ebfa3597b720163286d961528a900b38c` verified identical to main.
+- Production-targeted code staged on `staging-v7-6-rc` only. App blob `f604f021407c867c11f0f3640f987d167be597b0`; service worker blob `d636b07211a5cfe67c7ff17f2f8c0ede5ecd2b68`.
+- Existing Production Firebase configuration copied exactly from existing Production source. TEST project/link references removed; Keralaotsavam QR generated from Production app link. Existing Production manifest and assets preserved. JavaScript syntax and source readback checked; live browser/QR/Firebase behavior not yet verified.
+- Production main remains unchanged. No Firebase database/rules changes or data migration made.
+- BLOCKED before deployment: obtain actual current Production and TEST RTDB rules, backup Production database privately, audit permissions and verify cross-role behavior. The Production repository has no database.rules.json or firebase.json at its root. GitHub access does not grant Firebase console access.
