@@ -888,6 +888,13 @@ body.mba-v75-live-only>*:not(#mba-v75-live-root):not(script){display:none!import
 .mba756-version{font-size:11px;opacity:.8}
 #mba756-save-dialog .mba756-version{color:#475569;text-align:center}
 #mba756-save-dialog .mba756-ok{width:100%;min-height:46px;border:0;border-radius:10px;background:#15803d;color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+</style><style>
+#mba756-save-dialog .mba757-actions{display:grid;grid-template-columns:1fr 1.4fr;gap:10px}
+#mba756-save-dialog .mba757-cancel{min-height:46px;border:1px solid #cbd5e1;border-radius:10px;background:#f1f5f9;color:#183149;font-size:15px;font-weight:700;cursor:pointer}
+#mba756-save-dialog[data-state=confirm] .mba756-symbol{background:#e8f1fc;color:#1d4ed8}
+#mba756-save-dialog .mba757-status.paid{color:#15803d}
+#mba756-save-dialog .mba757-status.partial{color:#b45309}
+#mba756-save-dialog .mba757-status.unpaid{color:#b91c1c}
 </style></head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
@@ -1924,7 +1931,7 @@ function accessView(){if(!isSuper())return card('User Roles','<p>Only Super Admi
  const editingExisting=!!selected;
  const activePermissions=Object.entries(existing.permissions||{}).filter(([,v])=>v).map(([k])=>k);
  const userFormIntro=editingExisting?`<div class="notice"><b>Editing existing account:</b> ${esc(existing.email||selected)}<br><small>UID: ${esc(selected)} — locked to protect this user's role.</small></div>`:`<div class="notice"><b>Adding a different account</b><br><small>Paste that person's own Firebase UID. An email address is only a label; it does not identify the account.</small></div>`;
- const form=`<form data-form="access" class="sub-form access-panel"><h3>Assign or Revoke User Permissions</h3><small class="mba756-version">V7.5.6 TEST · Save confirmation</small>
+ const form=`<form data-form="access" class="sub-form access-panel"><h3>Assign or Revoke User Permissions</h3><small class="mba756-version">V7.5.7 TEST · Save confirmation</small>
  ${userFormIntro}
  ${field('Firebase User UID (from their Copy UID button)','userUid',selected,'text',editingExisting?'required readonly maxlength="128"':'required maxlength="128" autocapitalize="off" spellcheck="false"')}
  ${field('User email (label)','userEmail',existing.email||accessRequests[selected]?.email||'','email','maxlength="160"')}
@@ -3689,7 +3696,7 @@ function mba37ParseEntries(value,type,customCount){
 }
 /* Single atomic, cross-path update of teams, category entries, private contacts and payment receipts.
  * A compare-before-write check catches most stale clients; Firebase Rules enforce permissions. */
-async function mba37Register(form){
+async function mba37Register(form,options={}){
  if(!mba37CanRegister())throw Error('Team + Category Edit permission is required.');
  if(writePending)throw Error('Another save in progress.');
  const fd=new FormData(form),t=active(),type=String(fd.get('eventType')||'singles'),cid=String(fd.get('categoryId')||'');
@@ -3731,7 +3738,14 @@ async function mba37Register(form){
  });
  if(remaining>0)throw Error('Collected amount exceeds configured player fee; record extra separately in Finance.');
  patch['v3/tournaments/'+t.id+'/categories/'+cat.id]=cat;
- if(!confirm('Register '+entries.length+' entry/entries in '+cat.name+'? '+(received?money(received)+' received by '+receivedBy+' will be recorded in Finance.':'No payment will be recorded.')))return;
+ const message='Register '+entries.length+' entry/entries in '+cat.name+'? '+(received?money(received)+' received by '+receivedBy+' will be recorded in Finance.':'No payment will be recorded.');
+ if(options.quick){
+  if(!await mba757Ask('Confirm Registration',message,mba757RegistrationRows(t,cat,entries,mobile,options.fee,received,receivedBy)))return null;
+  if(authUser?.uid!==options.uid||active()?.id!==t.id||!mba37CanRegister()||!editScope(t.id))throw Error('Tournament or permission changed. Reopen Registration.');
+  if(received>0&&!mba37CanTakePayment())throw Error('Payment permission changed.');
+  if(received>0&&mbaV751Fee(active(),mbaV7Category(active(),cat.id))!==options.fee)throw Error('Fee changed. Reopen Registration.');
+  mba756SaveDialog('pending','Saving registration…','Saving player and payment details to TEST Firebase.');
+ }else if(!confirm(message))return;
  const live=await get(ref(db,'v3/tournaments/'+t.id+'/categories/'+cat.id));
  const liveValue=live.val();if(c){
   const pack=x=>JSON.stringify({id:x?.id,name:x?.name,format:x?.format||null,groups:Object.values(x?.groups||{}),entrants:Object.values(x?.entrants||{}),rules:x?.rules||null,playType:x?.playType||null,playersPerSide:x?.playersPerSide||null});
@@ -3740,8 +3754,16 @@ async function mba37Register(form){
  if(!c&&live.exists())throw Error('Category was just created on another device. Refresh.');
  writePending=true;
  try{await update(ref(db),patch);
-  const updated=await get(ref(db,'v3/tournaments'));setCloud(updated.val());
-  notice='Registrations synced to Categories, Fixtures and Finance.';render();
+  const receiptsSaved=Object.entries(patch).filter(([key])=>key.startsWith('v3/finance/'+t.id+'/payments/')).map(([,value])=>value);
+  const result={entries,cat,t,mobile,paid:Math.round(receiptsSaved.reduce((sum,row)=>sum+Number(row.amount||0),0)*100)/100,collector:[...new Set(receiptsSaved.map(row=>row.receivedBy))].join(', '),synced:true};
+  try{
+   const updated=await get(ref(db,'v3/tournaments'));setCloud(updated.val());
+   notice='Registrations synced to Categories, Fixtures and Finance.';render();
+  }catch(error){
+   if(!options.quick)throw error;
+   result.synced=false;console.warn('Registration saved; refresh unavailable:',errText(error));
+  }
+  return result;
  }finally{writePending=false}
 }
 
@@ -6847,12 +6869,16 @@ async function mbaV7SaveQuick(form){
  if(!mba37Money(paid)||paid>0&&(fee==null||paid>fee))throw Error('Enter an amount within the configured fee.');
  field('received',paid);field('contactName',form.elements.contactName.value.trim()||p1);
  if(paid>0){const who=form.elements.mba751Collector?.value;if(mba372Committee().length&&!who)throw Error('Select the committee member who received the payment.');field('receivedBy',who||authUser.email||'Signed-in committee');field('mode','Cash');}
- const beforeCount=cat.entrants.length;
+ const saveUid=authUser.uid,showFee=canSeePayments();
  if(isSuper())field('mobile',form.elements.mobile.value.trim());
  if(age){field('birthYear1',years[0]);field('birthYear2',years[1]);}
  mbaV7SelectedCategories.set(t.id,cat.id);
- await mba37Register(hidden); // Existing atomic save.
- if(active()?.id===t.id&&mbaV7Category(active(),cat.id)?.entrants.length>beforeCount){mbaV751Focus=true;render();}
+ const result=await mba37Register(hidden,{quick:true,uid:saveUid,fee});
+ if(!result)return;
+ if(authUser?.uid!==saveUid||active()?.id!==t.id||!mba37CanRegister()){mba756CloseDialog();return;}
+ const rows=mba757RegistrationRows(result.t,result.cat,result.entries,result.mobile,showFee?fee:null,result.paid,result.collector);
+ mba756SaveDialog('success',type==='doubles'?'Team Successfully Saved!':'Player Successfully Saved!','Registration saved to Firebase.',rows,null,result.synced?'Registration and recorded payment saved.':'Firebase accepted the save. Refresh the list before adding this entry again.');
+ mba757AfterClose=()=>{if(page==='registration'&&active()?.id===t.id&&result.synced)document.querySelector('#mba-v7-register-form [name=player1]')?.focus();};
 }
 // Keep the existing module-owned navigation events and validation functions intact.
 document.addEventListener('click',e=>{
@@ -6870,13 +6896,16 @@ document.addEventListener('change',e=>{
 document.addEventListener('input',e=>{
  if(e.target.closest('#mba-v7-birth-section'))mbaV7SyncRegistration();
 },true);
+let mba757QuickSaving=false;
 document.addEventListener('submit',e=>{
  const f=e.target.closest('#mba-v7-register-form,#mba-v7-custom-age');if(!f)return;
  e.preventDefault();e.stopImmediatePropagation();
- if(f.dataset.busy)return;
- f.dataset.busy='1';const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
- const work=f.id==='mba-v7-custom-age'?mbaV7CreateAgeCategory(Number(f.elements.minimum.value)):mbaV7SaveQuick(f);
- Promise.resolve(work).catch(err=>alert('V7 Registration: '+errText(err))).finally(()=>{delete f.dataset.busy;if(b?.isConnected)b.disabled=false;});
+ const quick=f.id==='mba-v7-register-form';
+ if(f.dataset.busy||(quick&&mba757QuickSaving))return;
+ f.dataset.busy='1';if(quick)mba757QuickSaving=true;
+ const b=f.querySelector('button[type=submit]');if(b)b.disabled=true;
+ const work=quick?mbaV7SaveQuick(f):mbaV7CreateAgeCategory(Number(f.elements.minimum.value));
+ Promise.resolve(work).catch(err=>{if(quick)mba756SaveDialog('error','Registration not confirmed',errText(err)+' — Check the registered list before retrying.');else alert('V7 Registration: '+errText(err));}).finally(()=>{if(quick)mba757QuickSaving=false;delete f.dataset.busy;if(b?.isConnected)b.disabled=false;});
 },true);
 const mbaV7PreviousRender=render;
 render=function(){
@@ -7217,7 +7246,7 @@ tournamentView=function(t){
  return bar+html;
 };
 
-/* MBA V7.5.6 TEST */
+/* MBA V7.5.7 TEST */
 let mbaV751Focus=false;
 function mbaV751Fee(t,c){
  if(!t||!c)return null;
@@ -7492,26 +7521,52 @@ render=function(){mba754PreviousRender();mba754SyncMobile();};
 
 
 /* V7.5.6: a persistent app-owned confirmation, independent of the view redraw and browser alerts. */
+let mba757ConfirmResolve=null,mba757AfterClose=null;
 function mba756CloseDialog(){
  const d=document.getElementById('mba756-save-dialog');if(!d)return;
  if(d.open&&typeof d.close==='function')d.close();
  d.remove();
+ const cb=mba757AfterClose;mba757AfterClose=null;if(cb)cb();
+ const resolve=mba757ConfirmResolve;mba757ConfirmResolve=null;if(resolve)resolve(false);
+}
+function mba757Ask(title,message,rows){
+ return new Promise(resolve=>{
+  mba756SaveDialog('confirm',title,message,rows,null);
+  mba757ConfirmResolve=resolve;
+ });
+}
+function mba757RegistrationRows(t,cat,entries,mobile,fee,paid,collector){
+ const rows=[['Tournament',t.name],['Category',cat.name]];
+ if(t.date)rows.push(['Date',dateShow(t.date)]);
+ const players=entries.flatMap(e=>e.players);
+ players.forEach((name,i)=>rows.push(['Player '+(i+1),name]));
+ const club=entries[0]?.club;if(club)rows.push(['Club / Academy',club]);
+ if(isSuper()&&mba754CanMobile(t)&&mobile)rows.push(['Mobile Number',mobile]);
+ if(canSeePayments()&&active()?.id===t.id){
+  const known=fee!=null&&Number.isFinite(fee);
+  rows.push(['Court Fee',known?money(fee):'Not set'],['Amount Received',money(paid)],['Balance',known?money(Math.max(0,Math.round((fee-paid)*100)/100)):'Not set'],['Payment Status',!known?'FEE NOT SET':fee===0?'NO FEE':paid>=fee?'PAID':paid>0?'PARTIAL':'NOT PAID'],['Collected by',paid>0?(collector||'Not attributed'):'—']);
+ }
+ return rows;
 }
 function mba756SaveDialog(state,heading,message,rows=[],permissions=[],note=''){
  let d=document.getElementById('mba756-save-dialog');
  if(!d){
   d=document.createElement('dialog');d.id='mba756-save-dialog';d.setAttribute('aria-labelledby','mba756-save-title');
   d.addEventListener('cancel',e=>{if(d.dataset.state==='pending')e.preventDefault();else{e.preventDefault();mba756CloseDialog();}});
-  d.addEventListener('click',e=>{if(e.target.closest('[data-mba756-ok]'))mba756CloseDialog();});
+  d.addEventListener('click',e=>{
+   if(e.target.closest('[data-mba757-confirm]')){
+    const resolve=mba757ConfirmResolve;mba757ConfirmResolve=null;mba756CloseDialog();if(resolve)resolve(true);
+   }else if(e.target.closest('[data-mba756-ok]'))mba756CloseDialog();
+  });
   document.body.append(d);
  }
  d.dataset.state=state;
- const symbol=state==='success'?'✓':state==='pending'?'…':'!';
+ const symbol=state==='success'?'✓':state==='pending'?'…':state==='confirm'?'?':'!';
  d.innerHTML='<div class="mba756-dialog-body"><div class="mba756-symbol" aria-hidden="true">'+symbol+'</div><h2 id="mba756-save-title">'+esc(heading)+'</h2><p class="mba756-message" role="status">'+esc(message)+'</p>'+
- (rows.length?'<dl>'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd>'+esc(v)+'</dd></div>').join('')+'</dl>':'')+
- (state==='success'&&rows.length?'<h3>Saved permissions</h3><ul>'+ (permissions.length?permissions.map(p=>'<li>✓ '+esc(p)+'</li>').join(''):'<li>No permissions selected</li>')+'</ul>':'')+
- (note?'<p class="mba756-note">'+esc(note)+'</p>':'')+'<small class="mba756-version">V7.5.6 TEST</small>'+
- (state==='pending'?'':'<button type="button" class="mba756-ok" data-mba756-ok>OK</button>')+'</div>';
+ (rows.length?'<dl>'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd class="'+(k==='Payment Status'?'mba757-status '+(v==='PAID'||v==='NO FEE'?'paid':v==='PARTIAL'?'partial':'unpaid'):'')+'">'+esc(v)+'</dd></div>').join('')+'</dl>':'')+
+ (state==='success'&&rows.length&&permissions!==null?'<h3>Saved permissions</h3><ul>'+ (permissions.length?permissions.map(p=>'<li>✓ '+esc(p)+'</li>').join(''):'<li>No permissions selected</li>')+'</ul>':'')+
+ (note?'<p class="mba756-note">'+esc(note)+'</p>':'')+'<small class="mba756-version">V7.5.7 TEST</small>'+
+ (state==='pending'?'':state==='confirm'?'<div class="mba757-actions"><button type="button" class="mba757-cancel" data-mba756-ok>Cancel</button><button type="button" class="mba756-ok" data-mba757-confirm>Confirm &amp; Save</button></div>':'<button type="button" class="mba756-ok" data-mba756-ok>OK</button>')+'</div>';
  if(!d.open){try{d.showModal()}catch{d.setAttribute('open','');d.classList.add('mba756-fallback');}}
  if(state!=='pending')d.querySelector('[data-mba756-ok]')?.focus();
 }
