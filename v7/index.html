@@ -895,6 +895,18 @@ body.mba-v75-live-only>*:not(#mba-v75-live-root):not(script){display:none!import
 #mba756-save-dialog .mba757-status.paid{color:#15803d}
 #mba756-save-dialog .mba757-status.partial{color:#b45309}
 #mba756-save-dialog .mba757-status.unpaid{color:#b91c1c}
+</style><style>
+#mba756-save-dialog .mba759-share-panel{display:grid;gap:9px;min-width:0}
+#mba756-save-dialog .mba759-preview canvas{display:block;width:100%;height:auto;border-radius:12px}
+#mba756-save-dialog .mba759-opt{display:flex;align-items:center;gap:8px;font-size:13px;color:#183149}
+#mba756-save-dialog .mba759-opt input{width:19px;height:19px;flex:none}
+#mba756-save-dialog .mba759-private,#mba756-save-dialog .mba759-export-status{color:#526578;font-size:11px;line-height:1.4}
+#mba756-save-dialog .mba759-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#mba756-save-dialog .mba759-actions button{border:1px solid #cbd5e1;border-radius:9px;min-height:44px;background:#eff4fa;color:#15324f;font-weight:700;cursor:pointer}
+#mba756-save-dialog .mba759-actions [data-mba759-send]{background:#116936;color:#fff;border-color:#116936}
+#mba756-save-dialog .mba759-actions button:disabled{opacity:.5;cursor:default}
+#mba756-save-dialog .mba759-details{font-size:13px;color:#475569}
+.mba759-list-share{margin-top:7px;align-self:flex-start}
 </style></head>
 <body><header><div class="container header-top"><div class="brand-head"><span class="brand-mark" aria-hidden="true">🏸</span><h1>MBA Tournaments</h1><p>Badminton Tournament Manager</p><span class="mba-maker-credit">App created by <strong>Usthad</strong></span></div></div>
 <div class="container mba-header-controls noprint" aria-label="Display preferences and time"><label class="mba-ui-control"><span>🎨 Color Theme</span><select id="mba-theme-select" aria-label="Color Theme"><option value="classic">Classic Blue</option><option value="light">Light</option><option value="dark">Dark</option><option value="navy">Navy &amp; Gold</option></select></label><label class="mba-ui-control"><span>🌐 Language</span><select id="mba-lang-select" aria-label="Language"><option value="en">English</option><option value="ml">മലയാളം</option></select></label><div class="mba-clock" role="timer" aria-label="Current time"><span class="mba-clock-label">🕒 Time</span><strong id="mba-clock-time">--:--:--</strong></div><button id="mba-global-share-link" class="btn mba-global-share-link noprint" type="button" title="Copy live Production app link">↗ Share App Link</button></div></header>
@@ -1940,7 +1952,7 @@ function accessView(){if(!isSuper())return card('User Roles','<p>Only Super Admi
  const editingExisting=!!selected;
  const activePermissions=Object.entries(existing.permissions||{}).filter(([,v])=>v).map(([k])=>k);
  const userFormIntro=editingExisting?`<div class="notice"><b>Editing existing account:</b> ${esc(existing.email||selected)}<br><small>UID: ${esc(selected)} — locked to protect this user's role.</small></div>`:`<div class="notice"><b>Adding a different account</b><br><small>Paste that person's own Firebase UID. An email address is only a label; it does not identify the account.</small></div>`;
- const form=`<form data-form="access" class="sub-form access-panel"><h3>Assign or Revoke User Permissions</h3><small class="mba756-version">V7.5.8 TEST · Save confirmation</small>
+ const form=`<form data-form="access" class="sub-form access-panel"><h3>Assign or Revoke User Permissions</h3><small class="mba756-version">V7.5.9 TEST · Save confirmation</small>
  ${userFormIntro}
  ${field('Firebase User UID (from their Copy UID button)','userUid',selected,'text',editingExisting?'required readonly maxlength="128"':'required maxlength="128" autocapitalize="off" spellcheck="false"')}
  ${field('User email (label)','userEmail',existing.email||accessRequests[selected]?.email||'','email','maxlength="160"')}
@@ -6888,6 +6900,7 @@ async function mbaV7SaveQuick(form){
  if(!result)return;
  if(authUser?.uid!==saveUid||active()?.id!==t.id||!mba37CanRegister()){mba756CloseDialog();return;}
  const rows=mba757RegistrationRows(result.t,result.cat,result.entries,result.mobile,showFee?fee:null,result.paid,result.collector);
+ if(isSuper()&&result.mobile&&hidden.elements.contactName?.value)rows.push(['Contact Person',hidden.elements.contactName.value]);
  mba756SaveDialog('success',type==='doubles'?'Team Successfully Saved!':'Player Successfully Saved!','Registration saved to Firebase.',rows,null,result.synced?'Registration and recorded payment saved.':'Firebase accepted the save. Refresh the list before adding this entry again.');
  mba757AfterClose=()=>{if(page==='registration'&&active()?.id===t.id&&result.synced)document.querySelector('#mba-v7-register-form [name=player1]')?.focus();};
 }
@@ -7258,7 +7271,7 @@ tournamentView=function(t){
  return bar+html;
 };
 
-/* MBA V7.5.8 TEST */
+/* MBA V7.5.9 TEST */
 let mbaV751Focus=false;
 function mbaV751Fee(t,c){
  if(!t||!c)return null;
@@ -7302,7 +7315,7 @@ mbaV73RegisteredTeams=function(t,catId){
    ${p&&mba37CanTakePayment()?`<label>Court Fee ${esc(money(p.fee))} · Total paid<input name="totalPaid" type="text" inputmode="decimal" autocomplete="off" value="${p.paid||''}"></label>`:''}
    <details class="mba-v7-optional"><summary>Optional: Club & Contact</summary><label>Club / Academy<input name="club" value="${esc(e.clubName||'')}"></label>${isSuper()?`<label>Contact Person<input name="contactName" value="${esc(privateRec.contactName||'')}"></label>`:''}</details>${p&&mba37CanTakePayment()?`<small>Current collector: ${esc(mbaV752Owners(p).join(', ')||'No payment')}</small>${mbaV751Collector('','Keep current / correct collector')}`:''}
    <div class="actions"><button type="submit" class="btn primary">Save Changes</button><button type="button" class="btn" data-mba-v74-cancel="${key}">Cancel</button></div></form>`:'';
-  return `<li class="mba-v74-entry"><small>${esc(t.name)} · ${esc(c.name)}${t.date?' · '+esc(dateShow(t.date)):''}</small><div class="mba-v74-row-heading"><b>${esc(entryLabel(t,c,e.id))}</b>${canEdit?`<span class="mba-v74-actions"><button type="button" class="btn mba-v74-edit-btn" data-mba-v74-${editing?'cancel':'open'}="${key}">${editing?'Cancel':'Edit'}</button><button type="button" class="btn danger-outline" data-mba751-delete="${key}">Delete</button></span>`:''}</div>${mba754CardDetails(t,e,p)}${mbaV751Status(p)}${form}</li>`;
+  return `<li class="mba-v74-entry"><small>${esc(t.name)} · ${esc(c.name)}${t.date?' · '+esc(dateShow(t.date)):''}</small><div class="mba-v74-row-heading"><b>${esc(entryLabel(t,c,e.id))}</b>${canEdit?`<span class="mba-v74-actions"><button type="button" class="btn mba-v74-edit-btn" data-mba-v74-${editing?'cancel':'open'}="${key}">${editing?'Cancel':'Edit'}</button><button type="button" class="btn danger-outline" data-mba751-delete="${key}">Delete</button></span>`:''}</div>${mba754CardDetails(t,e,p)}${mbaV751Status(p)}${!mbaV75LiveRequested()?`<button type="button" class="btn mba759-list-share" data-mba759-entry="${key}" data-tid="${esc(t.id)}">↗ Share Card</button>`:''}${form}</li>`;
  }).join('');
  return `<div class="mba-v73-list-head"><strong>Registered Players / Teams</strong><span>${entries.length} saved</span></div>${html?`<ol class="mba-v73-rows">${html}</ol>`:'<p>No registrations yet.</p>'}`;
 };
@@ -7577,7 +7590,7 @@ function mba756SaveDialog(state,heading,message,rows=[],permissions=[],note=''){
  d.innerHTML='<div class="mba756-dialog-body"><div class="mba756-symbol" aria-hidden="true">'+symbol+'</div><h2 id="mba756-save-title">'+esc(heading)+'</h2><p class="mba756-message" role="status">'+esc(message)+'</p>'+
  (rows.length?'<dl>'+rows.map(([k,v])=>'<div><dt>'+esc(k)+'</dt><dd class="'+(k==='Payment Status'?'mba757-status '+(v==='PAID'||v==='NO FEE'?'paid':v==='PARTIAL'?'partial':'unpaid'):'')+'">'+esc(v)+'</dd></div>').join('')+'</dl>':'')+
  (state==='success'&&rows.length&&permissions!==null?'<h3>Saved permissions</h3><ul>'+ (permissions.length?permissions.map(p=>'<li>✓ '+esc(p)+'</li>').join(''):'<li>No permissions selected</li>')+'</ul>':'')+
- (note?'<p class="mba756-note">'+esc(note)+'</p>':'')+'<small class="mba756-version">V7.5.8 TEST</small>'+
+ (note?'<p class="mba756-note">'+esc(note)+'</p>':'')+'<small class="mba756-version">V7.5.9 TEST</small>'+
  (state==='pending'?'':state==='confirm'?'<div class="mba757-actions"><button type="button" class="mba757-cancel" data-mba756-ok>Cancel</button><button type="button" class="mba756-ok" data-mba757-confirm>Confirm &amp; Save</button></div>':'<button type="button" class="mba756-ok" data-mba756-ok>OK</button>')+'</div>';
  if(!d.open){try{d.showModal()}catch{d.setAttribute('open','');d.classList.add('mba756-fallback');}}
  if(state!=='pending')d.querySelector('[data-mba756-ok]')?.focus();
@@ -7587,10 +7600,12 @@ function mba756SaveDialog(state,heading,message,rows=[],permissions=[],note=''){
 function mba758ScoreRows(t,m,result){
  const rows=[['Tournament',t.name],['Category',lookup(t,m.categoryId)?.name||'—'],['Court',String(m.court||'—')]];
  const names=participants(t,m);rows.push(['Side A',names[0]],['Side B',names[1]]);
+ if(t.date)rows.push(['Date',dateShow(t.date)]);
+ rows.push(['Format',m.stage==='knockout'?'Knockout':'League']);
  if(result&&result.mode!=='live'){
   const w=scoreWinner(result,effectiveRules(t,lookup(t,m.categoryId),m));
   rows.push(['Final Score',result.mode==='winner'?'Winner only':String(result.a)+' – '+String(result.b)]);
-  if(w)rows.push(['Winner',names[w==='a'?0:1]]);
+  if(w)rows.push(['Winner',names[w==='a'?0:1]],['Winning Side',w.toUpperCase()]);
  }
  return rows;
 }
@@ -7619,6 +7634,195 @@ function mba758MutationSummary(before,after,patches){
  if(paths.some(x=>x.p[3]==='categories'))return {title:'Category Successfully Updated!',rows};
  return {title:'Successfully Saved!',rows};
 }
+
+
+/* V7.5.9: local Canvas PNG exports. No image uploads, external APIs or public data writes.
+   Only explicit, authorized disclosure of phone/payment details; defaults are excluded. */
+const mba759ContactKeys=new Set(['Mobile Number','Contact Person']);
+const mba759PaymentKeys=new Set(['Court Fee','Amount Received','Balance','Payment Status','Collected by']);
+let mba759Card=null;
+function mba759Authorized(card){
+ const t=active();
+ return !!card&&!!authUser&&authUser.uid===card.uid&&!!remoteReady&&!readError&&!mbaV75LiveRequested()&&t?.id===card.tid&&viewScope(t.id);
+}
+function mba759Filtered(card,contact,payment){
+ if(!mba759Authorized(card))throw Error('Tournament access changed. Reopen the card.');
+ const t=active(),contactAllowed=contact&&mba754CanMobile(t),paymentAllowed=payment&&canSeePayments();
+ return card.rows.filter(([k])=>(!mba759ContactKeys.has(k)||contactAllowed)&&(!mba759PaymentKeys.has(k)||paymentAllowed));
+}
+function mba759Canvas(kind,rows){
+ const data=Object.fromEntries(rows),c=document.createElement('canvas'),W=720,P=38,inner=W-2*P;
+ const g=c.getContext('2d');if(!g)throw Error('Image rendering unavailable.');
+ const navy='#07172d',gold='#e1bd74',muted='#aec0d7',white='#f6f8fd',green='#8cf3ad',red='#ffaaaa';
+ const font=(size,bold=false)=> (bold?'700 ':'400 ')+size+'px Arial, sans-serif';
+ function wrap(txt,max,size,bold=false){
+  g.font=font(size,bold);const out=[];let line='';
+  for(const word of String(txt??'').split(/\s+/)){
+   const next=line?line+' '+word:word;
+   if(g.measureText(next).width<=max){line=next;continue}
+   if(line){out.push(line);line=''}
+   for(const ch of Array.from(word)){if(line&&g.measureText(line+ch).width>max){out.push(line);line=''}line+=ch}
+  }
+  if(line||!out.length)out.push(line);return out;
+ }
+ function rect(x,y,w,h,r,fill,stroke){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fillStyle=fill;g.fill();if(stroke){g.strokeStyle=stroke;g.lineWidth=1.6;g.stroke()}}
+ function txt(text,x,y,size,color,bold=false,align='left'){g.font=font(size,bold);g.textAlign=align;g.textBaseline='top';g.fillStyle=color;g.fillText(String(text),x,y)}
+ function lines(ls,x,y,size,color,bold=false,align='left',gap=1.25){ls.forEach((v,i)=>txt(v,x,y+i*size*gap,size,color,bold,align));return y+ls.length*size*gap}
+ const tournament=wrap(data.Tournament||'MBA Tournament',inner-16,32,true);
+ const meta=wrap([data.Category,data.Format,data.Court&&'COURT '+data.Court].filter(Boolean).join('  •  ').toUpperCase(),inner-10,18,true);
+ const header=182+tournament.length*40+meta.length*23+(data.Date?30:0);
+ let H,layout,score;
+ if(kind==='score'){
+  const parts=String(data['Final Score']||'').match(/^(\d+)\s*[–-]\s*(\d+)$/);
+  const winSide=data['Winning Side']||((data.Winner===data['Side A']&&data.Winner!==data['Side B'])?'A':(data.Winner===data['Side B']&&data.Winner!==data['Side A'])?'B':'');
+  const w=(inner-18)/2;const names=[data['Side A']||'TBD',data['Side B']||'TBD'].map(v=>wrap(v,w-30,25,true));const n=Math.max(...names.map(v=>v.length));
+  const winner=wrap(data.Winner?'WINNER  •  '+data.Winner:'MATCH COMPLETED',inner-30,25,true);
+  score={parts,winSide,w,names,n,winner};H=header+75+(n*32+174)+32+winner.length*32+110;
+ }else{
+  const players=rows.filter(([k])=>/^Player \d+$/.test(k));
+  const names=players.map(([k,v])=>({k,ls:wrap(v,inner-36,27,true)}));
+  const fields=rows.filter(([k])=>!['Tournament','Category','Date','Format','Court'].includes(k)&&!/^Player \d+$/.test(k)).map(([k,v])=>({k,ls:wrap(v,inner-250,22,true),label:wrap(k,190,18,false)}));
+  layout={names,fields};H=header+65+names.reduce((n,x)=>n+40+x.ls.length*34,0)+20+fields.reduce((n,x)=>n+Math.max(x.ls.length*28,x.label.length*23,30)+20,0)+100;
+ }
+ c.width=Math.round(W*1.5);c.height=Math.round(H*1.5);g.scale(1.5,1.5);
+ const gradient=g.createLinearGradient(0,0,W,H);gradient.addColorStop(0,'#102d50');gradient.addColorStop(.48,navy);gradient.addColorStop(1,'#101e36');g.fillStyle=gradient;g.fillRect(0,0,W,H);
+ rect(12,12,W-24,H-24,27,'#07172d55','#b18c49');rect(19,19,W-38,H-38,22,'#0a1b3355','#6d5837');
+ g.fillStyle=gold;g.fillRect(P,35,104,2);g.fillRect(W-P-104,35,104,2);
+ // A compact, original MBA monogram; no external image dependencies.
+ g.beginPath();g.moveTo(W/2,35);g.lineTo(W/2+42,50);g.lineTo(W/2+37,93);g.quadraticCurveTo(W/2+29,108,W/2,121);g.quadraticCurveTo(W/2-29,108,W/2-37,93);g.lineTo(W/2-42,50);g.closePath();g.fillStyle='#163659';g.fill();g.strokeStyle=gold;g.lineWidth=2;g.stroke();
+ txt('MBA',W/2,65,25,gold,true,'center');
+ txt('MALABAR BADMINTON ACADEMY',W/2,133,21,gold,true,'center');
+ let y=169;y=lines(tournament,W/2,y,32,white,true,'center');y=lines(meta,W/2,y+5,18,muted,true,'center');
+ if(data.Date){txt('TOURNAMENT DATE  •  '+data.Date,W/2,y+7,17,muted,false,'center');y+=30}
+ y=header;g.fillStyle='#574b39';g.fillRect(P,y,inner,1);
+ y+=22;
+ if(kind==='score'){
+  txt('FINAL MATCH RESULT',W/2,y,24,gold,true,'center');y+=53;
+  const {parts,winSide,w,names,n,winner}=score,h=n*32+174;
+  ['A','B'].forEach((side,i)=>{
+   const x=P+i*(w+18),cx=x+w/2,won=winSide===side,lost=!!winSide&&!won;
+   rect(x,y,w,h,17,won?'#10382e':lost?'#302338':'#152a45',won?'#4fa273':lost?'#8c5b63':'#56708e');
+   txt(won?'WINNER':lost?'LOST':'SIDE '+side,cx,y+18,18,won?green:lost?red:muted,true,'center');
+   lines(names[i],cx,y+49,25,white,true,'center');
+   const value=parts?parts[i+1]:(won?'WON':lost?'LOST':'—');
+   txt(value,cx,y+65+n*32,parts?72:38,won?green:lost?red:white,true,'center');
+  });
+  y+=h+32;y=lines(winner,W/2,y,25,gold,true,'center');
+ }else{
+  txt('PLAYER / TEAM REGISTRATION',W/2,y,22,gold,true,'center');y+=43;
+  for(const item of layout.names){const h=28+item.ls.length*34;rect(P,y,inner,h+12,12,'#173452','#715e3e');txt(item.k.toUpperCase(),P+18,y+9,14,gold,true);lines(item.ls,P+18,y+29,27,white,true);y+=h+12}
+  y+=12;
+  for(const item of layout.fields){
+   const h=Math.max(item.ls.length*28,item.label.length*23,30)+20;
+   g.fillStyle='#354762';g.fillRect(P,y,inner,1);
+   lines(item.label,P+5,y+10,18,muted,false);
+   const color=item.k==='Payment Status'?(item.ls[0]==='PAID'||item.ls[0]==='NO FEE'?green:item.ls[0]==='PARTIAL'?gold:red):white;
+   lines(item.ls,W-P-5,y+10,22,color,true,'right');y+=h;
+  }
+ }
+ g.fillStyle='#665435';g.fillRect(P,H-78,inner,1);
+ txt('MBA TOURNAMENTS',W/2,H-64,19,gold,true,'center');txt('App created by Usthad',W/2,H-38,15,muted,false,'center');
+ return c;
+}
+function mba759Mount(d,kind,rows){
+ const card={kind,rows:rows.map(([k,v])=>[String(k),String(v??'')]),uid:authUser?.uid,tid:active()?.id,blob:null,file:null,epoch:0,contact:false,payment:false};
+ if(!mba759Authorized(card))return;
+ mba759Card=card;
+ const hasContact=card.rows.some(([k,v])=>mba759ContactKeys.has(k)&&v)&&mba754CanMobile(active());
+ const hasPayment=card.rows.some(([k])=>mba759PaymentKeys.has(k))&&canSeePayments();
+ const body=d.querySelector('.mba756-dialog-body'),details=body.querySelector('dl');
+ const host=document.createElement('section');host.className='mba759-share-panel';
+ host.innerHTML='<div class="mba759-preview"></div>'+
+ (hasContact?'<label class="mba759-opt"><input type="checkbox" data-mba759-contact> Include contact details in image</label>':'')+
+ (hasPayment?'<label class="mba759-opt"><input type="checkbox" data-mba759-payment> Include payment details in image</label>':'')+
+ (hasContact||hasPayment?'<small class="mba759-private">Only include private details when the recipient needs them. Shared images can be forwarded.</small>':'')+
+ '<div class="mba759-actions"><button type="button" data-mba759-send disabled>↗ Share Image</button><button type="button" data-mba759-download disabled>↓ Save PNG</button></div><small class="mba759-export-status" role="status" aria-live="polite"></small>';
+ if(details){const wrap=document.createElement('details');wrap.className='mba759-details';const label=document.createElement('summary');label.textContent='Saved details';wrap.append(label);details.before(wrap);wrap.append(details);wrap.after(host);}else body.append(host);
+ const preview=host.querySelector('.mba759-preview'),send=host.querySelector('[data-mba759-send]'),download=host.querySelector('[data-mba759-download]'),status=host.querySelector('.mba759-export-status');
+ const contact=host.querySelector('[data-mba759-contact]'),payment=host.querySelector('[data-mba759-payment]');
+ function rebuild(){
+  const epoch=++card.epoch;card.blob=null;card.file=null;send.disabled=download.disabled=true;
+  try{
+   card.contact=!!contact?.checked;card.payment=!!payment?.checked;
+   const filtered=mba759Filtered(card,card.contact,card.payment);
+   const canvas=mba759Canvas(kind,filtered);preview.replaceChildren(canvas);status.textContent='Preparing HD image…';
+   canvas.toBlob(blob=>{
+    if(mba759Card!==card||epoch!==card.epoch||!host.isConnected)return;
+    if(!blob){status.textContent='Image could not be prepared.';return}
+    card.blob=blob;const filename='MBA-'+(kind==='score'?'Score':'Registration')+'-'+new Date().toISOString().slice(0,10)+'.png';
+    try{card.file=new File([blob],filename,{type:'image/png'});}catch{card.file=null}
+    send.disabled=download.disabled=false;status.textContent=canvas.width+' × '+canvas.height+' px · PNG';
+   },'image/png');
+  }catch(err){preview.replaceChildren();status.textContent=errText(err)}
+ }
+ function valid(){
+  if(mba759Card!==card||!mba759Authorized(card)||card.contact&&!mba754CanMobile(active())||card.payment&&!canSeePayments()){
+   card.blob=null;card.file=null;send.disabled=download.disabled=true;preview.replaceChildren();status.textContent='Access changed. Reopen the card.';return false;
+  }
+  return !!card.blob;
+ }
+ function save(){
+  if(!valid())return;
+  const url=URL.createObjectURL(card.blob),a=document.createElement('a');a.href=url;a.download=card.file?.name||'MBA-card.png';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000);status.textContent='PNG download requested.';
+ }
+ contact?.addEventListener('change',rebuild);payment?.addEventListener('change',rebuild);
+ download.addEventListener('click',save);
+ send.addEventListener('click',()=>{
+  if(!valid())return;
+  const shareData=card.file?{files:[card.file],title:kind==='score'?'MBA Match Result':'MBA Registration'}:null;
+  if(shareData&&typeof navigator.share==='function'&&typeof navigator.canShare==='function'&&navigator.canShare(shareData)){
+   navigator.share(shareData).then(()=>{if(host.isConnected)status.textContent='Share completed.'}).catch(err=>{if(host.isConnected)status.textContent=err?.name==='AbortError'?'Sharing cancelled.':'Sharing unavailable. Use Save PNG.';});
+  }else{save();if(host.isConnected)status.textContent='Image saved via download. Open it in WhatsApp to share.';}
+ });
+ rebuild();
+}
+const mba759OriginalDialog=mba756SaveDialog;
+mba756SaveDialog=function(state,heading,message,rows=[],permissions=[],note=''){
+ mba759Card=null;
+ mba759OriginalDialog(state,heading,message,rows,permissions,note);
+ if(state!=='success'||permissions!==null||!authUser||mbaV75LiveRequested())return;
+ const keys=new Set(rows.map(([k])=>k));
+ const kind=keys.has('Final Score')&&keys.has('Side A')&&keys.has('Side B')?'score':rows.some(([k])=>/^Player \d+$/.test(k))?'registration':'';
+ if(kind)mba759Mount(document.getElementById('mba756-save-dialog'),kind,rows);
+};
+const mba759OldClose=mba756CloseDialog;
+mba756CloseDialog=function(){mba759Card=null;mba759OldClose();};
+const mba759OldRender=render;
+render=function(){
+ mba759OldRender();
+ if(mba759Card&&(!mba759Authorized(mba759Card)||mba759Card.contact&&!mba754CanMobile(active())||mba759Card.payment&&!canSeePayments()))mba756CloseDialog();
+};
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('[data-mba759-entry]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();if(b.disabled)return;
+ const t=active(),[cid,eid]=b.dataset.mba759Entry.split('|'),c=t?.categories.find(x=>x.id===cid),entry=c?.entrants.find(x=>x.id===eid);
+ if(!t||t.id!==b.dataset.tid||!entry||!mba372EntryActive(entry)||mbaV75LiveRequested()||!viewScope(t.id))return;
+ const user=authUser?.uid;b.disabled=true;
+ try{
+  const team=t.teams.find(x=>x.id===entry.teamId),players=entry.playerIds.map(id=>team?.players.find(p=>p.id===id)?.name||'');
+  if(players.some(x=>!x))throw Error('Registration details unavailable.');
+  let mobile='',contactName='';
+  if(mba754CanMobile(t)){
+   try{
+    const path='v3/privateRegistrations/'+t.id+'/'+entry.id;
+    if(isSuper()){const record=(await get(ref(db,path))).val()||{};mobile=String(record.mobile||'');contactName=String(record.contactName||'');}
+    else mobile=String((await get(ref(db,path+'/mobile'))).val()||'');
+   }catch{mobile='';contactName='';}
+  }
+  if(authUser?.uid!==user||active()?.id!==t.id||mbaV75LiveRequested()||!viewScope(t.id))return;
+  const fresh=active(),cat=fresh.categories.find(x=>x.id===cid),en=cat?.entrants.find(x=>x.id===eid);
+  if(!en||!mba372EntryActive(en))throw Error('Registration changed. Reopen the list.');
+  const currentTeam=fresh.teams.find(x=>x.id===en.teamId),currentNames=en.playerIds.map(id=>currentTeam?.players.find(p=>p.id===id)?.name||'');
+  if(currentNames.some(x=>!x))throw Error('Registration details unavailable.');
+  const rows=[['Tournament',fresh.name],['Category',cat.name]];if(fresh.date)rows.push(['Date',dateShow(fresh.date)]);
+  currentNames.forEach((name,i)=>rows.push(['Player '+(i+1),name]));
+  if(en.clubName)rows.push(['Club / Academy',en.clubName]);
+  if(mba754CanMobile(fresh)&&/^[0-9+()\s-]{6,20}$/.test(mobile)){rows.push(['Mobile Number',mobile]);if(isSuper()&&contactName)rows.push(['Contact Person',contactName]);}
+  const p=mbaV751PayInfo(fresh,cat,en);
+  if(p&&canSeePayments())rows.push(['Court Fee',money(p.fee)],['Amount Received',money(p.paid)],['Balance',money(Math.max(0,p.fee-p.paid))],['Payment Status',p.fee===0?'NO FEE':p.paid>=p.fee?'PAID':p.paid>0?'PARTIAL':'NOT PAID'],['Collected by',p.paid>0?mbaV752Owners(p).join(', ')||'Not attributed':'—']);
+  mba756SaveDialog('success','Registration Card','Share this registered player or team as a PNG image.',rows,null);
+ }catch(err){mba756SaveDialog('error','Card unavailable',errText(err))}
+ finally{if(b.isConnected)b.disabled=false;}
+},true);
 
 mbaV7InstallNavigation();
 mbaV71AddNavigationShortcuts();
