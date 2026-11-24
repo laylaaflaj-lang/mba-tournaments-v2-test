@@ -1969,6 +1969,7 @@ async function mbaRunBulkAccessAction(action){
   await update(ref(db),updates);
   notice=isDelete?'Access removed for '+uids.length+' user(s). Sign-in accounts and tournaments were NOT deleted.':'Bulk permissions updated for '+uids.length+' user(s). Tournament scopes are unchanged.';
   render();
+  alert('✅ '+notice);
  }finally{writePending=false}
 }
 function fillRolePermissions(form){
@@ -2020,6 +2021,7 @@ async function financeSubmit(kind,data){
   await createFinanceEvent('transfer',{from:get('from'),to:get('to'),amount:safeAmount(data.get('amount')),date:get('date')});return;
  }
 }
+let mba755AccessSaving=false;
 async function accessSubmit(data){
  if(!isSuper())throw Error('Super Admin only');
  if(!accessListReady||!accessScopesReady)throw Error('User Roles or tournament permissions are still loading. Try again after the existing users and scope list have loaded.');
@@ -2053,10 +2055,26 @@ async function accessSubmit(data){
  const updates={['v3/access/'+uidString]:record,['v3/accessRequests/'+uidString]:null};
  for(const id of new Set([...Object.keys(oldScopes),...Object.keys(userScopes)]))updates['v3/tournamentAccess/'+uidString+'/'+id]=userScopes[id]||null;
  await update(ref(db),updates);
- const saved=await get(ref(db,'v3/access/'+uidString));
- if(!saved.exists()||saved.val().updatedAt!==stamp)throw Error('Save could not be verified. Refresh User Roles before trying again.');
- accessList[uidString]=saved.val();accessScopesByUid[uidString]=userScopes;
+ let saved,verifiedScopes;
+ try{
+  [saved,verifiedScopes]=await Promise.all([get(ref(db,'v3/access/'+uidString)),get(ref(db,'v3/tournamentAccess/'+uidString))]);
+  const actual=saved.val(),scopes=verifiedScopes.val()||{};
+  const permsMatch=actual&&Object.keys(permissions).every(k=>(actual.permissions?.[k]===true)===permissions[k]);
+  const scopeKeys=new Set([...Object.keys(userScopes),...Object.keys(scopes)]);
+  const scopesMatch=[...scopeKeys].every(k=>(scopes[k]?.view===true)===(userScopes[k]?.view===true)&&(scopes[k]?.edit===true)===(userScopes[k]?.edit===true));
+  if(!saved.exists()||actual.updatedAt!==stamp||actual.role!==role||actual.active!==record.active||!permsMatch||!scopesMatch)throw Error('Read-back mismatch');
+ }catch(error){
+  notice='Firebase accepted the save, but verification was incomplete. Reopen User Roles to check the saved permissions.';
+  render();alert('⚠ Save verification incomplete.\nFirebase accepted the update for '+(email||uidString)+', but the saved permissions could not be fully verified.\nPlease reopen User Roles and check before retrying.');
+  return;
+ }
+ accessList[uidString]=saved.val();accessScopesByUid[uidString]=verifiedScopes.val()||{};
+ const enabled=permissionsList.filter(([k])=>saved.val().permissions?.[k]===true).map(([k,label])=>k==='mobileRead'?'Show Mobile Number':label);
+ if(saved.val().permissions?.printView===true)enabled.push('A4 Print');
+ const mobileEnabled=role==='super'?'Always allowed for Super Admin':!record.active?'Account inactive':role==='viewer'?'Hidden':permissions.mobileRead?'Allowed (assigned tournaments only)':'Hidden';
+ const scopeCount=Object.keys(userScopes).length;
  editor=null;notice='Saved & verified for '+(email||uidString)+'. Other user accounts were not changed.';render();
+ alert('✅ Permissions saved successfully!\n\nUser: '+(email||uidString)+'\nRole: '+(mbaV372RoleLabels[role]||role)+'\nAccount: '+(record.active?'Active':'Inactive')+'\nShow Mobile Number: '+mobileEnabled+'\nAssigned tournaments: '+(role==='super'?'All (Super Admin)':scopeCount)+'\n\nSaved permissions:\n'+(enabled.length?enabled.map(x=>'• '+x).join('\n'):'None selected')+'\n\nOther users were not changed.');
 }
 
 function playerPicker(){const names=libraryNames();return names.length?`<div class="reusable-picker"><p class="helper">Choose saved player names. These are copied as new, independent tournament players.</p><div class="reuse-grid">${names.map(name=>`<label class="choice"><input type="checkbox" name="reusePlayer" value="${esc(name)}"> ${esc(name)}</label>`).join('')}</div></div>`:'<p class="helper">No saved players yet. Add players to a team first.</p>'}
@@ -2578,9 +2596,13 @@ document.addEventListener('submit',async ev=>{
  const form=ev.target.closest('form[data-form]');if(!form)return;ev.preventDefault();
  const data=new FormData(form),kind=form.dataset.form,t=active();unsavedFormChanges=false;
  if(kind.startsWith('fin-')||kind==='access'){
-  const btn=form.querySelector('button[type="submit"]');if(btn)btn.disabled=true;
+  if(kind==='access'&&mba755AccessSaving)return;
+  const btn=form.querySelector('button[type="submit"]'),originalLabel=btn?.textContent;
+  if(kind==='access')mba755AccessSaving=true;
+  if(btn){btn.disabled=true;if(kind==='access')btn.textContent='Saving…';}
   try{if(kind==='access')await accessSubmit(data);else{await financeSubmit(kind,data);notice='Saved online to TEST Firebase.';render()}}
-  catch(e){alert('Not saved: '+errText(e));if(btn)btn.disabled=false}return;
+  catch(e){alert('Not saved: '+errText(e))}
+  finally{if(kind==='access')mba755AccessSaving=false;if(btn?.isConnected){btn.disabled=false;btn.textContent=originalLabel;}}return;
  }
  if(!allowedToEdit()){alert('Viewer is read-only.');return}
  op(()=>{
@@ -7172,7 +7194,7 @@ tournamentView=function(t){
  return bar+html;
 };
 
-/* MBA V7.5.4 TEST */
+/* MBA V7.5.5 TEST */
 let mbaV751Focus=false;
 function mbaV751Fee(t,c){
  if(!t||!c)return null;
