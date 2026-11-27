@@ -99,3 +99,8 @@ Freeze approved TEST → complete P0 verification → prepare Production-targete
 - Owner provided Cloud Shell screenshot showing all nine listed SHA256 file checks OK, original TEST rules comparison passed, PUT returned status ok, and readback equality check completed with `SUCCESS: V7.6 TEST Rules Published and Verified`.
 - TEST rules only were updated; timestamped TEST rules rollback backup created by command. No production rules or application changes made in this step.
 - Next: real TEST app regression with a disposable test tournament, including super/admin/scorer/viewer roles, contact permission grant/revoke, registration/fees and collector, scoring/live/final, score edit/delete. Production release remains gated on these results.
+
+### Live TEST browser evidence — 27 November 2026
+- Owner screenshots show eight existing TEST tournaments visible after new rules publication; existing tournament `Test new1` displays saved 21–0 result, correct winner card, Share completed message, and downloaded PNG opened in Windows Photos (1080 × 1095, 461.6 KB).
+- Registration card for `Test new1` displays two entrants, mobile number (not reproduced here), INR 500 fee and receipt, INR 0 balance, PAID, collector Askar. Contact/payment include checkboxes visible and checked. Actual opt-out export and non-super authorization not yet verified.
+- No evidence of creation of a separate new tournament. Desktop workflow evidence only; actual Android sharing and delegated scorer/registration/mobile read-revoke checks pending. Production unchanged.
