@@ -94,3 +94,8 @@ Freeze approved TEST → complete P0 verification → prepare Production-targete
 - Owner supplied Cloud Shell screenshot at 20:09 IST (terminal 14:39 UTC). Production candidate explicitly reports 40 assertions passed; overall sequential TEST + Production verification script reports EMULATOR CHECKS PASSED and exit code 0. TEST count inferred from the shared 40-assertion loop, not separately visible in screenshot.
 - Synthetic rules-engine verification passed. No live Firebase rules or Production code published by this step.
 - Next gate: compare currently deployed TEST rules with original TEST backup; preserve a fresh rollback copy, publish only verified TEST candidate, then validate actual app role/scoring/registration/finance workflows. Production remains unchanged pending live TEST regression and release approval.
+
+### TEST rules published — 27 November 2026
+- Owner provided Cloud Shell screenshot showing all nine listed SHA256 file checks OK, original TEST rules comparison passed, PUT returned status ok, and readback equality check completed with `SUCCESS: V7.6 TEST Rules Published and Verified`.
+- TEST rules only were updated; timestamped TEST rules rollback backup created by command. No production rules or application changes made in this step.
+- Next: real TEST app regression with a disposable test tournament, including super/admin/scorer/viewer roles, contact permission grant/revoke, registration/fees and collector, scoring/live/final, score edit/delete. Production release remains gated on these results.
